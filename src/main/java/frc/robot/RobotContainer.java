@@ -5,9 +5,11 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
-import frc.robot.autos.*;
+// import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 
@@ -20,18 +22,16 @@ import frc.robot.subsystems.*;
 public class RobotContainer {
     /* Controllers */
     private final Joystick driver = new Joystick(0);
-
-    /* Drive Controls */
-    private final int translationAxis = XboxController.Axis.kLeftY.value;
-    private final int strafeAxis = XboxController.Axis.kLeftX.value;
-    private final int rotationAxis = XboxController.Axis.kRightX.value;
+    private final Joystick secondary = new Joystick(1);
 
     /* Driver Buttons */
-    private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
-    private final JoystickButton robotCentric = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
+    private final JoystickButton shoot = new JoystickButton(driver, 1);
+    private final JoystickButton zeroGyro = new JoystickButton(driver, 2);
+    private final JoystickButton regurgitate = new JoystickButton(secondary, 3);
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
+    private final Shooter s_Shooter = new Shooter();
 
     private final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve);
 
@@ -40,10 +40,10 @@ public class RobotContainer {
         s_Swerve.setDefaultCommand(
             new TeleopSwerve(
                 s_Swerve, 
-                () -> -driver.getRawAxis(translationAxis), 
-                () -> -driver.getRawAxis(strafeAxis), 
-                () -> -driver.getRawAxis(rotationAxis), 
-                () -> robotCentric.getAsBoolean()
+                () -> -driver.getY(), 
+                () -> -driver.getZ(), 
+                () -> -driver.getTwist(), 
+                () -> true//robotCentric.getAsBoolean()
             )
         );
 
@@ -60,6 +60,18 @@ public class RobotContainer {
     private void configureButtonBindings() {
         /* Driver Buttons */
         zeroGyro.onTrue(new InstantCommand(() -> kinesthetics.zeroHeading()));
+        shoot.debounce(0.3).and(() -> ShooterAutoAim.isInRange(kinesthetics))
+            .whileTrue(new SequentialCommandGroup(
+                new InstantCommand(() -> s_Shooter.setNeck(true, false), s_Shooter),
+                new ShooterAutoAim(kinesthetics, s_Swerve, s_Shooter),
+                new InstantCommand(() -> s_Shooter.setNeck(false, true))
+            )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(true, true), s_Shooter));
+        regurgitate
+            .whileTrue(new SequentialCommandGroup(
+                new ShooterManualAim(s_Shooter, secondary::getY),
+                new InstantCommand(() -> s_Shooter.setGoalSpin(Constants.CommandConstants.regurgitateSpeed), s_Shooter),
+                new InstantCommand(() -> s_Shooter.setNeck(false, true), s_Shooter)
+            ));
     }
 
     /**
@@ -69,6 +81,7 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         // An ExampleCommand will run in autonomous
-        return new exampleAuto(s_Swerve);
+        // return new exampleAuto(s_Swerve);
+        return new WaitCommand(5);
     }
 }

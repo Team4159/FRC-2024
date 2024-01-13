@@ -32,11 +32,12 @@ public final class Constants {
 
         /* Swerve Kinematics 
          * No need to ever change this unless you are not doing a traditional rectangular/square 4 module swerve */
-         public static final SwerveDriveKinematics swerveKinematics = new SwerveDriveKinematics(
+        public static final SwerveDriveKinematics swerveKinematics = new SwerveDriveKinematics(
             new Translation2d(wheelBase / 2.0, trackWidth / 2.0),
             new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
             new Translation2d(-wheelBase / 2.0, trackWidth / 2.0),
             new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0));
+        public static final double yawTolerance = Math.PI/256; // Radians
 
         /* Module Gear Ratios */
         public static final double driveGearRatio = chosenModule.driveGearRatio;
@@ -134,8 +135,24 @@ public final class Constants {
     }
 
     public static final class Shooter {
-        public static final int[] angleMotorIDs = {};
+        public static final int[] angleMotorIDs = {5, 6};
+        public static final int shooterMLeftID = 7;
+        public static final int shooterMRightID = 8;
+        public static final int neckMotorID = 9;
+
         public static final double pitchTolerance = Math.PI/512;
+
+        public static final double neckSpeed = 0.3; // -1 to 1
+    }
+
+    public static final class Intake {
+        public static final int[] angleMotorIDs = {1, 2};
+        public static final int intakeMotorID = 3;
+        public static final int feederMotorID = 4;
+
+        public static final double pitchTolerance = Math.PI/64;
+
+        public static final double intakeSpeed = 0.6;
     }
 
     public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot
@@ -154,9 +171,11 @@ public final class Constants {
                 kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
     }
 
+    public static final class CommandConstants {
+        public static final double regurgitateSpeed = 3; // radians per second
+    }
+
     public static final class Field {
         public static final Map<Alliance, Pose3d> speakers = Map.of(Alliance.Red, new Pose3d(), Alliance.Blue, new Pose3d());
-
-        // we can shoot from ~2 meters from the subwoofer shooting straight
     }
 }

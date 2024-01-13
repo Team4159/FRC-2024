@@ -4,9 +4,8 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Vision extends SubsystemBase {
+public class Vision {
     private static final NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
 
     public static Pose3d getVisionPose() {

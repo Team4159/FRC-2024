@@ -1,27 +1,31 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.CANSparkFlex;
+import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 
-public class Shooter extends SubsystemBase {
-    private Kinesthetics kinesthetics;
-    
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+
+public class Shooter extends SubsystemBase {    
     private TalonFX angleMotorController;
     private MotionMagicDutyCycle angleDutyCycle;
 
-    private CANSparkFlex shooterMotorController;
+    private CANSparkFlex shooterMLeftController, shooterMRightController;
+
+    private CANSparkMax neckMotorController;
     
-    public Shooter(Kinesthetics k) {
-        kinesthetics = k;
+    public Shooter() {
         angleMotorController = new TalonFX(Constants.Shooter.angleMotorIDs[0]);
         for (int n = 1; n < Constants.Shooter.angleMotorIDs.length; n++)
             new TalonFX(Constants.Shooter.angleMotorIDs[n]).setControl(new Follower(Constants.Shooter.angleMotorIDs[0], false));
+        shooterMLeftController = new CANSparkFlex(Constants.Shooter.shooterMLeftID, CANSparkLowLevel.MotorType.kBrushless);
+        shooterMRightController =new CANSparkFlex(Constants.Shooter.shooterMRightID,CANSparkLowLevel.MotorType.kBrushless);
+        shooterMRightController.follow(shooterMLeftController, true); // for now, no spin.
+        neckMotorController = new CANSparkMax(Constants.Shooter.neckMotorID, CANSparkLowLevel.MotorType.kBrushless);
     }
 
     public double getPitch() {
@@ -33,10 +37,18 @@ public class Shooter extends SubsystemBase {
     }
 
     public double getSpin() {
-        return shooterMotorController.getEncoder().getVelocity() * Math.PI / 30;
+        return shooterMLeftController.getEncoder().getVelocity() * Math.PI / 30;
     }
 
     public void setGoalSpin(double goalRadiansPerSecond) { // TODO: figure out how to get radians per sec from m/s
-        shooterMotorController.getPIDController().setReference(goalRadiansPerSecond * 30/Math.PI, CANSparkMax.ControlType.kVelocity);
+        shooterMLeftController.getPIDController().setReference(goalRadiansPerSecond * 30/Math.PI, CANSparkMax.ControlType.kVelocity);
+    }
+
+    public void stopSpin() {
+        shooterMLeftController.stopMotor();
+    }
+
+    public void setNeck(boolean stop, boolean isForwards) {
+        neckMotorController.set((stop ? 0 : isForwards ? 1 : -1) * Constants.Shooter.neckSpeed);
     }
 }
