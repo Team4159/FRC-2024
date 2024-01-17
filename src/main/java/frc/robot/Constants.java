@@ -6,6 +6,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -22,12 +23,12 @@ public final class Constants {
     public static final class Swerve {
         public static final int pigeonID = 1;
 
-        public static final COTSTalonFXSwerveConstants chosenModule =  //TODO: This must be tuned to specific robot
-        COTSTalonFXSwerveConstants.SDS.MK4i.Falcon500(COTSTalonFXSwerveConstants.SDS.MK4i.driveRatios.L3);
+        public static final COTSTalonFXSwerveConstants chosenModule =
+            COTSTalonFXSwerveConstants.SDS.MK4i.KrakenX60(COTSTalonFXSwerveConstants.SDS.MK4i.driveRatios.L3);
 
         /* Drivetrain Constants */
-        public static final double trackWidth = Units.inchesToMeters(21.75); //TODO: This must be tuned to specific robot
-        public static final double wheelBase = Units.inchesToMeters(21.75); //TODO: This must be tuned to specific robot
+        public static final double trackWidth = Units.inchesToMeters(21.75);
+        public static final double wheelBase = Units.inchesToMeters(21.75);
         public static final double wheelCircumference = chosenModule.wheelCircumference;
 
         /* Swerve Kinematics 
@@ -141,7 +142,9 @@ public final class Constants {
         public static final int neckMotorID = 9;
 
         public static final double pitchTolerance = Math.PI/512;
+        public static final double spinTolerance = Math.PI/256;
 
+        public static final double restingPitch = 0;
         public static final double neckSpeed = 0.3; // -1 to 1
     }
 
@@ -171,11 +174,16 @@ public final class Constants {
                 kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
     }
 
-    public static final class CommandConstants {
+    public static final class CommandConstants { // TODO: This must be tuned to specific robot
         public static final double regurgitateSpeed = 3; // radians per second
+
+        public static final double ampShooterAngle = Units.degreesToRadians(75);
+        public static final double ampShooterSpin = 12;
+        public static final double ampAutoDistanceToStartSpinning = 1; // meters
     }
 
-    public static final class Field {
+    public static final class Field { // TODO: fill in information
         public static final Map<Alliance, Pose3d> speakers = Map.of(Alliance.Red, new Pose3d(), Alliance.Blue, new Pose3d());
+        public static final Map<Alliance, Pose2d> amps = Map.of(Alliance.Red, new Pose2d(), Alliance.Blue, new Pose2d());
     }
 }

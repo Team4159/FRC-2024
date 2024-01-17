@@ -1,16 +1,21 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
 // import frc.robot.autos.*;
-import frc.robot.commands.*;
+import frc.robot.commands.ShooterManualAim;
+import frc.robot.commands.ShooterManualSpin;
+import frc.robot.commands.TeleopSwerve;
+import frc.robot.commands.groups.AmpAuto;
+import frc.robot.commands.groups.SpeakerAutoAim;
 import frc.robot.subsystems.*;
 
 /**
@@ -25,8 +30,9 @@ public class RobotContainer {
     private final Joystick secondary = new Joystick(1);
 
     /* Driver Buttons */
-    private final JoystickButton shoot = new JoystickButton(driver, 1);
-    private final JoystickButton zeroGyro = new JoystickButton(driver, 2);
+    private final JoystickButton autoSpk = new JoystickButton(driver, 1);
+    private final JoystickButton autoAmp = new JoystickButton(driver, 2);
+    private final JoystickButton zeroGyro = new JoystickButton(driver, 3);
     private final JoystickButton regurgitate = new JoystickButton(secondary, 3);
 
     /* Subsystems */
@@ -60,18 +66,24 @@ public class RobotContainer {
     private void configureButtonBindings() {
         /* Driver Buttons */
         zeroGyro.onTrue(new InstantCommand(() -> kinesthetics.zeroHeading()));
-        shoot.debounce(0.3).and(() -> ShooterAutoAim.isInRange(kinesthetics))
+        autoSpk.debounce(0.3).and(kinesthetics::hasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
             .whileTrue(new SequentialCommandGroup(
                 new InstantCommand(() -> s_Shooter.setNeck(true, false), s_Shooter),
-                new ShooterAutoAim(kinesthetics, s_Swerve, s_Shooter),
+                new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter),
                 new InstantCommand(() -> s_Shooter.setNeck(false, true))
             )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(true, true), s_Shooter));
-        regurgitate
+        autoAmp.debounce(0.3).and(kinesthetics::hasNote)
             .whileTrue(new SequentialCommandGroup(
-                new ShooterManualAim(s_Shooter, secondary::getY),
-                new InstantCommand(() -> s_Shooter.setGoalSpin(Constants.CommandConstants.regurgitateSpeed), s_Shooter),
-                new InstantCommand(() -> s_Shooter.setNeck(false, true), s_Shooter)
-            ));
+                new InstantCommand(() -> s_Shooter.setNeck(true, false), s_Shooter),
+                new AmpAuto(kinesthetics, s_Swerve, s_Shooter),
+                new InstantCommand(() -> s_Shooter.setNeck(false, true))
+            )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(true, true), s_Shooter));
+        regurgitate // does not check if kinesthetics has note- because this should also work when kinesthetics fails
+            .whileTrue(new ParallelCommandGroup(
+                    new ShooterManualAim(s_Shooter, secondary::getY),
+                    new ShooterManualSpin(s_Shooter, () -> Constants.CommandConstants.regurgitateSpeed)
+                ).andThen(new InstantCommand(() -> s_Shooter.setNeck(false, true), s_Shooter))
+            ).onFalse(new InstantCommand(() -> s_Shooter.setNeck(true, true), s_Shooter));
     }
 
     /**
@@ -80,8 +92,8 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        // An ExampleCommand will run in autonomous
-        // return new exampleAuto(s_Swerve);
-        return new WaitCommand(5);
+        return new SequentialCommandGroup(
+            Commands.runOnce(() -> kinesthetics.setPose(new Pose2d()))
+        ); // add auto here
     }
 }

@@ -15,10 +15,11 @@ public class Kinesthetics extends SubsystemBase {
     private Swerve s_Swerve;
 
     // Sensor Information
-    public Pigeon2 gyro;
+    private Pigeon2 gyro;
 
     // Data Fields
     private DriverStation.Alliance alliance;
+    private boolean rotationLock = false;
     private SwerveDrivePoseEstimator poseEstimator;
 
     public Kinesthetics(Swerve s) {
@@ -47,6 +48,18 @@ public class Kinesthetics extends SubsystemBase {
     // Public Getters & Setters
     public DriverStation.Alliance getAlliance() {
         return alliance;
+    }
+
+    public boolean hasNote() {
+        return true;
+    }
+
+    public boolean isRotationLocked() {
+        return rotationLock;
+    }
+
+    public void lockRotation(boolean lock) {
+        rotationLock = lock;
     }
 
     public Pose2d getPose() {

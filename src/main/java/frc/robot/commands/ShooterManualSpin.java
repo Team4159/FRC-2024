@@ -6,29 +6,29 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.Shooter;
 
-public class ShooterManualAim extends Command {
+public class ShooterManualSpin extends Command {
     private Shooter s_Shooter;
-    private DoubleSupplier desiredPitch;
+    private DoubleSupplier desiredSpin;
     
-    public ShooterManualAim(Shooter s, DoubleSupplier pitchSupplier) {
+    public ShooterManualSpin(Shooter s, DoubleSupplier spinSupplier) {
         s_Shooter = s;
         addRequirements(s_Shooter);
-        desiredPitch = pitchSupplier;
+        desiredSpin = spinSupplier;
     }
 
     @Override
     public void execute() {
-        s_Shooter.setGoalPitch(desiredPitch.getAsDouble());
+        s_Shooter.setGoalSpin(desiredSpin.getAsDouble());
     }
 
     @Override
     public boolean isFinished() {
-        return Math.abs(s_Shooter.getPitch() - desiredPitch.getAsDouble()) < Constants.Shooter.pitchTolerance;
+        return Math.abs(s_Shooter.getSpin() - desiredSpin.getAsDouble()) < Constants.Shooter.spinTolerance;
     }
 
     @Override
     public void end(boolean interrupted) {
-        if (interrupted) s_Shooter.setGoalPitch(Constants.Shooter.restingPitch);
+        if (interrupted) s_Shooter.stopSpin();
         super.end(interrupted);
     }
 }
