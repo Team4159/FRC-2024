@@ -17,7 +17,8 @@ public class Kinesthetics extends SubsystemBase {
 
     // Sensor Information
     private Pigeon2 gyro;
-    private DigitalInput beamBreak;
+    private DigitalInput feederBeamBreak;
+    private DigitalInput shooterBeamBreak;
 
     // Data Fields
     private DriverStation.Alliance alliance;
@@ -31,7 +32,8 @@ public class Kinesthetics extends SubsystemBase {
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.setYaw(0);
 
-        beamBreak = new DigitalInput(Constants.Intake.beamBreakID);
+        feederBeamBreak = new DigitalInput(Constants.Intake.beamBreakID);
+        shooterBeamBreak = new DigitalInput(Constants.Shooter.beamBreakID);
 
         alliance = DriverStation.getAlliance().orElse(null);
         poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d());
@@ -53,8 +55,12 @@ public class Kinesthetics extends SubsystemBase {
         return alliance;
     }
 
-    public boolean hasNote() {
-        return beamBreak.get();
+    public boolean feederHasNote() {
+        return feederBeamBreak.get();
+    }
+
+    public boolean shooterHasNote() {
+        return shooterBeamBreak.get();
     }
 
     public Pose2d getPose() {

@@ -141,9 +141,11 @@ public final class Constants {
         public static final int shooterMLeftID = 7;
         public static final int shooterMRightID = 8;
         public static final int neckMotorID = 9;
+        public static final int beamBreakID = 1; // PWM
 
         public static final double pitchTolerance = Math.PI/512;
         public static final double spinTolerance = Math.PI/256;
+        public static final double restingPitchTolerance = Math.PI/16;
 
         public static final double restingPitch = 0;
         public static final double neckSpeed = 0.3; // -1 to 1

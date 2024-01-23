@@ -11,11 +11,8 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 // import frc.robot.autos.*;
-import frc.robot.commands.ShooterManualAim;
-import frc.robot.commands.ShooterManualSpin;
-import frc.robot.commands.ManualSwerve;
-import frc.robot.commands.groups.AmpAuto;
-import frc.robot.commands.groups.SpeakerAutoAim;
+import frc.robot.commands.*;
+import frc.robot.commands.groups.*;
 import frc.robot.subsystems.*;
 
 /**
@@ -66,13 +63,13 @@ public class RobotContainer {
     private void configureButtonBindings() {
         /* Driver Buttons */
         zeroGyro.onTrue(new InstantCommand(() -> kinesthetics.zeroHeading()));
-        autoSpk.debounce(0.3).and(kinesthetics::hasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
+        autoSpk.debounce(0.3).and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
             .whileTrue(new SequentialCommandGroup(
                 new InstantCommand(() -> s_Shooter.setNeck(true, false), s_Shooter),
                 new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()),
                 new InstantCommand(() -> s_Shooter.setNeck(false, true))
             )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(true, true), s_Shooter));
-        autoAmp.debounce(0.3).and(kinesthetics::hasNote)
+        autoAmp.debounce(0.3).and(kinesthetics::shooterHasNote)
             .whileTrue(new SequentialCommandGroup(
                 new InstantCommand(() -> s_Shooter.setNeck(true, false), s_Shooter),
                 new AmpAuto(kinesthetics, s_Swerve, s_Shooter),
