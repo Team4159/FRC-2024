@@ -1,5 +1,8 @@
 package frc.robot.commands.groups;
 
+import java.util.function.DoubleSupplier;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -12,15 +15,20 @@ import frc.robot.subsystems.Swerve;
 public class SpeakerAutoAim extends Command {
     private Kinesthetics kinesthetics;
     private Swerve s_Swerve;
-    private double desiredYaw;
     private Shooter s_Shooter;
+
+    private DoubleSupplier desiredTranslation;
+    private DoubleSupplier desiredStrafe;
+    private double desiredYaw;
     private double desiredPitch;
     private double desiredSpin; // radians/second
 
-    public SpeakerAutoAim(Kinesthetics k, Swerve sw, Shooter sh) { // TODO: needs to accept translation args to continue moving
+    public SpeakerAutoAim(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup) { // TODO: needs to accept translation args to continue moving
         kinesthetics = k;
         s_Swerve = sw;
         s_Shooter = sh;
+        desiredTranslation = translationSup;
+        desiredStrafe = strafeSup;
         addRequirements(kinesthetics, s_Swerve, s_Shooter);
     }
 
@@ -30,12 +38,18 @@ public class SpeakerAutoAim extends Command {
 
     @Override
     public void execute() {
+        double translationVal = MathUtil.applyDeadband(desiredTranslation.getAsDouble(), Constants.stickDeadband);
+        double strafeVal = MathUtil.applyDeadband(desiredStrafe.getAsDouble(), Constants.stickDeadband);
+
         Transform3d transform = getDifference(kinesthetics);
         desiredPitch = transform.getRotation().getY() + 0; // TODO: Calculate ascension for shooting arc
         desiredYaw = transform.getRotation().getZ() + 0; // TODO: Calculate angle offset to account for velocity and anglular velocity
         desiredSpin = 10; // TODO: Calculate firing velocity
-        kinesthetics.lockRotation(true);
-        s_Swerve.drive(new Translation2d(), desiredYaw, true, false);
+
+        s_Swerve.drive(
+            new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed),
+            desiredYaw, true, false
+        );
         s_Shooter.setGoalPitch(desiredPitch);
         s_Shooter.setGoalSpin(desiredSpin);
     }
@@ -49,7 +63,6 @@ public class SpeakerAutoAim extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        kinesthetics.lockRotation(false);
         if (interrupted) {
             s_Shooter.setGoalPitch(Constants.Shooter.restingPitch);
             s_Shooter.stopSpin();

@@ -14,7 +14,7 @@ public class AmpAuto extends ParallelCommandGroup {
     public AmpAuto(Kinesthetics k, Swerve sw, Shooter sh) {
         var desiredPose = Constants.Field.amps.get(k.getAlliance());
         addCommands(
-            new AutoSwerve(sw, desiredPose),
+            new AutoSwerve(k, sw, desiredPose),
             new ParallelCommandGroup(
                 new ShooterManualAim(sh, () -> Constants.CommandConstants.ampShooterAngle),
                 new WaitUntilCommand(() ->

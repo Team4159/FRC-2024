@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 // import frc.robot.autos.*;
 import frc.robot.commands.ShooterManualAim;
 import frc.robot.commands.ShooterManualSpin;
-import frc.robot.commands.TeleopSwerve;
+import frc.robot.commands.ManualSwerve;
 import frc.robot.commands.groups.AmpAuto;
 import frc.robot.commands.groups.SpeakerAutoAim;
 import frc.robot.subsystems.*;
@@ -44,10 +44,10 @@ public class RobotContainer {
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         s_Swerve.setDefaultCommand(
-            new TeleopSwerve(
+            new ManualSwerve(
                 s_Swerve, 
                 () -> -driver.getY(), 
-                () -> -driver.getZ(), 
+                () -> -driver.getX(), 
                 () -> -driver.getTwist(), 
                 () -> true//robotCentric.getAsBoolean()
             )
@@ -69,7 +69,7 @@ public class RobotContainer {
         autoSpk.debounce(0.3).and(kinesthetics::hasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
             .whileTrue(new SequentialCommandGroup(
                 new InstantCommand(() -> s_Shooter.setNeck(true, false), s_Shooter),
-                new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter),
+                new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()),
                 new InstantCommand(() -> s_Shooter.setNeck(false, true))
             )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(true, true), s_Shooter));
         autoAmp.debounce(0.3).and(kinesthetics::hasNote)

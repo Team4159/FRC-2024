@@ -21,6 +21,7 @@ public final class Constants {
     public static final double stickDeadband = 0.1;
 
     public static final class Swerve {
+        public static final String canBus = "Drivetrain";
         public static final int pigeonID = 1;
 
         public static final COTSTalonFXSwerveConstants chosenModule =
@@ -152,6 +153,7 @@ public final class Constants {
         public static final int[] angleMotorIDs = {1, 2};
         public static final int intakeMotorID = 3;
         public static final int feederMotorID = 4;
+        public static final int beamBreakID = 0; // PWM
 
         public static final double pitchTolerance = Math.PI/64;
 
