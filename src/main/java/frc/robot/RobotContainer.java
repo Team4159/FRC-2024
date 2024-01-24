@@ -35,6 +35,8 @@ public class RobotContainer {
     private final JoystickButton zeroGyro = new JoystickButton(driver, 3);
     private final JoystickButton regurgitate = new JoystickButton(secondary, 3);
 
+    private final JoystickButton intake = new JoystickButton(secondary, 4);
+
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
     private final Shooter s_Shooter = new Shooter();

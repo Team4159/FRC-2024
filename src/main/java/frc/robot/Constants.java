@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.util.COTSTalonFXSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
@@ -149,14 +150,26 @@ public final class Constants {
     }
 
     public static final class Intake {
-        public static final int[] angleMotorIDs = {1, 2};
-        public static final int intakeMotorID = 3;
-        public static final int feederMotorID = 4;
+        public static final int angleMotorID = 1;
+        public static final int intakeMotorID = 2;
+        public static final int feederMotorID = 3;
 
         public static final double pitchTolerance = Math.PI/64;
 
         public static final double intakeSpeed = 0.6;
-    }
+
+        public static enum IntakeState {
+            INITIAL(0),
+            DOWN(0), //intaking setpoint, TODO
+            STOW(0), // stowed setpoint, TODO
+            OFF(-1);
+            
+            public final double setpoint;
+            IntakeState(double setpoint) {
+                this.setpoint = setpoint;
+            }
+        }
+    } 
 
     public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot
         public static final double kMaxSpeedMetersPerSecond = 3;
