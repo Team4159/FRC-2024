@@ -22,6 +22,7 @@ public final class Constants {
     public static final double stickDeadband = 0.1;
 
     public static final class Swerve {
+        public static final String canBus = "Drivetrain";
         public static final int pigeonID = 1;
 
         public static final COTSTalonFXSwerveConstants chosenModule =
@@ -141,18 +142,27 @@ public final class Constants {
         public static final int shooterMLeftID = 7;
         public static final int shooterMRightID = 8;
         public static final int neckMotorID = 9;
+        public static final int beamBreakID = 1; // PWM
 
         public static final double pitchTolerance = Math.PI/512;
         public static final double spinTolerance = Math.PI/256;
+        public static final double restingPitchTolerance = Math.PI/16;
 
         public static final double restingPitch = 0;
         public static final double neckSpeed = 0.3; // -1 to 1
     }
 
     public static final class Intake {
+<<<<<<< HEAD
         public static final int angleMotorID = 1;
         public static final int intakeMotorID = 2;
         public static final int feederMotorID = 3;
+=======
+        public static final int[] angleMotorIDs = {1, 2};
+        public static final int intakeMotorID = 3;
+        public static final int feederMotorID = 4;
+        public static final int beamBreakID = 0; // PWM
+>>>>>>> b15f1f960b0d1031fc8327318bcadfc4cd9b7596
 
         public static final double pitchTolerance = Math.PI/64;
 
