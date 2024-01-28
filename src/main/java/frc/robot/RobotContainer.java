@@ -30,13 +30,14 @@ public class RobotContainer {
     private final JoystickButton autoSpk = new JoystickButton(driver, 1);
     private final JoystickButton autoAmp = new JoystickButton(driver, 2);
     private final JoystickButton zeroGyro = new JoystickButton(driver, 3);
-    private final JoystickButton regurgitate = new JoystickButton(secondary, 3);
-
-    private final JoystickButton intake = new JoystickButton(secondary, 4);
+    private final JoystickButton autoIntake = new JoystickButton(secondary, 2);
+    private final JoystickButton manualRegurgitate = new JoystickButton(secondary, 3);
+    private final JoystickButton manualShoot = new JoystickButton(secondary, 4);
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
     private final Shooter s_Shooter = new Shooter();
+    private final Intake s_Intake = new Intake();
 
     private final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve);
 
@@ -77,10 +78,18 @@ public class RobotContainer {
                 new AmpAuto(kinesthetics, s_Swerve, s_Shooter),
                 new InstantCommand(() -> s_Shooter.setNeck(false, true))
             )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(true, true), s_Shooter));
-        regurgitate // does not check if kinesthetics has note- because this should also work when kinesthetics fails
+        autoIntake.debounce(0.3).and(() -> !kinesthetics.shooterHasNote() && !kinesthetics.feederHasNote())
+            .and(() -> IntakeAuto.isInRange(kinesthetics))
+            .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Intake));
+        manualRegurgitate
+            .whileTrue(new SequentialCommandGroup(
+                s_Intake.new ChangeState(Constants.Intake.IntakeState.DOWN),                   
+                new InstantCommand(() -> s_Intake.setSpin(true))
+            ));
+        manualShoot // does not check if kinesthetics has note- because this should also work when kinesthetics fails
             .whileTrue(new ParallelCommandGroup(
-                    new ShooterManualAim(s_Shooter, secondary::getY),
-                    new ShooterManualSpin(s_Shooter, () -> Constants.CommandConstants.regurgitateSpeed)
+                    s_Shooter.new ChangeAim(secondary::getY),
+                    s_Shooter.new ChangeSpin(() -> Constants.CommandConstants.regurgitateSpeed)
                 ).andThen(new InstantCommand(() -> s_Shooter.setNeck(false, true), s_Shooter))
             ).onFalse(new InstantCommand(() -> s_Shooter.setNeck(true, true), s_Shooter));
     }

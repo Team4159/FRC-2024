@@ -13,7 +13,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.util.COTSTalonFXSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
@@ -153,20 +152,14 @@ public final class Constants {
     }
 
     public static final class Intake {
-<<<<<<< HEAD
         public static final int angleMotorID = 1;
-        public static final int intakeMotorID = 2;
-        public static final int feederMotorID = 3;
-=======
-        public static final int[] angleMotorIDs = {1, 2};
         public static final int intakeMotorID = 3;
         public static final int feederMotorID = 4;
         public static final int beamBreakID = 0; // PWM
->>>>>>> b15f1f960b0d1031fc8327318bcadfc4cd9b7596
 
         public static final double pitchTolerance = Math.PI/64;
 
-        public static final double intakeSpeed = 0.6;
+        public static final double intakeSpeed = 0.6; // -1 to 1
 
         public static enum IntakeState {
             INITIAL(0),
