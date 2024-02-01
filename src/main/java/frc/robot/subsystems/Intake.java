@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.SpinState;
 
 public class Intake extends SubsystemBase {
     private CANSparkFlex angleMotorController;
@@ -30,8 +31,8 @@ public class Intake extends SubsystemBase {
         return intakeMotorController.getEncoder().getVelocity();
     }
 
-    public void setSpin(boolean reversed) {
-        intakeMotorController.set((reversed ? -1 : 1) * Constants.Intake.intakeSpeed);
+    public void setSpin(SpinState ss) {
+        intakeMotorController.set(ss.multiplier * Constants.Intake.intakeSpeed);
     }
 
     public class ChangeState extends Command {
@@ -44,18 +45,21 @@ public class Intake extends SubsystemBase {
 
         @Override
         public void initialize() {
-            setGoalPitch(desiredState.setpoint);
+            setGoalPitch(desiredState.pitch);
+            setSpin(desiredState.spin);
             super.initialize();
         }
 
         @Override
         public boolean isFinished() {
-            return Math.abs(getPitch() - desiredState.setpoint) < Constants.Intake.pitchTolerance;
+            return Math.abs(getPitch() - desiredState.pitch) < Constants.Intake.pitchTolerance &&
+                Math.abs(getSpin() - desiredState.spin.multiplier * Constants.Intake.intakeSpeed) < Constants.Intake.spinTolerance;
         }
 
         @Override
         public void end(boolean interrupted) {
-            if (interrupted) setGoalPitch(Constants.Intake.IntakeState.STOW.setpoint);
+            if (interrupted) setGoalPitch(Constants.Intake.IntakeState.STOW.pitch);
+            setSpin(SpinState.ST);
             super.end(interrupted);
         }
     }

@@ -12,6 +12,7 @@ import com.revrobotics.CANSparkMax;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.SpinState;
 
 public class Shooter extends SubsystemBase {    
     private TalonFX angleMotorController;
@@ -51,8 +52,8 @@ public class Shooter extends SubsystemBase {
         shooterMLeftController.stopMotor();
     }
 
-    public void setNeck(boolean stop, boolean isForwards) {
-        neckMotorController.set((stop ? 0 : isForwards ? 1 : -1) * Constants.Shooter.neckSpeed);
+    public void setNeck(SpinState ss) {
+        neckMotorController.set(ss.multiplier * Constants.Shooter.neckSpeed);
     }
 
     public class ChangeAim extends Command {

@@ -158,18 +158,21 @@ public final class Constants {
         public static final int beamBreakID = 0; // PWM
 
         public static final double pitchTolerance = Math.PI/64;
+        public static final double spinTolerance = Math.PI/16;
 
         public static final double intakeSpeed = 0.6; // -1 to 1
 
         public static enum IntakeState {
-            INITIAL(0),
-            DOWN(0), //intaking setpoint, TODO
-            STOW(0), // stowed setpoint, TODO
-            OFF(-1);
+            STOW(0, SpinState.ST), // starting pos & when moving
+            DOWN(0, SpinState.FW), // intaking
+            HANDOFF(0,SpinState.BW), // handing off (duh)
+            OFF(-1, SpinState.ST);
             
-            public final double setpoint;
-            IntakeState(double setpoint) {
-                this.setpoint = setpoint;
+            public final double pitch;
+            public final SpinState spin;
+            private IntakeState(double p, SpinState s) {
+                this.pitch = p;
+                this.spin = s;
             }
         }
     } 
@@ -191,15 +194,25 @@ public final class Constants {
     }
 
     public static final class CommandConstants { // TODO: This must be tuned to specific robot
-        public static final double regurgitateSpeed = 3; // radians per second
+        public static final double manualShooterSpin = 3; // radians per second
 
         public static final double ampShooterAngle = Units.degreesToRadians(75);
         public static final double ampShooterSpin = 12;
         public static final double ampAutoDistanceToStartSpinning = 1; // meters
+
+        public static final double shooterHandoffAngle = Units.degreesToRadians(45);
     }
 
     public static final class Field { // TODO: fill in information
         public static final Map<Alliance, Pose3d> speakers = Map.of(Alliance.Red, new Pose3d(), Alliance.Blue, new Pose3d());
         public static final Map<Alliance, Pose2d> amps = Map.of(Alliance.Red, new Pose2d(), Alliance.Blue, new Pose2d());
+    }
+
+    public static enum SpinState {
+        FW(1), ST(0), BW(-1);
+        public final int multiplier;
+        private SpinState(int mult) {
+            multiplier = mult;
+        }
     }
 }

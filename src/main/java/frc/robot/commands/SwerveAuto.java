@@ -15,8 +15,8 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.Kinesthetics;
 import frc.robot.subsystems.Swerve;
 
-public class AutoSwerve extends SequentialCommandGroup {
-    public AutoSwerve(Kinesthetics kinesthetics, Swerve s_Swerve, Pose2d destination){
+public class SwerveAuto extends SequentialCommandGroup {
+    public SwerveAuto(Kinesthetics kinesthetics, Swerve s_Swerve, Pose2d destination){
         // TrajectoryConfig config =
         //     new TrajectoryConfig(
         //             Constants.AutoConstants.kMaxSpeedMetersPerSecond,

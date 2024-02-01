@@ -10,9 +10,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Constants.SpinState;
 // import frc.robot.autos.*;
 import frc.robot.commands.*;
-import frc.robot.commands.groups.*;
 import frc.robot.subsystems.*;
 
 /**
@@ -44,7 +44,7 @@ public class RobotContainer {
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         s_Swerve.setDefaultCommand(
-            new ManualSwerve(
+            new SwerveManual(
                 s_Swerve, 
                 () -> -driver.getY(), 
                 () -> -driver.getX(), 
@@ -68,30 +68,33 @@ public class RobotContainer {
         zeroGyro.onTrue(new InstantCommand(() -> kinesthetics.zeroHeading()));
         autoSpk.debounce(0.3).and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
             .whileTrue(new SequentialCommandGroup(
-                new InstantCommand(() -> s_Shooter.setNeck(true, false), s_Shooter),
+                new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter),
                 new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()),
-                new InstantCommand(() -> s_Shooter.setNeck(false, true))
-            )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(true, true), s_Shooter));
+                new InstantCommand(() -> s_Shooter.setNeck(SpinState.FW))
+            )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter));
         autoAmp.debounce(0.3).and(kinesthetics::shooterHasNote)
             .whileTrue(new SequentialCommandGroup(
-                new InstantCommand(() -> s_Shooter.setNeck(true, false), s_Shooter),
+                new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter),
                 new AmpAuto(kinesthetics, s_Swerve, s_Shooter),
-                new InstantCommand(() -> s_Shooter.setNeck(false, true))
-            )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(true, true), s_Shooter));
+                new InstantCommand(() -> s_Shooter.setNeck(SpinState.FW))
+            )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter));
         autoIntake.debounce(0.3).and(() -> !kinesthetics.shooterHasNote() && !kinesthetics.feederHasNote())
             .and(() -> IntakeAuto.isInRange(kinesthetics))
-            .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Intake));
+            .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake));
         manualRegurgitate
             .whileTrue(new SequentialCommandGroup(
                 s_Intake.new ChangeState(Constants.Intake.IntakeState.DOWN),                   
-                new InstantCommand(() -> s_Intake.setSpin(true))
+                new InstantCommand(() -> s_Intake.setSpin(SpinState.BW))
             ));
         manualShoot // does not check if kinesthetics has note- because this should also work when kinesthetics fails
-            .whileTrue(new ParallelCommandGroup(
+            .whileTrue(new SequentialCommandGroup(
+                new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter),
+                new ParallelCommandGroup(
                     s_Shooter.new ChangeAim(secondary::getY),
-                    s_Shooter.new ChangeSpin(() -> Constants.CommandConstants.regurgitateSpeed)
-                ).andThen(new InstantCommand(() -> s_Shooter.setNeck(false, true), s_Shooter))
-            ).onFalse(new InstantCommand(() -> s_Shooter.setNeck(true, true), s_Shooter));
+                    s_Shooter.new ChangeSpin(() -> Constants.CommandConstants.manualShooterSpin)
+                ),
+                new InstantCommand(() -> s_Shooter.setNeck(SpinState.FW), s_Shooter)
+            )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter));
     }
 
     /**
