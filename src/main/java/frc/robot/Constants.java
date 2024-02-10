@@ -203,9 +203,10 @@ public final class Constants {
         public static final double shooterHandoffAngle = Units.degreesToRadians(45);
     }
 
-    public static final class Field { // TODO: fill in information
+    public static final class Environment { // TODO: fill in information
         public static final Map<Alliance, Pose3d> speakers = Map.of(Alliance.Red, new Pose3d(), Alliance.Blue, new Pose3d());
         public static final Map<Alliance, Pose2d> amps = Map.of(Alliance.Red, new Pose2d(), Alliance.Blue, new Pose2d());
+        public static final float G = 9.8f;
     }
 
     public static enum SpinState {

@@ -33,7 +33,7 @@ public class SpeakerAutoAim extends Command {
     }
 
     private static Transform3d getDifference(Kinesthetics k) {
-        return new Pose3d(k.getPose()).minus(Constants.Field.speakers.get(k.getAlliance()));
+        return new Pose3d(k.getPose()).minus(Constants.Environment.speakers.get(k.getAlliance()));
     }
 
     @Override
@@ -42,9 +42,23 @@ public class SpeakerAutoAim extends Command {
         double strafeVal = MathUtil.applyDeadband(desiredStrafe.getAsDouble(), Constants.stickDeadband);
 
         Transform3d transform = getDifference(kinesthetics);
-        desiredPitch = transform.getRotation().getY() + 0; // TODO: Calculate ascension for shooting arc
-        desiredYaw = transform.getRotation().getZ() + 0; // TODO: Calculate angle offset to account for velocity and anglular velocity
-        desiredSpin = 10; // TODO: Calculate firing velocity
+        double roottwogh = Math.sqrt(2*Constants.Environment.G*transform.getZ()); // Z is vertical
+        desiredPitch = Math.atan(roottwogh / (
+            (transform.getY()*Constants.Environment.G)
+            / roottwogh
+            - kinesthetics.getVelocity().get(1, 0) // y velocity
+        ));
+        if (desiredPitch < 0) desiredPitch += Math.PI;
+        desiredYaw = transform.getRotation().getX() + 0; // TODO: Calculate angle offset to account for velocity and anglular velocity
+        desiredSpin = Math.sqrt(
+            2*Constants.Environment.G*transform.getZ()
+            +
+            Math.pow(
+                (transform.getY()*Constants.Environment.G)
+                / roottwogh
+                - kinesthetics.getVelocity().get(1, 0) // y velocity
+            , 2)
+        );
 
         s_Swerve.drive(
             new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed),
