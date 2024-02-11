@@ -36,8 +36,8 @@ public class RobotContainer {
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
-    private final Shooter s_Shooter = new Shooter();
-    private final Intake s_Intake = new Intake();
+    // private final Shooter s_Shooter = new Shooter();
+    // private final Intake s_Intake = new Intake();
 
     private final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve);
 
@@ -48,8 +48,8 @@ public class RobotContainer {
                 s_Swerve, 
                 () -> -driver.getY(), 
                 () -> -driver.getX(), 
-                () -> -driver.getTwist(), 
-                () -> true//robotCentric.getAsBoolean()
+                () -> -driver.getZ(), 
+                () -> false//robotCentric.getAsBoolean()
             )
         );
 
@@ -66,35 +66,35 @@ public class RobotContainer {
     private void configureButtonBindings() {
         /* Driver Buttons */
         zeroGyro.onTrue(new InstantCommand(() -> kinesthetics.zeroHeading()));
-        autoSpk.debounce(0.3).and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
-            .whileTrue(new SequentialCommandGroup(
-                new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter),
-                new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()),
-                new InstantCommand(() -> s_Shooter.setNeck(SpinState.FW))
-            )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter));
-        autoAmp.debounce(0.3).and(kinesthetics::shooterHasNote)
-            .whileTrue(new SequentialCommandGroup(
-                new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter),
-                new AmpAuto(kinesthetics, s_Swerve, s_Shooter),
-                new InstantCommand(() -> s_Shooter.setNeck(SpinState.FW))
-            )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter));
-        autoIntake.debounce(0.3).and(() -> !kinesthetics.shooterHasNote() && !kinesthetics.feederHasNote())
-            .and(() -> IntakeAuto.isInRange(kinesthetics))
-            .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake));
-        manualRegurgitate
-            .whileTrue(new SequentialCommandGroup(
-                s_Intake.new ChangeState(Constants.Intake.IntakeState.DOWN),                   
-                new InstantCommand(() -> s_Intake.setSpin(SpinState.BW))
-            ));
-        manualShoot // does not check if kinesthetics has note- because this should also work when kinesthetics fails
-            .whileTrue(new SequentialCommandGroup(
-                new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter),
-                new ParallelCommandGroup(
-                    s_Shooter.new ChangeAim(secondary::getY),
-                    s_Shooter.new ChangeSpin(() -> Constants.CommandConstants.manualShooterSpin)
-                ),
-                new InstantCommand(() -> s_Shooter.setNeck(SpinState.FW), s_Shooter)
-            )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter));
+        // autoSpk.debounce(0.3).and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
+        //     .whileTrue(new SequentialCommandGroup(
+        //         new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter),
+        //         new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()),
+        //         new InstantCommand(() -> s_Shooter.setNeck(SpinState.FW))
+        //     )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter));
+        // autoAmp.debounce(0.3).and(kinesthetics::shooterHasNote)
+        //     .whileTrue(new SequentialCommandGroup(
+        //         new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter),
+        //         new AmpAuto(kinesthetics, s_Swerve, s_Shooter),
+        //         new InstantCommand(() -> s_Shooter.setNeck(SpinState.FW))
+        //     )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter));
+        // autoIntake.debounce(0.3).and(() -> !kinesthetics.shooterHasNote() && !kinesthetics.feederHasNote())
+        //     .and(() -> IntakeAuto.isInRange(kinesthetics))
+        //     .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake));
+        // manualRegurgitate
+        //     .whileTrue(new SequentialCommandGroup(
+        //         s_Intake.new ChangeState(Constants.Intake.IntakeState.DOWN),                   
+        //         new InstantCommand(() -> s_Intake.setSpin(SpinState.BW))
+        //     ));
+        // manualShoot // does not check if kinesthetics has note- because this should also work when kinesthetics fails
+        //     .whileTrue(new SequentialCommandGroup(
+        //         new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter),
+        //         new ParallelCommandGroup(
+        //             s_Shooter.new ChangeAim(secondary::getY),
+        //             s_Shooter.new ChangeSpin(() -> Constants.CommandConstants.manualShooterSpin)
+        //         ),
+        //         new InstantCommand(() -> s_Shooter.setNeck(SpinState.FW), s_Shooter)
+        //     )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter));
     }
 
     /**

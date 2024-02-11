@@ -28,7 +28,7 @@ public class Kinesthetics extends SubsystemBase {
         s_Swerve = s;
         s_Swerve.setKinesthetics(this);
 
-        gyro = new Pigeon2(Constants.Swerve.pigeonID);
+        gyro = new Pigeon2(Constants.Swerve.pigeonID, Constants.Swerve.drivetrainCANBus);
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.setYaw(0);
 
@@ -42,7 +42,7 @@ public class Kinesthetics extends SubsystemBase {
     @Override
     public void periodic() {
         poseEstimator.update(getHeading(), s_Swerve.getModulePositions());
-        poseEstimator.addVisionMeasurement(Vision.getBotPose().toPose2d(), Vision.getLimelightPing());
+        // poseEstimator.addVisionMeasurement(Vision.getBotPose().toPose2d(), Vision.getLimelightPing());
         super.periodic();
     }
 
