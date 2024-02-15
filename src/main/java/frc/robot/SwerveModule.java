@@ -10,7 +10,6 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.math.Conversions;
 import frc.lib.util.SwerveModuleConstants;
 
@@ -53,7 +52,6 @@ public class SwerveModule {
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop){
         desiredState = SwerveModuleState.optimize(desiredState, getState().angle);
         mAngleMotor.setControl(anglePosition.withPosition(desiredState.angle.getRotations()));
-        SmartDashboard.putNumber("Mod "+moduleNumber+" Current", mAngleMotor.getSupplyCurrent().getValueAsDouble());
         setSpeed(desiredState, isOpenLoop);
     }
 

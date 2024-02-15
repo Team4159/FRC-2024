@@ -49,7 +49,7 @@ public class RobotContainer {
                 () -> -driver.getY(), 
                 () -> -driver.getX(), 
                 () -> -driver.getZ(), 
-                () -> false//robotCentric.getAsBoolean()
+                () -> true//robotCentric.getAsBoolean()
             )
         );
 
