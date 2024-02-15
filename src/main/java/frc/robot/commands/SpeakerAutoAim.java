@@ -23,7 +23,7 @@ public class SpeakerAutoAim extends Command {
     private double desiredPitch;
     private double desiredSpin; // radians/second
 
-    public SpeakerAutoAim(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup) { // TODO: needs to accept translation args to continue moving
+    public SpeakerAutoAim(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
         kinesthetics = k;
         s_Swerve = sw;
         s_Shooter = sh;

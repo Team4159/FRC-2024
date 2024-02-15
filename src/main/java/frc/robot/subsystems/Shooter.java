@@ -44,7 +44,7 @@ public class Shooter extends SubsystemBase {
         return shooterMLeftController.getEncoder().getVelocity() * Math.PI / 30;
     }
 
-    public void setGoalSpin(double goalRadiansPerSecond) { // TODO: figure out how to get radians per sec from m/s
+    public void setGoalSpin(double goalRadiansPerSecond) { // TODO: Feedforward velocity
         shooterMLeftController.getPIDController().setReference(goalRadiansPerSecond * 30/Math.PI, CANSparkMax.ControlType.kVelocity);
     }
 
