@@ -3,9 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
@@ -36,16 +34,30 @@ public class SwerveAuto extends Command {
         addRequirements(kinesthetics, swerve);
     }
 
+    public SwerveAuto(Kinesthetics k, Swerve s, Trajectory t) {
+        kinesthetics = k;
+        swerve = s;
+        trajectory = t;
+        addRequirements(kinesthetics, swerve);
+    }
+
+    @Override
+    public void initialize() {
+        timer.reset();
+        super.initialize();
+    }
+
     @Override
     public void execute() {
+        var state = trajectory.sample(timer.get());
         swerve.setModuleStates(Constants.Swerve.swerveKinematics.toSwerveModuleStates(
-            controller.calculate(kinesthetics.getPose(), trajectory.sample(timer.get()), null)
+            controller.calculate(kinesthetics.getPose(), state, state.poseMeters.getRotation())
         ));
     }
 
     @Override
     public boolean isFinished() {
-        
+        return timer.hasElapsed(trajectory.getTotalTimeSeconds());
     }
 
     @Override

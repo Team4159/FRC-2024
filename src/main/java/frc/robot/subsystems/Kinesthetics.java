@@ -3,11 +3,12 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 
+import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -85,7 +86,12 @@ public class Kinesthetics extends SubsystemBase {
         poseEstimator.resetPosition(getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d(getPose().getTranslation(), new Rotation2d()));
     }
 
-    public Vector<N2> getVelocity() {
-        return n
+    public Vector<N3> getVelocity() { // v_x, v_y, ω
+        var speeds = Constants.Swerve.swerveKinematics.toChassisSpeeds(s_Swerve.getModuleStates());
+        var vec = new Vector<N3>(Nat.N3());
+        vec.set(0, 0, speeds.vxMetersPerSecond);
+        vec.set(1, 0, speeds.vyMetersPerSecond);
+        vec.set(2, 0, speeds.omegaRadiansPerSecond);
+        return vec;
     }
 }
