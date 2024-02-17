@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -175,6 +176,8 @@ public final class Constants {
                 this.spin = s;
             }
         }
+
+        public static final Translation3d luxonisTranslation = new Translation3d(); // TODO: This must be tuned to specific robot
     } 
 
     public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot

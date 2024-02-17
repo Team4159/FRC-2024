@@ -48,8 +48,8 @@ public class RobotContainer {
                 s_Swerve, 
                 () -> -driver.getY(), 
                 () -> -driver.getX(), 
-                () -> -driver.getTwist(), 
-                () -> true//robotCentric.getAsBoolean()
+                () -> driver.getTwist(), 
+                () -> false//robotCentric.getAsBoolean()
             )
         );
 
@@ -79,7 +79,7 @@ public class RobotContainer {
                 new InstantCommand(() -> s_Shooter.setNeck(SpinState.FW))
             )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter));
         autoIntake.debounce(0.3).and(() -> !kinesthetics.shooterHasNote() && !kinesthetics.feederHasNote())
-            .and(() -> IntakeAuto.isInRange(kinesthetics))
+            .and(() -> IntakeAuto.canRun(kinesthetics))
             .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake));
         manualRegurgitate
             .whileTrue(new SequentialCommandGroup(

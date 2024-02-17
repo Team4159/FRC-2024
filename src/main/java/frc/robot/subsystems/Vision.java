@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import frc.robot.Constants;
 
 public class Vision {
     private static final NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
@@ -21,7 +22,7 @@ public class Vision {
 
     public static Translation3d getNoteTranslation() {
         double[] ntdata = rpiTable.getEntry("notetrans").getDoubleArray(new double[3]);
-        return new Translation3d(ntdata[0], ntdata[1], ntdata[2]);
+        return new Translation3d(ntdata[0], ntdata[1], ntdata[2]).plus(Constants.Intake.luxonisTranslation);
     }
 
     public static double getRpiPing() {
