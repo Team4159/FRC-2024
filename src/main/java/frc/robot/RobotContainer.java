@@ -48,8 +48,8 @@ public class RobotContainer {
                 s_Swerve, 
                 () -> -driver.getY(), 
                 () -> -driver.getX(), 
-                () -> -driver.getZ(), 
-                () -> true//robotCentric.getAsBoolean()
+                () -> driver.getZ(), 
+                () -> false //robotCentric.getAsBoolean()
             )
         );
 
