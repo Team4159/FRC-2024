@@ -163,6 +163,9 @@ public final class Constants {
 
         public static final double intakeSpeed = 0.6; // -1 to 1
 
+        public static final double intakeRange = 0.2; // meters
+        public static final double intakeField = 80; // degrees
+
         public static enum IntakeState {
             STOW(0, SpinState.ST), // starting pos & when moving
             DOWN(0, SpinState.FW), // intaking
