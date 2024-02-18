@@ -5,6 +5,7 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -50,21 +51,24 @@ public class ShooterLookupTable extends Command{
     }
 
     private ShooterCommand getBestCommand(){
-        Transform3d closestMatch = null;
-        Transform3d secClosestMatch = null;
+        Transform2d closestMatch = null;
+        Transform2d secClosestMatch = null;
+
+        double closestAccuracy = Double.MAX_VALUE;
+        double secClosestAccuracy = Double.MAX_VALUE;
 
         // Locate closest and second closest match
-        for (Transform3d key : Constants.Shooter.shooterTable.keySet()) {
-            if(closestMatch == null){
+        for (Transform2d key : Constants.Shooter.shooterTable.keySet()) {
+            double accuracy = Math.abs(key.getX() - s_Kinesthetics.getPose().getX()) + Math.abs(key.getY() - s_Kinesthetics.getPose().getY());
+            if(accuracy < closestAccuracy){
+                secClosestMatch = closestMatch;
                 closestMatch = key;
+                secClosestAccuracy = closestAccuracy;
+                closestAccuracy = accuracy;
             }
-            else{
-                double accuracy = Math.abs(key.getX() - s_Kinesthetics.getPose().getX()) + Math.abs(key.getY() - s_Kinesthetics.getPose().getX());
-                double closestAccuracy = Math.abs(closestMatch.getX() - s_Kinesthetics.getPose().getX()) + Math.abs(closestMatch.getY() - s_Kinesthetics.getPose().getX());
-                if(accuracy > closestAccuracy){
-                    secClosestMatch = closestMatch;
-                    closestMatch = key;
-                }
+            else if(accuracy < secClosestAccuracy){
+                secClosestMatch = key;
+                secClosestAccuracy = accuracy;
             }
         }
         // Take average of closest match and second closest match

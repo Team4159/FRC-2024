@@ -21,7 +21,7 @@ public class SpeakerAutoAim extends Command {
     private DoubleSupplier desiredStrafe;
     private double desiredYaw;
     private double desiredPitch;
-    private double desiredSpin; // radians/second
+    private double desiredNoteVel; // radians/second
 
     public SpeakerAutoAim(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
         kinesthetics = k;
@@ -50,7 +50,7 @@ public class SpeakerAutoAim extends Command {
         ));
         if (desiredPitch < 0) desiredPitch += Math.PI;
         desiredYaw = transform.getRotation().getX() + 0; // TODO: Calculate angle offset to account for velocity and anglular velocity
-        desiredSpin = Math.sqrt(
+        desiredNoteVel = Math.sqrt(
             2*Constants.Environment.G*transform.getZ()
             +
             Math.pow(
@@ -65,14 +65,14 @@ public class SpeakerAutoAim extends Command {
             desiredYaw, true, false
         );
         s_Shooter.setGoalPitch(desiredPitch);
-        s_Shooter.setGoalSpin(desiredSpin);
+        s_Shooter.setGoalSpin(desiredNoteVel);
     }
 
     @Override
     public boolean isFinished() {
         return Math.abs(kinesthetics.getHeading().getRadians() - desiredYaw) < Constants.Swerve.yawTolerance
             && Math.abs(s_Shooter.getPitch() - desiredPitch) < Constants.Shooter.pitchTolerance
-            && Math.abs(s_Shooter.getSpin() - desiredSpin) < Constants.Shooter.spinTolerance;
+            && Math.abs(s_Shooter.getSpin() - desiredNoteVel) < Constants.Shooter.spinTolerance;
     }
 
     @Override
