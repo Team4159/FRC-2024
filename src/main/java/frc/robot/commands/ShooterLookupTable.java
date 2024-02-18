@@ -53,18 +53,21 @@ public class ShooterLookupTable extends Command{
         Transform3d closestMatch = null;
         Transform3d secClosestMatch = null;
 
+        double closestAccuracy = Double.MAX_VALUE;
+        double secClosestAccuracy = Double.MAX_VALUE;
+
         // Locate closest and second closest match
         for (Transform3d key : Constants.Shooter.shooterTable.keySet()) {
-            if(closestMatch == null){
+            double accuracy = Math.abs(key.getX() - s_Kinesthetics.getPose().getX()) + Math.abs(key.getY() - s_Kinesthetics.getPose().getY());
+            if(accuracy < closestAccuracy){
+                secClosestMatch = closestMatch;
                 closestMatch = key;
+                secClosestAccuracy = closestAccuracy;
+                closestAccuracy = accuracy;
             }
-            else{
-                double accuracy = Math.abs(key.getX() - s_Kinesthetics.getPose().getX()) + Math.abs(key.getY() - s_Kinesthetics.getPose().getX());
-                double closestAccuracy = Math.abs(closestMatch.getX() - s_Kinesthetics.getPose().getX()) + Math.abs(closestMatch.getY() - s_Kinesthetics.getPose().getX());
-                if(accuracy > closestAccuracy){
-                    secClosestMatch = closestMatch;
-                    closestMatch = key;
-                }
+            else if(accuracy < secClosestAccuracy){
+                secClosestMatch = key;
+                secClosestAccuracy = accuracy;
             }
         }
         // Take average of closest match and second closest match
