@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -148,10 +149,9 @@ public final class Constants {
 
         public static final double pitchTolerance = Math.PI/512;
         public static final double spinTolerance = Math.PI/256;
-        public static final double restingPitchTolerance = Math.PI/16;
 
-        public static final double restingPitch = 0;
-        public static final double neckSpeed = 0.3; // -1 to 1
+        public static final double restingPitch = 0; // radians
+        public static final double neckSpeed = 0.3; // volts / 12, -1 to 1
 
         public static final Map<Transform3d, ShooterCommand> shooterTable= new HashMap<>();
         // Map values by testing below
@@ -163,10 +163,13 @@ public final class Constants {
         public static final int feederMotorID = 4;
         public static final int beamBreakID = 0; // PWM
 
-        public static final double pitchTolerance = Math.PI/64;
-        public static final double spinTolerance = Math.PI/16;
+        public static final double pitchTolerance = Math.PI/64; // radians
+        public static final double spinTolerance = Math.PI/16; // radians
 
-        public static final double intakeSpeed = 0.6; // -1 to 1
+        public static final double intakeSpin = 0.6; // radians / second, -1 to 1
+
+        public static final double intakeRange = 0.2; // meters
+        public static final double intakeField = 80; // degrees
 
         public static enum IntakeState {
             STOW(0, SpinState.ST), // starting pos & when moving
@@ -176,11 +179,14 @@ public final class Constants {
             
             public final double pitch;
             public final SpinState spin;
+            /** @param p radians */
             private IntakeState(double p, SpinState s) {
                 this.pitch = p;
                 this.spin = s;
             }
         }
+
+        public static final Translation3d luxonisTranslation = new Translation3d(); // TODO: This must be tuned to specific robot
     } 
 
     public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot

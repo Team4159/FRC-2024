@@ -9,16 +9,16 @@ import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.numbers.N3;
 
 public class RobotState extends Pose2d {
-    private Vector<N2> m_velocity;
+    private Vector<N3> m_velocity;
 
     public RobotState(Pose2d pose) {
-        this(pose.getTranslation(), pose.getRotation(), new Vector<N2>(Nat.N2()));
+        this(pose.getTranslation(), pose.getRotation(), new Vector<N3>(Nat.N3()));
     }
 
-    public RobotState(Translation2d position, Rotation2d rotation, Vector<N2> velocity) {
+    public RobotState(Translation2d position, Rotation2d rotation, Vector<N3> velocity) {
         super(position, rotation);
         this.m_velocity = velocity;
     }
@@ -28,11 +28,15 @@ public class RobotState extends Pose2d {
     }
 
     public double getVelocityY() {
-        return m_velocity.get(0, 1);
+        return m_velocity.get(1, 0);
+    }
+
+    public double getVelocityOmega() {
+        return m_velocity.get(2, 0);
     }
 
     @JsonProperty
-    public Vector<N2> getVelocity() {
+    public Vector<N3> getVelocity() {
         return m_velocity;
     }
 

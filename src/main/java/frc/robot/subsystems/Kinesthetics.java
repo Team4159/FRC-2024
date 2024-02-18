@@ -44,7 +44,7 @@ public class Kinesthetics extends SubsystemBase {
 
     @Override
     public void periodic() {
-        poseEstimator.update(getHeading(), s_Swerve.getModulePositions());
+        poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
         poseEstimator.addVisionMeasurement(Vision.getBotPose().toPose2d(), Vision.getLimelightPing());
         super.periodic();
     }
@@ -86,7 +86,8 @@ public class Kinesthetics extends SubsystemBase {
         poseEstimator.resetPosition(getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d(getPose().getTranslation(), new Rotation2d()));
     }
 
-    public Vector<N3> getVelocity() { // v_x, v_y, ω
+    /** @return v_x meters / second, v_y meters / second, ω radians / second */
+    public Vector<N3> getVelocity() {
         var speeds = Constants.Swerve.swerveKinematics.toChassisSpeeds(s_Swerve.getModuleStates());
         var vec = new Vector<N3>(Nat.N3());
         vec.set(0, 0, speeds.vxMetersPerSecond);
