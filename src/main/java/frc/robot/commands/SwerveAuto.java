@@ -4,22 +4,22 @@ import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.math.RobotState;
 import frc.robot.Constants;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.Kinesthetics;
 import frc.robot.subsystems.Swerve;
 
 public class SwerveAuto extends Command {
     private static final HolonomicDriveController controller = new HolonomicDriveController(
-            new PIDController(Constants.AutoConstants.kPXController, 0, 0),
-            new PIDController(Constants.AutoConstants.kPYController, 0, 0),
-            new ProfiledPIDController(Constants.AutoConstants.kPThetaController, 0, 0,
-                    new TrapezoidProfile.Constraints(Constants.AutoConstants.kMaxSpeedMetersPerSecond,
-                            Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared)));
+            new PIDController(AutoConstants.kPXController, 0, 0),
+            new PIDController(AutoConstants.kPYController, 0, 0),
+            new ProfiledPIDController(AutoConstants.kPThetaController, 0, 0,
+                    AutoConstants.kThetaControllerConstraints));
     
     private Kinesthetics kinesthetics;
     private Swerve swerve;
@@ -30,7 +30,7 @@ public class SwerveAuto extends Command {
     public SwerveAuto(Kinesthetics k, Swerve s, RobotState end) {
         kinesthetics = k;
         swerve = s;
-        trajectory = TrajectoryGenerator.generateTrajectory(kinesthetics.getPose(), null, end, null);
+        trajectory = TrajectoryGenerator.generateTrajectory(kinesthetics.getPose(), null, end, new TrajectoryConfig(AutoConstants.kMaxAccelerationMetersPerSecondSquared, AutoConstants.kMaxAccelerationMetersPerSecondSquared));
         addRequirements(kinesthetics, swerve);
     }
 

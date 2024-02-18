@@ -30,6 +30,7 @@ public class Swerve extends SubsystemBase {
         kinesthetics = k;
     }
 
+    /** @param rotation radians / second */
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
         SwerveModuleState[] swerveModuleStates =
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(

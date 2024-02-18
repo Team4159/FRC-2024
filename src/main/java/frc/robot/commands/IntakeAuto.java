@@ -21,9 +21,15 @@ import frc.robot.subsystems.Vision;
 
 public class IntakeAuto extends SequentialCommandGroup {
     public IntakeAuto(Kinesthetics k, Swerve sw, Shooter sh, Intake i) {
-        var notetrans = Vision.getNoteTranslation().toTranslation2d();
-        if (notetrans.getNorm() > Constants.Intake.intakeRange || Math.abs(MathUtil.inputModulus(notetrans.getAngle().getDegrees(), -180, 180)) > Constants.Intake.intakeField/2) {
-            addCommands(new SwerveAuto(k, sw, new RobotState(new Translation2d(notetrans.getNorm()-Constants.Swerve.trackWidth/2, notetrans.getAngle()), k.getHeading().plus(notetrans.getAngle()), new Vector<N3>(Nat.N3()))));
+        this(k, sw, sh, i, false);
+    }
+
+    public IntakeAuto(Kinesthetics k, Swerve sw, Shooter sh, Intake i, boolean disableMovement) {
+        if (!disableMovement) {
+            var notetrans = Vision.getNoteTranslation().toTranslation2d();
+            if (notetrans.getNorm() > Constants.Intake.intakeRange || Math.abs(MathUtil.inputModulus(notetrans.getAngle().getDegrees(), -180, 180)) > Constants.Intake.intakeField/2) {
+                addCommands(new SwerveAuto(k, sw, new RobotState(new Translation2d(notetrans.getNorm()-Constants.Swerve.trackWidth/2, notetrans.getAngle()), k.getHeading().plus(notetrans.getAngle()), new Vector<N3>(Nat.N3()))));
+            }
         }
         addCommands(
             i.new ChangeState(IntakeState.DOWN),

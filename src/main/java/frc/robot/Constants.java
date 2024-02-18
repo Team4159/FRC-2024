@@ -146,10 +146,9 @@ public final class Constants {
 
         public static final double pitchTolerance = Math.PI/512;
         public static final double spinTolerance = Math.PI/256;
-        public static final double restingPitchTolerance = Math.PI/16;
 
-        public static final double restingPitch = 0;
-        public static final double neckSpeed = 0.3; // -1 to 1
+        public static final double restingPitch = 0; // radians
+        public static final double neckSpeed = 0.3; // volts / 12, -1 to 1
     }
 
     public static final class Intake {
@@ -158,10 +157,10 @@ public final class Constants {
         public static final int feederMotorID = 4;
         public static final int beamBreakID = 0; // PWM
 
-        public static final double pitchTolerance = Math.PI/64;
-        public static final double spinTolerance = Math.PI/16;
+        public static final double pitchTolerance = Math.PI/64; // radians
+        public static final double spinTolerance = Math.PI/16; // radians
 
-        public static final double intakeSpeed = 0.6; // -1 to 1
+        public static final double intakeSpin = 0.6; // radians / second, -1 to 1
 
         public static final double intakeRange = 0.2; // meters
         public static final double intakeField = 80; // degrees
@@ -174,6 +173,7 @@ public final class Constants {
             
             public final double pitch;
             public final SpinState spin;
+            /** @param p radians */
             private IntakeState(double p, SpinState s) {
                 this.pitch = p;
                 this.spin = s;

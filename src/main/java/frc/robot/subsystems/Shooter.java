@@ -8,9 +8,12 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkBase;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.math.Conversions;
 import frc.robot.Constants;
 import frc.robot.Constants.SpinState;
 
@@ -18,9 +21,7 @@ public class Shooter extends SubsystemBase {
     private TalonFX angleMotorController;
     private MotionMagicDutyCycle angleDutyCycle;
 
-    private CANSparkFlex shooterMLeftController, shooterMRightController;
-
-    private CANSparkMax neckMotorController;
+    private CANSparkBase shooterMLeftController, shooterMRightController, neckMotorController;
     
     public Shooter() {
         angleMotorController = new TalonFX(Constants.Shooter.angleMotorIDs[0]);
@@ -32,20 +33,24 @@ public class Shooter extends SubsystemBase {
         neckMotorController = new CANSparkMax(Constants.Shooter.neckMotorID, CANSparkLowLevel.MotorType.kBrushless);
     }
 
+    /** @return radians */
     public double getPitch() {
-        return angleMotorController.getPosition().getValueAsDouble() * 2 * Math.PI;
+        return Units.rotationsToRadians(angleMotorController.getPosition().getValueAsDouble());
+    }
+    
+    /** @param goalPitch radians */
+    public void setGoalPitch(double goalPitch) {
+        angleMotorController.setControl(angleDutyCycle.withPosition(Units.radiansToRotations(goalPitch)).withSlot(0));
     }
 
-    public void setGoalPitch(double goalRadians) {
-        angleMotorController.setControl(angleDutyCycle.withPosition(goalRadians).withSlot(0));
-    }
-
+    /** @return radians / second */
     public double getSpin() {
-        return shooterMLeftController.getEncoder().getVelocity() * Math.PI / 30;
+        return Units.rotationsPerMinuteToRadiansPerSecond(shooterMLeftController.getEncoder().getVelocity());
     }
 
-    public void setGoalSpin(double goalRadiansPerSecond) { // TODO: Feedforward velocity
-        shooterMLeftController.getPIDController().setReference(goalRadiansPerSecond * 30/Math.PI, CANSparkMax.ControlType.kVelocity);
+    /** @param goalNoteVel meters / second */
+    public void setGoalSpin(double goalNoteVel) {
+        shooterMLeftController.getPIDController().setReference(FeedForward.calculate(goalNoteVel), CANSparkBase.ControlType.kSmartVelocity);
     }
 
     public void stopSpin() {
@@ -54,6 +59,12 @@ public class Shooter extends SubsystemBase {
 
     public void setNeck(SpinState ss) {
         neckMotorController.set(ss.multiplier * Constants.Shooter.neckSpeed);
+    }
+
+    private static class FeedForward { // TODO: Shooter feedforward
+        static double calculate(double desiredNoteVelocity) { // meters / second -> rotations / minute
+            return Conversions.MPSToRPS(desiredNoteVelocity, desiredNoteVelocity) / 60;
+        }
     }
 
     public class ChangeAim extends Command {

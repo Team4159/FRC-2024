@@ -5,34 +5,37 @@ import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.SpinState;
 
 public class Intake extends SubsystemBase {
-    private CANSparkFlex angleMotorController;
-    private CANSparkMax intakeMotorController;
+    private CANSparkBase angleMotorController, intakeMotorController;
 
     public Intake() {
         angleMotorController = new CANSparkFlex(Constants.Intake.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
         intakeMotorController = new CANSparkMax(Constants.Intake.intakeMotorID, CANSparkLowLevel.MotorType.kBrushless);
     }
     
+    /** @return radians */
     public double getPitch() {
-        return angleMotorController.getEncoder().getPosition();
+        return Units.rotationsToRadians(angleMotorController.getEncoder().getPosition());
     }
     
-    public void setGoalPitch(double position) {
-        angleMotorController.getPIDController().setReference(position, CANSparkBase.ControlType.kDutyCycle);
+    /** @param goalPitch radians */
+    public void setGoalPitch(double goalPitch) {
+        angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch), CANSparkBase.ControlType.kSmartMotion);
     }
 
+    /** @return radians / second */
     public double getSpin() {
-        return intakeMotorController.getEncoder().getVelocity();
+        return Units.rotationsPerMinuteToRadiansPerSecond(intakeMotorController.getEncoder().getVelocity());
     }
 
     public void setSpin(SpinState ss) {
-        intakeMotorController.set(ss.multiplier * Constants.Intake.intakeSpeed);
+        intakeMotorController.set(ss.multiplier * Constants.Intake.intakeSpin);
     }
 
     public class ChangeState extends Command {
@@ -53,7 +56,7 @@ public class Intake extends SubsystemBase {
         @Override
         public boolean isFinished() {
             return Math.abs(getPitch() - desiredState.pitch) < Constants.Intake.pitchTolerance &&
-                Math.abs(getSpin() - desiredState.spin.multiplier * Constants.Intake.intakeSpeed) < Constants.Intake.spinTolerance;
+                Math.abs(getSpin() - desiredState.spin.multiplier * Constants.Intake.intakeSpin) < Constants.Intake.spinTolerance;
         }
 
         @Override
