@@ -1,5 +1,6 @@
 package frc.robot;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -9,6 +10,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -16,6 +18,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.util.COTSTalonFXSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
+import frc.robot.commands.ShooterCommand;
 
 public final class Constants {
     public static final double stickDeadband = 0.1;
@@ -149,6 +152,9 @@ public final class Constants {
 
         public static final double restingPitch = 0;
         public static final double neckSpeed = 0.3; // -1 to 1
+
+        public static final Map<Transform3d, ShooterCommand> shooterTable= new HashMap<>();
+        // Map values by testing below
     }
 
     public static final class Intake {
