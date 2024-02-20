@@ -28,7 +28,7 @@ public class Kinesthetics extends SubsystemBase {
         s_Swerve = s;
         s_Swerve.setKinesthetics(this);
 
-        gyro = new Pigeon2(Constants.Swerve.pigeonID);
+        gyro = new Pigeon2(Constants.Swerve.pigeonID, Constants.Swerve.canBus);
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.setYaw(0);
 
