@@ -12,11 +12,13 @@ import frc.robot.Constants;
 import frc.robot.Constants.SpinState;
 
 public class Intake extends SubsystemBase {
-    private CANSparkBase angleMotorController, intakeMotorController;
+    private CANSparkBase angleMotorController, intakeMotorController, feederMotorController;
 
     public Intake() {
         angleMotorController = new CANSparkFlex(Constants.Intake.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
-        intakeMotorController = new CANSparkMax(Constants.Intake.intakeMotorID, CANSparkLowLevel.MotorType.kBrushless);
+        intakeMotorController = new CANSparkFlex(Constants.Intake.intakeMotorID, CANSparkLowLevel.MotorType.kBrushless);
+        feederMotorController = new CANSparkMax(Constants.Intake.feederMotorID, CANSparkLowLevel.MotorType.kBrushless);
+        feederMotorController.follow(intakeMotorController);
     }
     
     /** @return radians */

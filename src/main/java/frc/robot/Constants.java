@@ -9,6 +9,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -200,18 +201,29 @@ public final class Constants {
     }
 
     public static final class CommandConstants { // TODO: This must be tuned to specific robot
+        public static final double bumperWidth = Units.inchesToMeters(4);
+
         public static final double manualShooterSpin = 3; // radians per second
 
         public static final double ampShooterAngle = Units.degreesToRadians(75);
         public static final double ampShooterSpin = 12;
-        public static final double ampAutoDistanceToStartSpinning = 1; // meters
+        public static final double ampAutoDistanceToStartSpinning = 1.5; // meters
 
         public static final double shooterHandoffAngle = Units.degreesToRadians(45);
     }
 
-    public static final class Environment { // TODO: fill in information
-        public static final Map<Alliance, Pose3d> speakers = Map.of(Alliance.Red, new Pose3d(), Alliance.Blue, new Pose3d());
-        public static final Map<Alliance, Pose2d> amps = Map.of(Alliance.Red, new Pose2d(), Alliance.Blue, new Pose2d());
+    public static final class Environment {
+        /** @param speakers Pose3d is in meters */
+        public static final Map<Alliance, Pose3d> speakers = Map.of(
+            Alliance.Red, new Pose3d(16.579, 5.548, 1.891, new Rotation3d(0, 0, Units.degreesToRadians(-90))),
+            Alliance.Blue, new Pose3d(-0.0381, 5.548, 1.891, new Rotation3d(0, 0, Units.degreesToRadians(90)))
+        );
+        /** @param amps Pose2d is in meters */
+        public static final Map<Alliance, Pose2d> amps = Map.of(
+            Alliance.Red, new Pose2d(14.7008, 8.2042, Rotation2d.fromDegrees(0)),
+            Alliance.Blue, new Pose2d(1.842, 8.2042, Rotation2d.fromDegrees(0))
+        );
+        /** @param G meters / second squared */
         public static final float G = 9.8f;
     }
 
