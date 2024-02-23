@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.SpinState;
 import frc.robot.Constants.Intake.IntakeState;
-// import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 
@@ -50,8 +49,8 @@ public class RobotContainer {
                 s_Swerve, 
                 () -> -driver.getY(), 
                 () -> -driver.getX(), 
-                () -> driver.getTwist(), 
-                () -> false//robotCentric.getAsBoolean()
+                () -> -driver.getZ(), 
+                () -> false //robotCentric.getAsBoolean()
             )
         );
 
