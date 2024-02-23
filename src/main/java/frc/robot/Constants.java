@@ -205,6 +205,7 @@ public final class Constants {
 
         public static final double manualShooterSpin = 3; // radians per second
 
+        public static final double ampAutoDistanceMax = 3.0; // meters
         public static final double ampShooterAngle = Units.degreesToRadians(75);
         public static final double ampShooterSpin = 12;
         public static final double ampAutoDistanceToStartSpinning = 1.5; // meters

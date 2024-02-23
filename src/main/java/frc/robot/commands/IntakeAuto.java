@@ -34,7 +34,7 @@ public class IntakeAuto extends SequentialCommandGroup {
         addCommands(
             i.new ChangeState(IntakeState.DOWN),
             new ParallelCommandGroup(
-                new WaitUntilCommand(k::feederHasNote),
+                // new WaitUntilCommand(k::feederHasNote),
                 sh.new ChangeAim(() -> Constants.CommandConstants.shooterHandoffAngle)
             ),
             new InstantCommand(() -> sh.setNeck(SpinState.FW), sh),

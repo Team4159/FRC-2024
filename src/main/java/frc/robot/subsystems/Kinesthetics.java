@@ -20,7 +20,7 @@ public class Kinesthetics extends SubsystemBase {
 
     // Sensor Information
     private Pigeon2 gyro;
-    private DigitalInput feederBeamBreak;
+    // private DigitalInput feederBeamBreak;
     private DigitalInput shooterBeamBreak;
 
     // Data Fields
@@ -31,11 +31,11 @@ public class Kinesthetics extends SubsystemBase {
         s_Swerve = s;
         s_Swerve.setKinesthetics(this);
 
-        gyro = new Pigeon2(Constants.Swerve.pigeonID);
+        gyro = new Pigeon2(Constants.Swerve.pigeonID, Constants.Swerve.canBus);
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.setYaw(0);
 
-        feederBeamBreak = new DigitalInput(Constants.Intake.beamBreakID);
+        // feederBeamBreak = new DigitalInput(Constants.Intake.beamBreakID);
         shooterBeamBreak = new DigitalInput(Constants.Shooter.beamBreakID);
 
         alliance = DriverStation.getAlliance().orElse(null);
@@ -58,9 +58,9 @@ public class Kinesthetics extends SubsystemBase {
         return alliance;
     }
 
-    public boolean feederHasNote() {
-        return feederBeamBreak.get();
-    }
+    // public boolean feederHasNote() {
+    //     return feederBeamBreak.get();
+    // }
 
     public boolean shooterHasNote() {
         return shooterBeamBreak.get();

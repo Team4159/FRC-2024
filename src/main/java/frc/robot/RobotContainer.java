@@ -74,13 +74,13 @@ public class RobotContainer {
                 new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()),
                 new InstantCommand(() -> s_Shooter.setNeck(SpinState.FW))
             )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter));
-        autoAmp.debounce(0.3).and(kinesthetics::shooterHasNote)
+        autoAmp.debounce(0.3).and(kinesthetics::shooterHasNote).and(() -> AmpAuto.isInRange(kinesthetics))
             .whileTrue(new SequentialCommandGroup(
                 new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter),
                 new AmpAuto(kinesthetics, s_Swerve, s_Shooter),
                 new InstantCommand(() -> s_Shooter.setNeck(SpinState.FW))
             )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter));
-        autoIntake.debounce(0.3).and(() -> !kinesthetics.shooterHasNote() && !kinesthetics.feederHasNote())
+        autoIntake.debounce(0.3).and(() -> !kinesthetics.shooterHasNote()) // && !kinesthetics.feederHasNote()
             .and(() -> IntakeAuto.canRun(kinesthetics))
             .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake))
             .onFalse(new ParallelCommandGroup(
@@ -96,7 +96,7 @@ public class RobotContainer {
             .whileTrue(new SequentialCommandGroup(
                 new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter),
                 new ParallelCommandGroup(
-                    s_Shooter.new ChangeAim(secondary::getY),
+                    s_Shooter.new ChangeAim(secondary::getThrottle),
                     s_Shooter.new ChangeSpin(() -> Constants.CommandConstants.manualShooterSpin)
                 ),
                 new InstantCommand(() -> s_Shooter.setNeck(SpinState.FW), s_Shooter)

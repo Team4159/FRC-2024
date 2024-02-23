@@ -25,4 +25,11 @@ public class AmpAuto extends ParallelCommandGroup {
             ).andThen(sh.new ChangeSpin(() -> Constants.CommandConstants.ampShooterSpin))
         );
     }
+
+    public static boolean isInRange(Kinesthetics k) { // are we close enough
+        return 
+            Constants.Environment.amps.get(k.getAlliance()).getTranslation()
+            .getDistance(k.getPose().getTranslation())
+            < Constants.CommandConstants.ampAutoDistanceMax;
+    }
 }
