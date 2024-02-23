@@ -45,11 +45,9 @@ public class Kinesthetics extends SubsystemBase {
     @Override
     public void periodic() {
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
-<<<<<<< HEAD
-        poseEstimator.addVisionMeasurement(Vision.getBotPose().toPose2d(), Vision.getLimelightPing());
-=======
-        // poseEstimator.addVisionMeasurement(Vision.getBotPose().toPose2d(), Vision.getLimelightPing());
->>>>>>> 32be0c08ce55a8f28fbc54cfb12583f408b0fb44
+        var visionPose = Vision.getBotPose();
+        if (visionPose != null)
+            poseEstimator.addVisionMeasurement(visionPose.toPose2d(), Vision.getLimelightPing());
         super.periodic();
     }
 

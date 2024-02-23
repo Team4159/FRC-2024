@@ -286,11 +286,7 @@ public class COTSTalonFXSwerveConstants {
                 /** (150 / 7) : 1 */
                 double angleGearRatio = ((150.0 / 7.0) / 1.0);
         
-<<<<<<< HEAD
                 double angleKP = 20.0;
-=======
-                double angleKP = 30.0; // TODO: This needs to be tuned to the individual robot
->>>>>>> 32be0c08ce55a8f28fbc54cfb12583f408b0fb44
                 double angleKI = 0.0;
                 double angleKD = 0.0;
         
