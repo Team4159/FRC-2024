@@ -97,7 +97,7 @@ public class RobotContainer {
                 new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter),
                 new ParallelCommandGroup(
                     s_Shooter.new ChangeAim(secondary::getThrottle),
-                    s_Shooter.new ChangeSpin(() -> Constants.CommandConstants.manualShooterSpin)
+                    s_Shooter.new ChangeSpin(() -> Math.abs(secondary.getY()) * Constants.CommandConstants.manualShooterSpinMax)
                 ),
                 new InstantCommand(() -> s_Shooter.setNeck(SpinState.FW), s_Shooter)
             )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter));

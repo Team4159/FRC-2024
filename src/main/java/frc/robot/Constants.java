@@ -203,12 +203,12 @@ public final class Constants {
     public static final class CommandConstants { // TODO: This must be tuned to specific robot
         public static final double bumperWidth = Units.inchesToMeters(4);
 
-        public static final double manualShooterSpin = 3; // radians per second
+        public static final double manualShooterSpinMax = 3; // meters / second
 
         public static final double ampAutoDistanceMax = 3.0; // meters
         public static final double ampShooterAngle = Units.degreesToRadians(75);
         public static final double ampShooterSpin = 12;
-        public static final double ampAutoDistanceToStartSpinning = 1.5; // meters
+        public static final double ampAutoDistanceToStartSpinning = 1; // meters
 
         public static final double shooterHandoffAngle = Units.degreesToRadians(45);
     }
