@@ -2,12 +2,10 @@ package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
 
-import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.CANSparkBase;
 
 import edu.wpi.first.math.util.Units;
@@ -17,16 +15,11 @@ import frc.lib.math.Conversions;
 import frc.robot.Constants;
 import frc.robot.Constants.SpinState;
 
-public class Shooter extends SubsystemBase {    
-    private TalonFX angleMotorController;
-    private MotionMagicDutyCycle angleDutyCycle;
-
-    private CANSparkBase shooterMLeftController, shooterMRightController, neckMotorController;
+public class Shooter extends SubsystemBase {  
+    private CANSparkBase angleMotorController, shooterMLeftController, shooterMRightController, neckMotorController;
     
     public Shooter() {
-        angleMotorController = new TalonFX(Constants.Shooter.angleMotorIDs[0]);
-        for (int n = 1; n < Constants.Shooter.angleMotorIDs.length; n++)
-            new TalonFX(Constants.Shooter.angleMotorIDs[n]).setControl(new Follower(Constants.Shooter.angleMotorIDs[0], false));
+        angleMotorController = new CANSparkMax(Constants.Shooter.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
         shooterMLeftController = new CANSparkFlex(Constants.Shooter.shooterMLeftID, CANSparkLowLevel.MotorType.kBrushless);
         shooterMRightController= new CANSparkFlex(Constants.Shooter.shooterMRightID,CANSparkLowLevel.MotorType.kBrushless);
         shooterMRightController.follow(shooterMLeftController, true); // for now, no spin.
@@ -35,12 +28,12 @@ public class Shooter extends SubsystemBase {
 
     /** @return radians */
     public double getPitch() {
-        return Units.rotationsToRadians(angleMotorController.getPosition().getValueAsDouble());
+        return Units.rotationsToRadians(angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
     }
     
     /** @param goalPitch radians */
     public void setGoalPitch(double goalPitch) {
-        angleMotorController.setControl(angleDutyCycle.withPosition(Units.radiansToRotations(goalPitch)).withSlot(0));
+        angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch), CANSparkBase.ControlType.kSmartMotion);
     }
 
     /** @return radians / second */

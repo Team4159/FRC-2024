@@ -6,6 +6,7 @@ import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -22,7 +23,7 @@ public class Intake extends SubsystemBase {
     }
     
     /** @return radians */
-    public double getPitch() {
+    public double getPitch() { // FIXME this has to be absolute, but currently is relative
         return Units.rotationsToRadians(angleMotorController.getEncoder().getPosition());
     }
     
@@ -38,6 +39,11 @@ public class Intake extends SubsystemBase {
 
     public void setSpin(SpinState ss) {
         intakeMotorController.set(ss.multiplier * Constants.Intake.intakeSpin);
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("motor", angleMotorController.getAppliedOutput());
     }
 
     public class ChangeState extends Command {

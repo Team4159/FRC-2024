@@ -142,24 +142,10 @@ public final class Constants {
         }
     }
 
-    public static final class Shooter {
-        public static final int[] angleMotorIDs = {5, 6};
-        public static final int shooterMLeftID = 7;
-        public static final int shooterMRightID = 8;
-        public static final int neckMotorID = 9;
-        public static final int beamBreakID = 1; // PWM
-
-        public static final double pitchTolerance = Math.PI/512;
-        public static final double spinTolerance = Math.PI/256;
-
-        public static final double restingPitch = 0; // radians
-        public static final double neckSpeed = 0.3; // volts / 12, -1 to 1
-    }
-
     public static final class Intake {
         public static final int angleMotorID = 1;
-        public static final int intakeMotorID = 3;
-        public static final int feederMotorID = 4;
+        public static final int intakeMotorID = 2;
+        public static final int feederMotorID = 3;
         public static final int beamBreakID = 0; // PWM
 
         public static final double pitchTolerance = Math.PI/64; // radians
@@ -171,11 +157,10 @@ public final class Constants {
         public static final double intakeField = 80; // degrees
 
         public static enum IntakeState {
-            STOW(0, SpinState.ST), // starting pos & when moving
-            DOWN(0, SpinState.FW), // intaking
-            HANDOFF(0,SpinState.BW), // handing off (duh)
-            OFF(-1, SpinState.ST);
-            
+            STOW(3, SpinState.ST), // starting pos & when moving
+            DOWN(138, SpinState.FW), // intaking
+            HANDOFF(3,SpinState.BW); // handing off (duh)
+
             public final double pitch;
             public final SpinState spin;
             /** @param p radians */
@@ -187,6 +172,20 @@ public final class Constants {
 
         public static final Translation3d luxonisTranslation = new Translation3d(); // TODO: This must be tuned to specific robot
     } 
+
+    public static final class Shooter {
+        public static final int angleMotorID = 4;
+        public static final int shooterMLeftID = 5;
+        public static final int shooterMRightID = 6;
+        public static final int neckMotorID = 7;
+        public static final int beamBreakID = 1; // PWM
+
+        public static final double pitchTolerance = Math.PI/512;
+        public static final double spinTolerance = Math.PI/256;
+
+        public static final double restingPitch = 0; // radians
+        public static final double neckSpeed = 0.3; // volts / 12, -1 to 1
+    }
 
     public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot
         public static final double kMaxSpeedMetersPerSecond = 3;
@@ -207,14 +206,14 @@ public final class Constants {
     public static final class CommandConstants { // TODO: This must be tuned to specific robot
         public static final double bumperWidth = Units.inchesToMeters(4);
 
-        public static final double manualShooterSpinMax = 3; // meters / second
+        public static final double shooterSpinMax = 3; // meters / second
+        public static final double speakerShooterAngleMax = Units.degreesToRadians(80);
+        public static final double shooterHandoffAngle = Units.degreesToRadians(45);
 
         public static final double ampAutoDistanceMax = 3.0; // meters
         public static final double ampShooterAngle = Units.degreesToRadians(75);
         public static final double ampShooterSpin = 12;
         public static final double ampAutoDistanceToStartSpinning = 1; // meters
-
-        public static final double shooterHandoffAngle = Units.degreesToRadians(45);
     }
 
     public static final class Environment {
