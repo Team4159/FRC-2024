@@ -8,6 +8,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.CANSparkBase;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -33,6 +34,7 @@ public class Shooter extends SubsystemBase {
 
     /** @param goalPitch radians */
     public void setGoalPitch(double goalPitch) {
+        goalPitch = MathUtil.clamp(goalPitch, 0.5, Constants.Shooter.maximumPitch);
         angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch), CANSparkBase.ControlType.kSmartMotion);
     }
 

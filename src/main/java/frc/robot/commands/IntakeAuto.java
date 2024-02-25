@@ -6,7 +6,6 @@ import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.lib.math.RobotState;
@@ -32,14 +31,10 @@ public class IntakeAuto extends SequentialCommandGroup {
             }
         }
         addCommands(
-            i.new ChangeState(IntakeState.DOWN),
-            new ParallelCommandGroup(
-                // new WaitUntilCommand(k::feederHasNote),
-                sh.toPitch(Constants.CommandConstants.shooterHandoffAngle)
-            ),
+            sh.toPitch(Constants.CommandConstants.shooterHandoffAngle),
             new InstantCommand(() -> sh.setNeck(SpinState.FW), sh),
-            i.new ChangeState(IntakeState.HANDOFF),
-            new WaitUntilCommand(k::shooterHasNote),
+            i.new ChangeState(IntakeState.DOWN),
+            new WaitUntilCommand(k::shooterHasNote).withTimeout(2),
             new InstantCommand(() -> sh.setNeck(SpinState.ST), sh),
             i.new ChangeState(IntakeState.STOW)
         );

@@ -26,9 +26,9 @@ public class RobotContainer {
     // private final JoystickButton autoSpk = new JoystickButton(driver, 1);
     // private final JoystickButton autoAmp = new JoystickButton(driver, 2);
     // private final JoystickButton autoIntake = new JoystickButton(secondary, 2);
-    private final JoystickButton manualIntake = new JoystickButton(secondary, 1);
-    private final JoystickButton manualOuttake = new JoystickButton(secondary, 2);
-    private final JoystickButton manualShoot = new JoystickButton(secondary, 3);
+    private final JoystickButton manualIntake = new JoystickButton(secondary, 2);
+    private final JoystickButton manualOuttake = new JoystickButton(secondary, 3);
+    private final JoystickButton manualShoot = new JoystickButton(secondary, 1);
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
@@ -81,7 +81,7 @@ public class RobotContainer {
         //         new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter),
         //         s_Intake.new ChangeState(IntakeState.STOW)
         // //     ));
-        manualShoot.debounce(0.3) // does not check if kinesthetics has note- because this should also work when kinesthetics fails
+        manualShoot.debounce(0.1) // does not check if kinesthetics has note- because this should also work when kinesthetics fails
             .whileTrue(new SequentialCommandGroup(
                 new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter),
                 s_Shooter.new ChangeState(
@@ -93,13 +93,13 @@ public class RobotContainer {
                 new WaitUntilCommand(() -> !kinesthetics.shooterHasNote()).withTimeout(2),
                 new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter)
             ));
-        manualIntake.debounce(0.3)
+        manualIntake.debounce(0.1)
             .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true))
             .onFalse(new ParallelCommandGroup(
                 new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter),
                 s_Intake.new ChangeState(IntakeState.STOW)
             ));
-        manualOuttake.debounce(0.3).whileTrue(s_Intake.new ChangeState(IntakeState.SPIT));
+        manualOuttake.debounce(0.1).whileTrue(s_Intake.new ChangeState(IntakeState.SPIT));
     }
 
     public Command getAutonomousCommand() {
