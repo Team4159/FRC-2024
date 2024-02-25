@@ -5,7 +5,6 @@ import java.util.function.DoubleSupplier;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.CANSparkBase;
 
 import edu.wpi.first.math.util.Units;
@@ -28,7 +27,7 @@ public class Shooter extends SubsystemBase {
 
     /** @return radians */
     public double getPitch() {
-        return Units.rotationsToRadians(angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
+        return Units.rotationsToRadians(angleMotorController.getEncoder().getPosition());
     }
     
     /** @param goalPitch radians */
@@ -54,58 +53,52 @@ public class Shooter extends SubsystemBase {
         neckMotorController.set(ss.multiplier * Constants.Shooter.neckSpeed);
     }
 
+    @Override
+    public void periodic() {
+        System.out.println(getPitch());
+    }
+
     private static class FeedForward { // TODO: Shooter feedforward
         static double calculate(double desiredNoteVelocity) { // meters / second -> rotations / minute
             return Conversions.MPSToRPS(desiredNoteVelocity, desiredNoteVelocity) / 60;
         }
     }
 
-    public class ChangeAim extends Command {
-        private DoubleSupplier desiredPitch;
-        
-        public ChangeAim(DoubleSupplier pitchSupplier) {
+    public ChangeState toPitch(double pitch) {
+        return new ChangeState(() -> pitch, null);
+    }
+
+    public ChangeState toSpin(double spin) {
+        return new ChangeState(null, () -> spin);
+    }
+
+    public class ChangeState extends Command {
+        private DoubleSupplier desiredPitch, desiredSpin;
+
+        public ChangeState(DoubleSupplier pitchSupplier, DoubleSupplier spinSupplier) {
             addRequirements(Shooter.this);
             desiredPitch = pitchSupplier;
-        }
-    
-        @Override
-        public void execute() {
-            setGoalPitch(desiredPitch.getAsDouble());
-        }
-    
-        @Override
-        public boolean isFinished() {
-            return Math.abs(getPitch() - desiredPitch.getAsDouble()) < Constants.Shooter.pitchTolerance;
-        }
-    
-        @Override
-        public void end(boolean interrupted) {
-            if (interrupted) setGoalPitch(Constants.Shooter.restingPitch);
-            super.end(interrupted);
-        }
-    }
-    
-    public class ChangeSpin extends Command {
-        private DoubleSupplier desiredSpin;
-        
-        public ChangeSpin(DoubleSupplier spinSupplier) {
-            addRequirements(Shooter.this);
             desiredSpin = spinSupplier;
         }
-    
+        
         @Override
         public void execute() {
-            setGoalSpin(desiredSpin.getAsDouble());
+            if (desiredPitch != null) setGoalPitch(desiredPitch.getAsDouble());
+            if (desiredSpin != null) setGoalSpin(desiredSpin.getAsDouble());
         }
     
         @Override
         public boolean isFinished() {
-            return Math.abs(getSpin() - desiredSpin.getAsDouble()) < Constants.Shooter.spinTolerance;
+            return (desiredPitch == null || (Math.abs(getPitch() - desiredPitch.getAsDouble()) < Constants.Shooter.pitchTolerance))
+                && (desiredSpin == null || (Math.abs(getSpin() - desiredSpin.getAsDouble()) < Constants.Shooter.spinTolerance));
         }
     
         @Override
         public void end(boolean interrupted) {
-            if (interrupted) stopSpin();
+            if (interrupted) {
+                setGoalPitch(Constants.Shooter.restingPitch);
+                stopSpin();
+            }
             super.end(interrupted);
         }
     }

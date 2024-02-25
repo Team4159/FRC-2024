@@ -6,7 +6,6 @@ import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -16,14 +15,15 @@ public class Intake extends SubsystemBase {
     private CANSparkBase angleMotorController, intakeMotorController, feederMotorController;
 
     public Intake() {
-        angleMotorController = new CANSparkFlex(Constants.Intake.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
+        angleMotorController = new CANSparkMax(Constants.Intake.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
         intakeMotorController = new CANSparkFlex(Constants.Intake.intakeMotorID, CANSparkLowLevel.MotorType.kBrushless);
+        intakeMotorController.setInverted(true);
         feederMotorController = new CANSparkMax(Constants.Intake.feederMotorID, CANSparkLowLevel.MotorType.kBrushless);
-        feederMotorController.follow(intakeMotorController);
+        feederMotorController.follow(intakeMotorController, true);
     }
     
     /** @return radians */
-    public double getPitch() { // FIXME this has to be absolute, but currently is relative
+    public double getPitch() {
         return Units.rotationsToRadians(angleMotorController.getEncoder().getPosition());
     }
     
@@ -39,11 +39,6 @@ public class Intake extends SubsystemBase {
 
     public void setSpin(SpinState ss) {
         intakeMotorController.set(ss.multiplier * Constants.Intake.intakeSpin);
-    }
-
-    @Override
-    public void periodic() {
-        SmartDashboard.putNumber("motor", angleMotorController.getAppliedOutput());
     }
 
     public class ChangeState extends Command {
