@@ -49,7 +49,7 @@ public class SpeakerAutoAim extends Command {
             - kinesthetics.getVelocity().get(1, 0) // y velocity
         ));
         if (desiredPitch < 0) desiredPitch += Math.PI;
-        desiredYaw = transform.getRotation().getX() + 0; // TODO: Calculate angle offset to account for velocity and anglular velocity
+        desiredYaw = Math.atan(transform.getY()/transform.getX()); // TODO: Calculate angle offset to account for velocity and anglular velocity
         desiredNoteVel = Math.sqrt(
             2*Constants.Environment.G*transform.getZ()
             +
@@ -72,7 +72,8 @@ public class SpeakerAutoAim extends Command {
     public boolean isFinished() {
         return Math.abs(kinesthetics.getHeading().getRadians() - desiredYaw) < Constants.Swerve.yawTolerance
             && Math.abs(s_Shooter.getPitch() - desiredPitch) < Constants.Shooter.pitchTolerance
-            && Math.abs(s_Shooter.getSpin() - desiredNoteVel) < Constants.Shooter.spinTolerance;
+            && Math.abs(s_Shooter.getSpin() - desiredNoteVel) < Constants.Shooter.spinTolerance
+            && kinesthetics.getVelocity().get(2, 0) < Constants.CommandConstants.speakerShooterOmegaMax;
     }
 
     @Override

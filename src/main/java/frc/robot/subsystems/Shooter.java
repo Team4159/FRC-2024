@@ -5,6 +5,7 @@ import java.util.function.DoubleSupplier;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.CANSparkBase;
 
 import edu.wpi.first.math.util.Units;
@@ -27,9 +28,9 @@ public class Shooter extends SubsystemBase {
 
     /** @return radians */
     public double getPitch() {
-        return Units.rotationsToRadians(angleMotorController.getEncoder().getPosition());
+        return Units.rotationsToRadians(angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
     }
-    
+
     /** @param goalPitch radians */
     public void setGoalPitch(double goalPitch) {
         angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch), CANSparkBase.ControlType.kSmartMotion);
@@ -51,11 +52,6 @@ public class Shooter extends SubsystemBase {
 
     public void setNeck(SpinState ss) {
         neckMotorController.set(ss.multiplier * Constants.Shooter.neckSpeed);
-    }
-
-    @Override
-    public void periodic() {
-        System.out.println(getPitch());
     }
 
     private static class FeedForward { // TODO: Shooter feedforward

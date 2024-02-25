@@ -22,6 +22,7 @@ public class Vision {
     }
 
     public static Translation3d getNoteTranslation() {
+        if (!limelightTable.getEntry("notetrans").exists()) return null;
         double[] ntdata = rpiTable.getEntry("notetrans").getDoubleArray(new double[3]);
         return new Translation3d(ntdata[0], ntdata[1], ntdata[2]).plus(Constants.Intake.luxonisTranslation);
     }

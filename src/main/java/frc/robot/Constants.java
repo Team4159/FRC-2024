@@ -209,6 +209,7 @@ public final class Constants {
 
         public static final double shooterSpinMax = 3; // meters / second
         public static final double speakerShooterAngleMax = Units.degreesToRadians(80);
+        public static final double speakerShooterOmegaMax = Units.degreesToRadians(15);
         public static final double shooterHandoffAngle = Units.degreesToRadians(45);
 
         public static final double ampAutoDistanceMax = 3.0; // meters
