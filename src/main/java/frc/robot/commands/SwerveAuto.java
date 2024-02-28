@@ -10,16 +10,16 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.lib.math.RobotState;
 import frc.robot.Constants;
-import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.Swerve.AutoConfig;
 import frc.robot.subsystems.Kinesthetics;
 import frc.robot.subsystems.Swerve;
 
 public class SwerveAuto extends Command {
     private static final HolonomicDriveController controller = new HolonomicDriveController(
-            new PIDController(AutoConstants.kPXController, 0, 0),
-            new PIDController(AutoConstants.kPYController, 0, 0),
-            new ProfiledPIDController(AutoConstants.kPThetaController, 0, 0,
-                    AutoConstants.kThetaControllerConstraints));
+            new PIDController(AutoConfig.kPXController, 0, 0),
+            new PIDController(AutoConfig.kPYController, 0, 0),
+            new ProfiledPIDController(AutoConfig.kPThetaController, 0, 0,
+                    AutoConfig.kThetaControllerConstraints));
     
     private Kinesthetics kinesthetics;
     private Swerve swerve;
@@ -30,7 +30,7 @@ public class SwerveAuto extends Command {
     public SwerveAuto(Kinesthetics k, Swerve s, RobotState end) {
         kinesthetics = k;
         swerve = s;
-        trajectory = TrajectoryGenerator.generateTrajectory(kinesthetics.getPose(), null, end, new TrajectoryConfig(AutoConstants.kMaxAccelerationMetersPerSecondSquared, AutoConstants.kMaxAccelerationMetersPerSecondSquared));
+        trajectory = TrajectoryGenerator.generateTrajectory(kinesthetics.getPose(), null, end, new TrajectoryConfig(AutoConfig.kMaxAccelerationMetersPerSecondSquared, AutoConfig.kMaxAccelerationMetersPerSecondSquared));
         addRequirements(swerve);
     }
 

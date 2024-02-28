@@ -92,6 +92,22 @@ public final class Constants {
         /** Radians per Second */
         public static final double maxAngularVelocity = 4.0; //TODO: This must be tuned to specific robot
 
+        public static final class AutoConfig { //TODO: must be tuned to specific robot
+            public static final double kMaxSpeedMetersPerSecond = 3;
+            public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+            public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
+            public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
+        
+            public static final double kPXController = 1;
+            public static final double kPYController = 1;
+            public static final double kPThetaController = 1;
+        
+            /* Constraint for the motion profilied robot angle controller */
+            public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
+                new TrapezoidProfile.Constraints(
+                    kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+        }
+
         /* Neutral Modes */
         public static final NeutralModeValue angleNeutralMode = NeutralModeValue.Coast;
         public static final NeutralModeValue driveNeutralMode = NeutralModeValue.Brake;
@@ -201,22 +217,6 @@ public final class Constants {
                 this.pitch = p;
             }
         }
-    }
-
-    public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot
-        public static final double kMaxSpeedMetersPerSecond = 3;
-        public static final double kMaxAccelerationMetersPerSecondSquared = 3;
-        public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-        public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
-    
-        public static final double kPXController = 1;
-        public static final double kPYController = 1;
-        public static final double kPThetaController = 1;
-    
-        /* Constraint for the motion profilied robot angle controller */
-        public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
-            new TrapezoidProfile.Constraints(
-                kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
     }
 
     public static final class CommandConstants { // TODO: This must be tuned to specific robot
