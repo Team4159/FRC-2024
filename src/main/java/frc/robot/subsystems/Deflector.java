@@ -1,54 +1,54 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkAbsoluteEncoder;
 
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.DeflectorConstants.DeflectorState;
 
 public class Deflector extends SubsystemBase{
-    private CANSparkMax motor;
+    private CANSparkMax angleMotorController;
 
     public Deflector(){
-        motor = new CANSparkMax(Constants.DeflectorConstants.deflectorMotorID, MotorType.kBrushless);
+        angleMotorController = new CANSparkMax(Constants.DeflectorConstants.angleMotorID, MotorType.kBrushless);
     }
 
-    private void setGoalPos(double pos){
-        motor.getPIDController().setReference(pos, CANSparkMax.ControlType.kSmartMotion);
+    /** @return radians */
+    public double getPitch() {
+        return Units.rotationsToRadians(angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
     }
-
-    private void stopMotor(){
-        motor.stopMotor();
-    }
-
-    private double getPos(){
-        return motor.getEncoder().getPosition();
+    
+    /** @param goalPitch radians */
+    private void setGoalPitch(double goalPitch) {
+        angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch), CANSparkBase.ControlType.kSmartMotion);
     }
 
     public class ChangeState extends Command{
-        private final Constants.DeflectorConstants.DeflectorState dState;
+        private final Constants.DeflectorConstants.DeflectorState desiredState;
 
         public ChangeState(Constants.DeflectorConstants.DeflectorState ds){
-            dState = ds;
+            desiredState = ds;
             addRequirements(Deflector.this);
         }
 
         @Override
         public void initialize(){
-            setGoalPos(dState.pos);
+            setGoalPitch(desiredState.pitch);
             super.initialize();
         }
 
         @Override
         public boolean isFinished(){
-            return(Math.abs(getPos() -dState.pos) <= Constants.DeflectorConstants.deflectorTolerance);
+            return(Math.abs(getPitch() - desiredState.pitch) <= Constants.DeflectorConstants.deflectorTolerance);
         }
 
         @Override
         public void end(boolean interrupted){
-            if(interrupted) setGoalPos(Constants.DeflectorConstants.DeflectorState.DOWN.pos);
+            if(interrupted) setGoalPitch(Constants.DeflectorConstants.DeflectorState.DOWN.pitch);
             super.end(interrupted);
         }
     }

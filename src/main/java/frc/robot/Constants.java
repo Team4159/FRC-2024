@@ -1,5 +1,6 @@
 package frc.robot;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -10,6 +11,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -18,6 +20,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.util.COTSTalonFXSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
+import frc.robot.commands.ShooterCommand;
 
 public final class Constants {
     public static final double stickDeadband = 0.1;
@@ -186,20 +189,22 @@ public final class Constants {
         public static final double restingPitch = 0; // radians
         public static final double maximumPitch = Math.PI/2; // radians
         public static final double neckSpeed = 0.3; // volts / 12, -1 to 1
+
+        public static final Map<Transform2d, ShooterCommand> shooterTable = new HashMap<>();
+        // add map values below
     }
 
     public static final class DeflectorConstants {
-        public static final int deflectorMotorID = 8;
+        public static final int angleMotorID = 8;
         public static final double deflectorTolerance = Math.PI/256;
         public static enum DeflectorState{
-            //TODO: Temporary Values. Change setpoints once deflector built
-            // radians
             UP(Math.PI * 2.0/3.0),
             DOWN(0);
 
-            public final double pos;
-            private DeflectorState(double pos){
-                this.pos = pos;
+            /** @param p radians */
+            public final double pitch;
+            private DeflectorState(double p){
+                this.pitch = p;
             }
         }
     }
