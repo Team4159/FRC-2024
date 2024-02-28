@@ -5,6 +5,9 @@ import java.util.Map;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
+import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -136,6 +139,14 @@ public final class Constants {
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
+
+        public static final HolonomicPathFollowerConfig autoPathFollowerConfig = new HolonomicPathFollowerConfig( // TODO set values
+            new PIDConstants(5, 0, 0), // translation PID constants
+            new PIDConstants(5, 0, 0), // rotation PID constants
+            Constants.AutoConstants.kMaxSpeedMetersPerSecond, 
+            0.48, // drive base radius in m
+            new ReplanningConfig() // default path replanning config
+        );
     }
 
     public static final class Shooter {
