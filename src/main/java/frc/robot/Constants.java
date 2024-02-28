@@ -20,7 +20,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.util.COTSTalonFXSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
-import frc.robot.commands.ShooterCommand;
 
 public final class Constants {
     public static final double stickDeadband = 0.1;
@@ -189,9 +188,6 @@ public final class Constants {
         public static final double restingPitch = 0; // radians
         public static final double maximumPitch = Math.PI/2; // radians
         public static final double neckSpeed = 0.3; // volts / 12, -1 to 1
-
-        public static final Map<Transform2d, ShooterCommand> shooterTable = new HashMap<>();
-        // add map values below
     }
 
     public static final class DeflectorConstants {
