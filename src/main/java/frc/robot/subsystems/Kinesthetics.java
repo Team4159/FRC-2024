@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -34,6 +35,9 @@ public class Kinesthetics extends SubsystemBase {
         gyro = new Pigeon2(Constants.Swerve.pigeonID, Constants.Swerve.canBus);
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.setYaw(0);
+
+        Timer.delay(0.1);
+        s_Swerve.resetModulesToAbsolute();
 
         // feederBeamBreak = new DigitalInput(Constants.Intake.beamBreakID);
         shooterBeamBreak = new DigitalInput(Constants.Shooter.beamBreakID);

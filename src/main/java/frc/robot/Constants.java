@@ -102,7 +102,7 @@ public final class Constants {
             public static final int driveMotorID = 1;
             public static final int angleMotorID = 2;
             public static final int canCoderID = 1;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(125);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-54);
 
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -113,7 +113,7 @@ public final class Constants {
             public static final int driveMotorID = 3;
             public static final int angleMotorID = 4;
             public static final int canCoderID = 2;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(110); // -69.8
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-69); // -69.8
 
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -124,7 +124,7 @@ public final class Constants {
             public static final int driveMotorID = 5;
             public static final int angleMotorID = 6;
             public static final int canCoderID = 3;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(163);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-16);
 
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -135,7 +135,7 @@ public final class Constants {
             public static final int driveMotorID = 7;
             public static final int angleMotorID = 8;
             public static final int canCoderID = 4;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-124); // 55.4
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(55); // 55.4
 
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -146,12 +146,12 @@ public final class Constants {
         public static final int angleMotorID = 1;
         public static final int intakeMotorID = 2;
         public static final int feederMotorID = 3;
-        public static final int beamBreakID = 0; // PWM
+        public static final int beamBreakID = 1; // PWM
 
         public static final double pitchTolerance = Math.PI/64; // radians
         public static final double spinTolerance = Math.PI/16; // radians
 
-        public static final double intakeSpin = 0.6; // radians / second, -1 to 1
+        public static final double intakeSpin = 1; // -1 to 1
 
         public static final double intakeRange = 0.2; // meters
         public static final double intakeField = 64; // degrees
@@ -178,7 +178,7 @@ public final class Constants {
         public static final int shooterMLeftID = 5;
         public static final int shooterMRightID = 6;
         public static final int neckMotorID = 7;
-        public static final int beamBreakID = 1; // PWM
+        public static final int beamBreakID = 0; // PWM
 
         public static final double pitchTolerance = Math.PI/512;
         public static final double spinTolerance = Math.PI/256;
@@ -205,12 +205,12 @@ public final class Constants {
     }
 
     public static final class CommandConstants { // TODO: This must be tuned to specific robot
-        public static final double bumperWidth = Units.inchesToMeters(4);
+        public static final double bumperWidth = Units.inchesToMeters(2.75);
 
-        public static final double shooterSpinMax = 3; // meters / second
-        public static final double speakerShooterAngleMax = Units.degreesToRadians(80);
-        public static final double speakerShooterOmegaMax = Units.degreesToRadians(15);
+        public static final double shooterSpinMax = 20; // meters / second
         public static final double shooterHandoffAngle = Units.degreesToRadians(45);
+        public static final double speakerShooterAngleMax = Units.degreesToRadians(80);
+        public static final double speakerAutoOmegaMax = Units.degreesToRadians(15);
 
         public static final double ampAutoDistanceMax = 3.0; // meters
         public static final double ampShooterAngle = Units.degreesToRadians(75);

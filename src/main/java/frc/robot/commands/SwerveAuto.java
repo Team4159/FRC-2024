@@ -31,14 +31,14 @@ public class SwerveAuto extends Command {
         kinesthetics = k;
         swerve = s;
         trajectory = TrajectoryGenerator.generateTrajectory(kinesthetics.getPose(), null, end, new TrajectoryConfig(AutoConstants.kMaxAccelerationMetersPerSecondSquared, AutoConstants.kMaxAccelerationMetersPerSecondSquared));
-        addRequirements(kinesthetics, swerve);
+        addRequirements(swerve);
     }
 
     public SwerveAuto(Kinesthetics k, Swerve s, Trajectory t) {
         kinesthetics = k;
         swerve = s;
         trajectory = t;
-        addRequirements(kinesthetics, swerve);
+        addRequirements(swerve);
     }
 
     @Override

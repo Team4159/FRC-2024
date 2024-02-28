@@ -52,13 +52,14 @@ public class Shooter extends SubsystemBase {
         shooterMLeftController.stopMotor();
     }
 
-    public void setNeck(SpinState ss) {
+    private void setNeck(SpinState ss) {
         neckMotorController.set(ss.multiplier * Constants.Shooter.neckSpeed);
     }
 
     private static class FeedForward { // TODO: Shooter feedforward
-        static double calculate(double desiredNoteVelocity) { // meters / second -> rotations / minute
-            return Conversions.MPSToRPS(desiredNoteVelocity, desiredNoteVelocity) / 60;
+        /** @return rotations / minute */
+        static double calculate(double desiredNoteVelocity) {
+            return Conversions.MPSToRPS(desiredNoteVelocity, Units.inchesToMeters(4 * Math.PI)) * 60;
         }
     }
 
@@ -71,12 +72,20 @@ public class Shooter extends SubsystemBase {
     }
 
     public class ChangeState extends Command {
+        private boolean continuous = false;
         private DoubleSupplier desiredPitch, desiredSpin;
 
         public ChangeState(DoubleSupplier pitchSupplier, DoubleSupplier spinSupplier) {
-            addRequirements(Shooter.this);
             desiredPitch = pitchSupplier;
             desiredSpin = spinSupplier;
+            addRequirements(Shooter.this);
+        }
+
+        public ChangeState(DoubleSupplier pitchSupplier, DoubleSupplier spinSupplier, boolean continuous) {
+            desiredPitch = pitchSupplier;
+            desiredSpin = spinSupplier;
+            this.continuous = continuous;
+            addRequirements(Shooter.this);
         }
         
         @Override
@@ -87,16 +96,52 @@ public class Shooter extends SubsystemBase {
     
         @Override
         public boolean isFinished() {
+            if (continuous) return false;
             return (desiredPitch == null || (Math.abs(getPitch() - desiredPitch.getAsDouble()) < Constants.Shooter.pitchTolerance))
                 && (desiredSpin == null || (Math.abs(getSpin() - desiredSpin.getAsDouble()) < Constants.Shooter.spinTolerance));
         }
     
         @Override
         public void end(boolean interrupted) {
-            if (interrupted) {
+            if (interrupted && !continuous) {
                 setGoalPitch(Constants.Shooter.restingPitch);
                 stopSpin();
             }
+            super.end(interrupted);
+        }
+    }
+
+    public class ChangeNeck extends Command {
+        private Kinesthetics kinesthetics;
+
+        private boolean beamBreakMode; // should this command end when the beam break opens
+        private SpinState desiredNeck;
+
+        public ChangeNeck(SpinState ss) {
+            desiredNeck = ss;
+            addRequirements(Shooter.this);
+        }
+
+        public ChangeNeck(Kinesthetics k, SpinState ss) {
+            kinesthetics = k;
+            desiredNeck = ss;
+            beamBreakMode = kinesthetics.shooterHasNote();
+            addRequirements(Shooter.this);
+        }
+
+        @Override
+        public void initialize() {
+            setNeck(desiredNeck);
+        }
+
+        @Override
+        public boolean isFinished() { // this needs to be changed if it runs before initialize does
+            return !beamBreakMode || !kinesthetics.shooterHasNote();
+        }
+
+        @Override
+        public void end(boolean interrupted) {
+            if (interrupted) setNeck(SpinState.ST);
             super.end(interrupted);
         }
     }

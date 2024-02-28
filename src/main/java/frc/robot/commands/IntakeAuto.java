@@ -5,13 +5,13 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.lib.math.RobotState;
 import frc.robot.Constants;
-import frc.robot.Constants.SpinState;
 import frc.robot.Constants.Intake.IntakeState;
+import frc.robot.Constants.SpinState;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Kinesthetics;
 import frc.robot.subsystems.Shooter;
@@ -31,12 +31,14 @@ public class IntakeAuto extends SequentialCommandGroup {
             }
         }
         addCommands(
-            sh.toPitch(Constants.CommandConstants.shooterHandoffAngle),
-            new InstantCommand(() -> sh.setNeck(SpinState.FW), sh),
+            // sh.toPitch(Constants.CommandConstants.shooterHandoffAngle),
+            sh.new ChangeNeck(SpinState.FW),
             i.new ChangeState(IntakeState.DOWN),
             new WaitUntilCommand(k::shooterHasNote).withTimeout(2),
-            new InstantCommand(() -> sh.setNeck(SpinState.ST), sh),
-            i.new ChangeState(IntakeState.STOW)
+            new ParallelCommandGroup( // ending commands
+                i.new ChangeState(IntakeState.STOW),
+                sh.new ChangeNeck(SpinState.ST)
+            )
         );
     }
 

@@ -29,7 +29,7 @@ public class SpeakerAutoAim extends Command {
         s_Shooter = sh;
         desiredTranslation = translationSup;
         desiredStrafe = strafeSup;
-        addRequirements(kinesthetics, s_Swerve, s_Shooter);
+        addRequirements(s_Swerve, s_Shooter);
     }
 
     private static Transform3d getDifference(Kinesthetics k) {
@@ -73,7 +73,7 @@ public class SpeakerAutoAim extends Command {
         return Math.abs(kinesthetics.getHeading().getRadians() - desiredYaw) < Constants.Swerve.yawTolerance
             && Math.abs(s_Shooter.getPitch() - desiredPitch) < Constants.Shooter.pitchTolerance
             && Math.abs(s_Shooter.getSpin() - desiredNoteVel) < Constants.Shooter.spinTolerance
-            && kinesthetics.getVelocity().get(2, 0) < Constants.CommandConstants.speakerShooterOmegaMax;
+            && kinesthetics.getVelocity().get(2, 0) < Constants.CommandConstants.speakerAutoOmegaMax;
     }
 
     @Override

@@ -29,7 +29,7 @@ public class Intake extends SubsystemBase {
     }
     
     /** @param goalPitch radians */
-    public void setGoalPitch(double goalPitch) {
+    private void setGoalPitch(double goalPitch) {
         angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch), CANSparkBase.ControlType.kSmartMotion);
     }
 
@@ -38,7 +38,7 @@ public class Intake extends SubsystemBase {
         return Units.rotationsPerMinuteToRadiansPerSecond(intakeMotorController.getEncoder().getVelocity());
     }
 
-    public void setSpin(SpinState ss) {
+    private void setSpin(SpinState ss) {
         intakeMotorController.set(ss.multiplier * Constants.Intake.intakeSpin);
     }
 
