@@ -31,6 +31,7 @@ public class RobotContainer {
     private final Swerve s_Swerve = new Swerve();
     private final Shooter s_Shooter = new Shooter();
     private final Intake s_Intake = new Intake();
+    private final Deflector s_Deflector = new Deflector();
 
     private final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve);
 
@@ -68,7 +69,7 @@ public class RobotContainer {
         autoAmp.debounce(0.3).and(kinesthetics::shooterHasNote).and(() -> AmpAuto.isInRange(kinesthetics))
             .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
             .whileTrue(new SequentialCommandGroup(
-                new AmpAuto(kinesthetics, s_Swerve, s_Shooter),
+                new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector),
                 s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW)
             ));
         // autoIntake.debounce(0.3).and(() -> !kinesthetics.shooterHasNote()) // && !kinesthetics.feederHasNote()

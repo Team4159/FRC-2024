@@ -188,6 +188,22 @@ public final class Constants {
         public static final double neckSpeed = 0.3; // volts / 12, -1 to 1
     }
 
+    public static final class DeflectorConstants {
+        public static final int deflectorMotorID = 8;
+        public static final double deflectorTolerance = Math.PI/256;
+        public static enum DeflectorState{
+            //TODO: Temporary Values. Change setpoints once deflector built
+            // radians
+            UP(Math.PI * 2.0/3.0),
+            DOWN(0);
+
+            public final double pos;
+            private DeflectorState(double pos){
+                this.pos = pos;
+            }
+        }
+    }
+
     public static final class AutoConstants { //TODO: The below constants are used in the example auto, and must be tuned to specific robot
         public static final double kMaxSpeedMetersPerSecond = 3;
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;
