@@ -41,6 +41,14 @@ public class RobotContainer {
 
     private final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve);
 
+    private static final SendableChooser<Photogates.PhotogateDataMode> photogateDataMode = new SendableChooser<>();
+    static {
+        photogateDataMode.setDefaultOption("all", null);
+        photogateDataMode.addOption("delta", Photogates.PhotogateDataMode.DELTA);
+        photogateDataMode.addOption("first", Photogates.PhotogateDataMode.FIRST);
+        photogateDataMode.addOption("second",Photogates.PhotogateDataMode.SECOND);
+    };
+
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         s_Swerve.setDefaultCommand(
@@ -52,6 +60,8 @@ public class RobotContainer {
                 () -> false 
             )
         );
+
+        SmartDashboard.putData("Photogate Mode", photogateDataMode);
 
         // Configure the button bindings
         configureButtonBindings();
@@ -106,14 +116,9 @@ public class RobotContainer {
             .onFalse(s_Intake.new ChangeState(IntakeState.STOW));
 
         dumpData.debounce(5)
-            .onTrue(new InstantCommand(() -> System.out.println(
-                Photogates.calculateRegression(s_Photogates.exportData(
-                    (int)Math.floor(SmartDashboard.getNumber("regressmode", 0)),
-                    s_Shooter.getSpin()
-                ))
-            ), s_Photogates));
+            .onTrue(new InstantCommand(() -> System.out.println(s_Photogates.calculateRegression(photogateDataMode.getSelected())), s_Photogates));
         clearData
-            .onTrue(new InstantCommand(() -> s_Photogates.clearData(), s_Photogates));
+            .onTrue(new InstantCommand(s_Photogates::clearData, s_Photogates));
     }
 
     public Command getAutonomousCommand() {
