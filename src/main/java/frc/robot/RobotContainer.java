@@ -58,7 +58,7 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         /* Driver Buttons */
-        zeroGyro.onTrue(new InstantCommand(() -> kinesthetics.zeroHeading()));
+        zeroGyro.onTrue(new InstantCommand(kinesthetics::zeroHeading));
         // autoSpk.debounce(0.3).and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
         //     .whileTrue(new SequentialCommandGroup(
         //         new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter),

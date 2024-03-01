@@ -20,7 +20,7 @@ public class Shooter extends SubsystemBase {
     private CANSparkBase angleMotorController, shooterMLeftController, shooterMRightController, neckMotorController;
     
     public Shooter() {
-        angleMotorController = new CANSparkMax(Constants.Shooter.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
+        angleMotorController = new CANSparkFlex(Constants.Shooter.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
         shooterMLeftController = new CANSparkFlex(Constants.Shooter.shooterMLeftID, CANSparkLowLevel.MotorType.kBrushless);
         shooterMRightController= new CANSparkFlex(Constants.Shooter.shooterMRightID,CANSparkLowLevel.MotorType.kBrushless);
         shooterMRightController.follow(shooterMLeftController, true); // for now, no spin.
