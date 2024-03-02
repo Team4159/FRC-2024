@@ -1,17 +1,13 @@
 package frc.robot.subsystems;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.Shooter;
 
 public class Photogates extends SubsystemBase {
     private final double DELTA_DISTANCE = 0.05; // meters
@@ -81,5 +77,5 @@ public class Photogates extends SubsystemBase {
     }
 
     public static enum PhotogateDataMode {DELTA, FIRST, SECOND}
-    private record PhotogateData(PhotogateDataMode mode, double shooterRadPerSec, double photogateMetPerSec);
+    private record PhotogateData(PhotogateDataMode mode, double shooterRadPerSec, double photogateMetPerSec) {};
 }

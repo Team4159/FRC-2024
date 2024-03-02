@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -37,17 +38,16 @@ public class RobotContainer {
     private final Swerve s_Swerve = new Swerve();
     private final Shooter s_Shooter = new Shooter();
     private final Intake s_Intake = new Intake();
-    private final Photogates s_Photogates = new Photogates();
+    private final Photogates s_Photogates = new Photogates(s_Shooter);
 
     private final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve);
 
-    private static final SendableChooser<Photogates.PhotogateDataMode> photogateDataMode = new SendableChooser<>();
-    static {
-        photogateDataMode.setDefaultOption("all", null);
-        photogateDataMode.addOption("delta", Photogates.PhotogateDataMode.DELTA);
-        photogateDataMode.addOption("first", Photogates.PhotogateDataMode.FIRST);
-        photogateDataMode.addOption("second",Photogates.PhotogateDataMode.SECOND);
-    };
+    private static final SendableChooser<Photogates.PhotogateDataMode> photogateDataMode = new SendableChooser<>() {{
+        setDefaultOption("all", null);
+        addOption("delta", Photogates.PhotogateDataMode.DELTA);
+        addOption("first", Photogates.PhotogateDataMode.FIRST);
+        addOption("second",Photogates.PhotogateDataMode.SECOND);
+    }};
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
