@@ -79,7 +79,7 @@ public class SpeakerAutoAim extends Command {
     @Override
     public void end(boolean interrupted) {
         if (interrupted) {
-            s_Shooter.setGoalPitch(Constants.Shooter.restingPitch);
+            s_Shooter.setGoalPitch(0);
             s_Shooter.stopSpin();
         }
         super.end(interrupted);

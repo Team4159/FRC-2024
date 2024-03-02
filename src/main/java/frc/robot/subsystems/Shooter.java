@@ -8,7 +8,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.CANSparkBase;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -29,13 +28,12 @@ public class Shooter extends SubsystemBase {
 
     /** @return radians */
     public double getPitch() {
-        return Units.rotationsToRadians(angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
+        return Units.rotationsToRadians(angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition() - Constants.Shooter.pitchOffset);
     }
 
     /** @param goalPitch radians */
     public void setGoalPitch(double goalPitch) {
-        goalPitch = MathUtil.clamp(goalPitch, 0.5, Constants.Shooter.maximumPitch);
-        angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch), CANSparkBase.ControlType.kSmartMotion);
+        angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch) + Constants.Shooter.pitchOffset, CANSparkBase.ControlType.kSmartMotion);
     }
 
     /** @return radians / second */
@@ -45,7 +43,10 @@ public class Shooter extends SubsystemBase {
 
     /** @param goalNoteVel meters / second */
     public void setGoalSpin(double goalNoteVel) {
-        shooterMLeftController.getPIDController().setReference(FeedForward.calculate(goalNoteVel), CANSparkBase.ControlType.kSmartVelocity);
+        shooterMLeftController.getPIDController().setReference(
+            Conversions.MPSToRPS(goalNoteVel, Units.inchesToMeters(4) * Math.PI) * 60,
+            CANSparkBase.ControlType.kSmartVelocity
+        );
     }
 
     public void stopSpin() {
@@ -54,13 +55,6 @@ public class Shooter extends SubsystemBase {
 
     private void setNeck(SpinState ss) {
         neckMotorController.set(ss.multiplier * Constants.Shooter.neckSpeed);
-    }
-
-    private static class FeedForward { // TODO: Shooter feedforward
-        /** @return rotations / minute */
-        static double calculate(double desiredNoteVelocity) {
-            return Conversions.MPSToRPS(desiredNoteVelocity, Units.inchesToMeters(4 * Math.PI)) * 60;
-        }
     }
 
     public ChangeState toPitch(double pitch) {
@@ -104,7 +98,7 @@ public class Shooter extends SubsystemBase {
         @Override
         public void end(boolean interrupted) {
             if (interrupted && !continuous) {
-                setGoalPitch(Constants.Shooter.restingPitch);
+                setGoalPitch(0);
                 stopSpin();
             }
             super.end(interrupted);

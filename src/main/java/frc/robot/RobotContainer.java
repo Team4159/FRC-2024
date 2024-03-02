@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -11,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.Intake.IntakeState;
 import frc.robot.Constants.SpinState;
@@ -32,7 +34,7 @@ public class RobotContainer {
     private static final JoystickButton manualOuttake = new JoystickButton(secondary, 3);
 
     private static final JoystickButton dumpData = new JoystickButton(secondary, 16);
-    private static final JoystickButton clearData = new JoystickButton(secondary, 13);
+    private static final JoystickButton clearData = new JoystickButton(secondary, 15);
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
@@ -44,7 +46,6 @@ public class RobotContainer {
 
     private static final SendableChooser<Photogates.PhotogateDataMode> photogateDataMode = new SendableChooser<>() {{
         setDefaultOption("all", null);
-        addOption("delta", Photogates.PhotogateDataMode.DELTA);
         addOption("first", Photogates.PhotogateDataMode.FIRST);
         addOption("second",Photogates.PhotogateDataMode.SECOND);
     }};
@@ -65,6 +66,8 @@ public class RobotContainer {
 
         // Configure the button bindings
         configureButtonBindings();
+
+        DriverStation.silenceJoystickConnectionWarning(true);
     }
 
     /**
@@ -82,7 +85,7 @@ public class RobotContainer {
         //         new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()),
         //         new InstantCommand(() -> s_Shooter.setNeck(SpinState.FW))
         //     )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter));
-        autoAmp.debounce(0.3).and(kinesthetics::shooterHasNote).and(() -> AmpAuto.isInRange(kinesthetics))
+        autoAmp.debounce(0.1).and(kinesthetics::shooterHasNote).and(() -> AmpAuto.isInRange(kinesthetics))
             .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
             .whileTrue(new SequentialCommandGroup(
                 new AmpAuto(kinesthetics, s_Swerve, s_Shooter),
@@ -95,28 +98,35 @@ public class RobotContainer {
         //         new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter),
         //         s_Intake.new ChangeState(IntakeState.STOW)
         // //     ));
-        manualShoot.debounce(0.3) // does not check if kinesthetics has note- because this should also work when kinesthetics fails
+        manualShoot.debounce(0.1) // does not check if kinesthetics has note- because this should also work when kinesthetics fails
             .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
             .whileTrue(s_Shooter.new ChangeState(
-                () -> (secondary.getThrottle()+1)/2 * Constants.CommandConstants.speakerShooterAngleMax,
+                () -> (1-secondary.getThrottle())/2 * Constants.CommandConstants.speakerShooterAngleMax + Constants.CommandConstants.speakerShooterAngleMin,
                 () -> Math.abs(secondary.getY()) * Constants.CommandConstants.shooterSpinMax,
                 true
             )).onFalse(new SequentialCommandGroup(
-                s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
-                s_Shooter.new ChangeState(() -> Constants.Shooter.restingPitch, () -> 0)
+                new ParallelCommandGroup(
+                    s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
+                    new WaitCommand(1)
+                ),
+                s_Shooter.new ChangeNeck(SpinState.ST),
+                s_Shooter.new ChangeState(() -> 0, () -> 0)
             ));
-        manualIntake.debounce(0.3)
+        manualIntake.debounce(0.1)
             .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true))
             .onFalse(new ParallelCommandGroup(
                 s_Intake.new ChangeState(IntakeState.STOW),
                 s_Shooter.new ChangeNeck(SpinState.ST)
             ));
-        manualOuttake.debounce(0.3)
+        manualOuttake.debounce(0.1)
             .whileTrue(s_Intake.new ChangeState(IntakeState.SPIT))
             .onFalse(s_Intake.new ChangeState(IntakeState.STOW));
 
-        dumpData.debounce(5)
-            .onTrue(new InstantCommand(() -> System.out.println(s_Photogates.calculateRegression(photogateDataMode.getSelected())), s_Photogates));
+        dumpData.debounce(0.1)
+            .onTrue(new InstantCommand(() -> {
+                var ff = s_Photogates.calculateRegression(photogateDataMode.getSelected());
+                SmartDashboard.putString("regression", "y = "+ff.kv+"x + "+ff.ks);
+        }, s_Photogates));
         clearData
             .onTrue(new InstantCommand(s_Photogates::clearData, s_Photogates));
     }

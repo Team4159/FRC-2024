@@ -12,6 +12,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -48,6 +49,7 @@ public class Kinesthetics extends SubsystemBase {
 
     @Override
     public void periodic() {
+        SmartDashboard.putBoolean("shoter", shooterBeamBreak.get());
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
         var visionPose = Vision.getBotPose();
         if (visionPose != null)
