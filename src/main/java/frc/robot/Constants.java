@@ -140,6 +140,7 @@ public final class Constants {
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
 
+        // used by PathPlanner during setup
         public static final HolonomicPathFollowerConfig autoPathFollowerConfig = new HolonomicPathFollowerConfig( // TODO set values
             new PIDConstants(5, 0, 0), // translation PID constants
             new PIDConstants(5, 0, 0), // rotation PID constants

@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.SpinState;
 import frc.robot.Constants.Intake.IntakeState;
-// import frc.robot.autos.*;
+import frc.robot.auto.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 
@@ -62,15 +62,15 @@ public class RobotContainer {
             )
         );
 
-        // Register Named Commands for PathPlanner
+        // register Named Commands for PathPlanner
         NamedCommands.registerCommand("ampAuto", new AmpAuto(kinesthetics, s_Swerve, s_Shooter));
         NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake));
-        NamedCommands.registerCommand("speakerAutoAim", new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, null, null));
+        NamedCommands.registerCommand("speakerAutoAim", new ParallelCommandGroup(new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, null, null), new SpeakerAutoAimYaw(kinesthetics, s_Swerve, s_Shooter, null, null)));
 
-        // Configure the button bindings
+        // configure the button bindings
         configureButtonBindings();
 
-        // Configure SmartDashboard
+        // configure SmartDashboard
         autoChooser = AutoBuilder.buildAutoChooser(); // can accept a default auto by passing in its name as a string
         SmartDashboard.putData("Auto Chooser", autoChooser);
     }

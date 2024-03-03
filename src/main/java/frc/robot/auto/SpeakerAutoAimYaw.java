@@ -1,4 +1,8 @@
-package frc.robot.commands;
+/* a clone of SpeakerAutoAim that doesn't affect the robot and instead is able to return a desired rotation
+ * used for PathPlanner autos to override path rotation
+ */
+
+package frc.robot.auto;
 
 import java.util.function.DoubleSupplier;
 
@@ -12,7 +16,9 @@ import frc.robot.subsystems.Kinesthetics;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 
-public class SpeakerAutoAim extends Command {
+public class SpeakerAutoAimYaw extends Command {
+    public static SpeakerAutoAimYaw instance;
+
     private Kinesthetics kinesthetics;
     private Swerve s_Swerve;
     private Shooter s_Shooter;
@@ -23,12 +29,13 @@ public class SpeakerAutoAim extends Command {
     private double desiredPitch;
     private double desiredNoteVel; // radians/second
 
-    public SpeakerAutoAim(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
+    public SpeakerAutoAimYaw(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
         kinesthetics = k;
         s_Swerve = sw;
         s_Shooter = sh;
         desiredTranslation = translationSup;
         desiredStrafe = strafeSup;
+        instance = this;
         addRequirements(kinesthetics, s_Swerve, s_Shooter);
     }
 
@@ -60,12 +67,12 @@ public class SpeakerAutoAim extends Command {
             , 2)
         );
 
-        s_Swerve.drive(
-            new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed),
-            desiredYaw, true, false
-        );
-        s_Shooter.setGoalPitch(desiredPitch);
-        s_Shooter.setGoalSpin(desiredNoteVel);
+        //s_Swerve.drive(
+        //    new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed),
+        //    desiredYaw, true, false
+        //);
+        //s_Shooter.setGoalPitch(desiredPitch);
+        //s_Shooter.setGoalSpin(desiredNoteVel);
     }
 
     @Override
@@ -87,5 +94,9 @@ public class SpeakerAutoAim extends Command {
     public static boolean isInRange(Kinesthetics k) {
         Translation2d offset = getDifference(k).getTranslation().toTranslation2d();
         return offset.getY() < 0.1 && offset.getX() < 3; // TODO: plot out valid range
+    }
+
+    public double getDesiredYaw() {
+        return desiredYaw;
     }
 }

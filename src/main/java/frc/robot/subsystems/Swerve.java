@@ -1,17 +1,24 @@
 package frc.robot.subsystems;
 
 import frc.robot.SwerveModule;
+import frc.robot.auto.SpeakerAutoAimYaw;
 import frc.robot.Constants;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+
+import java.util.Optional;
+
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
@@ -27,20 +34,23 @@ public class Swerve extends SubsystemBase {
             new SwerveModule(3, Constants.Swerve.Mod3.constants)
         };
         
+        // PathPlanner setup
         AutoBuilder.configureHolonomic(
-            this.kinesthetics::getPose,
-            this.kinesthetics::setPose,
-            () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(this.getModuleStates()),
-            (ChassisSpeeds chassisSpeeds) -> {
+            this.kinesthetics::getPose, // a supplier for the robot pose
+            this.kinesthetics::setPose, // a consumer for the robot pose, accepts Pose2d
+            () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(this.getModuleStates()), // a supplier for robot relative ChassisSpeeds
+            (ChassisSpeeds chassisSpeeds) -> { // the drive method, accepts robot relative ChassisSpeeds
                 SwerveModuleState[] swerveModuleStates =
                 Constants.Swerve.swerveKinematics.toSwerveModuleStates(chassisSpeeds);
                 SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
                 for(SwerveModule mod : mSwerveMods) mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false);
             }, 
-            Constants.Swerve.autoPathFollowerConfig,
-            () -> this.kinesthetics.getAlliance() == DriverStation.Alliance.Red,
-            this // Reference to this subsystem to set requirements
+            Constants.Swerve.autoPathFollowerConfig, // config, include PID values
+            () -> this.kinesthetics.getAlliance() == DriverStation.Alliance.Red, // determines if autos should be flipped (i.e. if on Red Alliance)
+            this // reference to this subsystem to set requirements
         );
+
+        PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
     }
 
     public void setKinesthetics(Kinesthetics k) {
@@ -93,6 +103,17 @@ public class Swerve extends SubsystemBase {
     public void resetModulesToAbsolute(){
         for(SwerveModule mod : mSwerveMods) mod.resetToAbsolute();
     }
+
+    // override the path rotation if robot is currently shooting into speaker
+    public Optional<Rotation2d> getRotationTargetOverride(){
+    if (CommandScheduler.getInstance().isScheduled(SpeakerAutoAimYaw.instance)) {
+        // return an optional containing the speaker's rotation override (field relative rotation)
+        return Optional.of(new Rotation2d(SpeakerAutoAimYaw.instance.getDesiredYaw()));
+    } else {
+        // return an empty optional when path rotation should not be overriden
+        return Optional.empty();
+    }
+}
 
     @Override
     public void periodic(){
