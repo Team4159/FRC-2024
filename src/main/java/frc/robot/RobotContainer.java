@@ -1,9 +1,14 @@
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -43,6 +48,8 @@ public class RobotContainer {
 
     private final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve);
 
+    private final SendableChooser<Command> autoChooser;
+
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         s_Swerve.setDefaultCommand(
@@ -55,8 +62,17 @@ public class RobotContainer {
             )
         );
 
+        // Register Named Commands for PathPlanner
+        NamedCommands.registerCommand("ampAuto", new AmpAuto(kinesthetics, s_Swerve, s_Shooter));
+        NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake));
+        NamedCommands.registerCommand("speakerAutoAim", new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, null, null));
+
         // Configure the button bindings
         configureButtonBindings();
+
+        // Configure SmartDashboard
+        autoChooser = AutoBuilder.buildAutoChooser(); // can accept a default auto by passing in its name as a string
+        SmartDashboard.putData("Auto Chooser", autoChooser);
     }
 
     /**
@@ -111,7 +127,8 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return new SequentialCommandGroup(
-            Commands.runOnce(() -> kinesthetics.setPose(new Pose2d()))
-        ); // add auto here
+            Commands.runOnce(() -> kinesthetics.setPose(new Pose2d())),
+            autoChooser.getSelected()
+        );
     }
 }

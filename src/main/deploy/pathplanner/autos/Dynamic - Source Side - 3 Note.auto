@@ -5,7 +5,7 @@
       "x": 0.6573619984846805,
       "y": 4.397002070357417
     },
-    "rotation": -58.67130713219573
+    "rotation": 120.46554491945986
   },
   "command": {
     "type": "sequential",
@@ -24,7 +24,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Long to 8"
+                  "pathName": "Source Side to 8"
                 }
               }
             ]

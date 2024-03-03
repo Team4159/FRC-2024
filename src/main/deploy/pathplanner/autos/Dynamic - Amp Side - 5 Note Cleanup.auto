@@ -5,7 +5,7 @@
       "x": 0.6807503073695607,
       "y": 6.700750495518085
     },
-    "rotation": 60.25511870305773
+    "rotation": -118.72926878445519
   },
   "command": {
     "type": "sequential",
@@ -24,7 +24,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Short to 1"
+                  "pathName": "Amp Side to 1"
                 }
               }
             ]
@@ -82,6 +82,24 @@
           "type": "path",
           "data": {
             "pathName": "3 to 6"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "intakeAuto"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "6 to Stage"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "speakerAutoAim"
           }
         }
       ]

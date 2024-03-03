@@ -5,7 +5,7 @@
       "x": 0.7041386162544403,
       "y": 4.420390379242297
     },
-    "rotation": -58.392497753751115
+    "rotation": 118.9509952074668
   },
   "command": {
     "type": "sequential",
@@ -27,7 +27,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Long to Hide"
+            "pathName": "Source Side to Hide"
           }
         }
       ]
