@@ -14,7 +14,7 @@
         {
           "type": "named",
           "data": {
-            "name": "speakerAutoAim"
+            "name": "speakerSubwoofer"
           }
         },
         {
@@ -32,7 +32,25 @@
         {
           "type": "named",
           "data": {
-            "name": "speakerAutoAim"
+            "name": "speakerSubwoofer"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Side to 5 Static Intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5 to Amp Side"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "speakerSubwoofer"
           }
         }
       ]

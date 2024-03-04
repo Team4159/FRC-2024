@@ -164,7 +164,7 @@ public final class Constants {
         public static final HolonomicPathFollowerConfig autoPathFollowerConfig = new HolonomicPathFollowerConfig( // TODO set values
             new PIDConstants(5, 0, 0), // translation PID constants
             new PIDConstants(5, 0, 0), // rotation PID constants
-            Constants.AutoConstants.kMaxSpeedMetersPerSecond, 
+            Constants.Swerve.AutoConfig.kMaxSpeedMetersPerSecond, 
             0.48, // drive base radius in m
             new ReplanningConfig() // default path replanning config
         );
@@ -223,6 +223,8 @@ public final class Constants {
         public static final double shooterHandoffAngle = Units.rotationsToRadians(0.04);
         public static final double speakerShooterAngleMax = Units.degreesToRadians(80);
         public static final double speakerAutoOmegaMax = Units.degreesToRadians(15);
+        public static final double speakerSubwooferPitch = 0.1; // radians TODO 
+        public static final double speakerSubwooferSpin = 15; // meters / second TODO 
 
         public static final double ampAutoDistanceMax = 3.0; // meters
         public static final double ampShooterAngle = Units.degreesToRadians(75);

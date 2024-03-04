@@ -59,6 +59,12 @@ public class RobotContainer {
         NamedCommands.registerCommand("ampAuto", new AmpAuto(kinesthetics, s_Swerve, s_Shooter));
         NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake));
         NamedCommands.registerCommand("intakeStatic", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true));
+        NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
+            s_Shooter.new ChangeNeck(SpinState.ST),
+            s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferPitch, () -> Constants.CommandConstants.speakerSubwooferSpin, false),
+            s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
+            s_Shooter.new ChangeState(() -> Constants.Shooter.restingPitch, () -> 0)
+        ));
         NamedCommands.registerCommand("speakerAutoAim", new ParallelCommandGroup(new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, null, null), new SpeakerAutoAimYaw(kinesthetics, s_Swerve, s_Shooter, null, null)));
 
         // Configure the button bindings
