@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkAbsoluteEncoder;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,17 +18,18 @@ public class Intake extends SubsystemBase {
     public Intake() {
         angleMotorController = new CANSparkFlex(Constants.Intake.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
         intakeMotorController = new CANSparkFlex(Constants.Intake.intakeMotorID, CANSparkLowLevel.MotorType.kBrushless);
+        intakeMotorController.setInverted(true);
         feederMotorController = new CANSparkMax(Constants.Intake.feederMotorID, CANSparkLowLevel.MotorType.kBrushless);
-        feederMotorController.follow(intakeMotorController);
+        feederMotorController.follow(intakeMotorController, true);
     }
     
     /** @return radians */
     public double getPitch() {
-        return Units.rotationsToRadians(angleMotorController.getEncoder().getPosition());
+        return Units.rotationsToRadians(angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
     }
     
     /** @param goalPitch radians */
-    public void setGoalPitch(double goalPitch) {
+    private void setGoalPitch(double goalPitch) {
         angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch), CANSparkBase.ControlType.kSmartMotion);
     }
 
@@ -36,7 +38,7 @@ public class Intake extends SubsystemBase {
         return Units.rotationsPerMinuteToRadiansPerSecond(intakeMotorController.getEncoder().getVelocity());
     }
 
-    public void setSpin(SpinState ss) {
+    private void setSpin(SpinState ss) {
         intakeMotorController.set(ss.multiplier * Constants.Intake.intakeSpin);
     }
 

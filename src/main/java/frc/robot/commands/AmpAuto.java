@@ -18,11 +18,18 @@ public class AmpAuto extends ParallelCommandGroup {
         addCommands(
             new SwerveAuto(k, sw, new RobotState(desiredPose)),
             new ParallelCommandGroup(
-                sh.new ChangeAim(() -> Constants.CommandConstants.ampShooterAngle),
+                sh.toPitch(Constants.CommandConstants.ampShooterAngle),
                 new WaitUntilCommand(() ->
                     k.getPose().minus(desiredPose).getTranslation().getNorm() < Constants.CommandConstants.ampAutoDistanceToStartSpinning
                 )
-            ).andThen(sh.new ChangeSpin(() -> Constants.CommandConstants.ampShooterSpin))
+            ).andThen(sh.toSpin(Constants.CommandConstants.ampShooterSpin))
         );
+    }
+
+    public static boolean isInRange(Kinesthetics k) { // are we close enough
+        return 
+            Constants.Environment.amps.get(k.getAlliance()).getTranslation()
+            .getDistance(k.getPose().getTranslation())
+            < Constants.CommandConstants.ampAutoDistanceMax;
     }
 }

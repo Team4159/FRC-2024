@@ -2,14 +2,13 @@ package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
 
-import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.CANSparkBase;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -17,16 +16,11 @@ import frc.lib.math.Conversions;
 import frc.robot.Constants;
 import frc.robot.Constants.SpinState;
 
-public class Shooter extends SubsystemBase {    
-    private TalonFX angleMotorController;
-    private MotionMagicDutyCycle angleDutyCycle;
-
-    private CANSparkBase shooterMLeftController, shooterMRightController, neckMotorController;
+public class Shooter extends SubsystemBase {  
+    private CANSparkBase angleMotorController, shooterMLeftController, shooterMRightController, neckMotorController;
     
     public Shooter() {
-        angleMotorController = new TalonFX(Constants.Shooter.angleMotorIDs[0]);
-        for (int n = 1; n < Constants.Shooter.angleMotorIDs.length; n++)
-            new TalonFX(Constants.Shooter.angleMotorIDs[n]).setControl(new Follower(Constants.Shooter.angleMotorIDs[0], false));
+        angleMotorController = new CANSparkFlex(Constants.Shooter.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
         shooterMLeftController = new CANSparkFlex(Constants.Shooter.shooterMLeftID, CANSparkLowLevel.MotorType.kBrushless);
         shooterMRightController= new CANSparkFlex(Constants.Shooter.shooterMRightID,CANSparkLowLevel.MotorType.kBrushless);
         shooterMRightController.follow(shooterMLeftController, true); // for now, no spin.
@@ -35,12 +29,13 @@ public class Shooter extends SubsystemBase {
 
     /** @return radians */
     public double getPitch() {
-        return Units.rotationsToRadians(angleMotorController.getPosition().getValueAsDouble());
+        return Units.rotationsToRadians(angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
     }
-    
+
     /** @param goalPitch radians */
     public void setGoalPitch(double goalPitch) {
-        angleMotorController.setControl(angleDutyCycle.withPosition(Units.radiansToRotations(goalPitch)).withSlot(0));
+        goalPitch = MathUtil.clamp(goalPitch, 0.5, Constants.Shooter.maximumPitch);
+        angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch), CANSparkBase.ControlType.kSmartMotion);
     }
 
     /** @return radians / second */
@@ -57,62 +52,96 @@ public class Shooter extends SubsystemBase {
         shooterMLeftController.stopMotor();
     }
 
-    public void setNeck(SpinState ss) {
+    private void setNeck(SpinState ss) {
         neckMotorController.set(ss.multiplier * Constants.Shooter.neckSpeed);
     }
 
     private static class FeedForward { // TODO: Shooter feedforward
-        static double calculate(double desiredNoteVelocity) { // meters / second -> rotations / minute
-            return Conversions.MPSToRPS(desiredNoteVelocity, desiredNoteVelocity) / 60;
+        /** @return rotations / minute */
+        static double calculate(double desiredNoteVelocity) {
+            return Conversions.MPSToRPS(desiredNoteVelocity, Units.inchesToMeters(4 * Math.PI)) * 60;
         }
     }
 
-    public class ChangeAim extends Command {
-        private DoubleSupplier desiredPitch;
-        
-        public ChangeAim(DoubleSupplier pitchSupplier) {
-            addRequirements(Shooter.this);
+    public ChangeState toPitch(double pitch) {
+        return new ChangeState(() -> pitch, null);
+    }
+
+    public ChangeState toSpin(double spin) {
+        return new ChangeState(null, () -> spin);
+    }
+
+    public class ChangeState extends Command {
+        private boolean continuous = false;
+        private DoubleSupplier desiredPitch, desiredSpin;
+
+        public ChangeState(DoubleSupplier pitchSupplier, DoubleSupplier spinSupplier) {
             desiredPitch = pitchSupplier;
+            desiredSpin = spinSupplier;
+            addRequirements(Shooter.this);
         }
-    
+
+        public ChangeState(DoubleSupplier pitchSupplier, DoubleSupplier spinSupplier, boolean continuous) {
+            desiredPitch = pitchSupplier;
+            desiredSpin = spinSupplier;
+            this.continuous = continuous;
+            addRequirements(Shooter.this);
+        }
+        
         @Override
         public void execute() {
-            setGoalPitch(desiredPitch.getAsDouble());
+            if (desiredPitch != null) setGoalPitch(desiredPitch.getAsDouble());
+            if (desiredSpin != null) setGoalSpin(desiredSpin.getAsDouble());
         }
     
         @Override
         public boolean isFinished() {
-            return Math.abs(getPitch() - desiredPitch.getAsDouble()) < Constants.Shooter.pitchTolerance;
+            if (continuous) return false;
+            return (desiredPitch == null || (Math.abs(getPitch() - desiredPitch.getAsDouble()) < Constants.Shooter.pitchTolerance))
+                && (desiredSpin == null || (Math.abs(getSpin() - desiredSpin.getAsDouble()) < Constants.Shooter.spinTolerance));
         }
     
         @Override
         public void end(boolean interrupted) {
-            if (interrupted) setGoalPitch(Constants.Shooter.restingPitch);
+            if (interrupted && !continuous) {
+                setGoalPitch(Constants.Shooter.restingPitch);
+                stopSpin();
+            }
             super.end(interrupted);
         }
     }
-    
-    public class ChangeSpin extends Command {
-        private DoubleSupplier desiredSpin;
-        
-        public ChangeSpin(DoubleSupplier spinSupplier) {
+
+    public class ChangeNeck extends Command {
+        private Kinesthetics kinesthetics;
+
+        private boolean beamBreakMode; // should this command end when the beam break opens
+        private SpinState desiredNeck;
+
+        public ChangeNeck(SpinState ss) {
+            desiredNeck = ss;
             addRequirements(Shooter.this);
-            desiredSpin = spinSupplier;
         }
-    
+
+        public ChangeNeck(Kinesthetics k, SpinState ss) {
+            kinesthetics = k;
+            desiredNeck = ss;
+            beamBreakMode = kinesthetics.shooterHasNote();
+            addRequirements(Shooter.this);
+        }
+
         @Override
-        public void execute() {
-            setGoalSpin(desiredSpin.getAsDouble());
+        public void initialize() {
+            setNeck(desiredNeck);
         }
-    
+
         @Override
-        public boolean isFinished() {
-            return Math.abs(getSpin() - desiredSpin.getAsDouble()) < Constants.Shooter.spinTolerance;
+        public boolean isFinished() { // this needs to be changed if it runs before initialize does
+            return !beamBreakMode || !kinesthetics.shooterHasNote();
         }
-    
+
         @Override
         public void end(boolean interrupted) {
-            if (interrupted) stopSpin();
+            if (interrupted) setNeck(SpinState.ST);
             super.end(interrupted);
         }
     }
