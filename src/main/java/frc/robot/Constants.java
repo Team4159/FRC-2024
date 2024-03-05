@@ -199,9 +199,16 @@ public final class Constants {
         public static final double pitchTolerance = Math.PI/512;
         public static final double spinTolerance = Math.PI/256;
 
-        public static final double restingPitch = 0; // radians
+        public static final double restingPitch = Units.rotationsToRadians(0.032); // radians
         public static final double maximumPitch = Math.PI/2; // radians
         public static final double neckSpeed = 0.3; // volts / 12, -1 to 1
+
+        //Angle motor PID constans
+        //TODO: set and tune constants
+        public static final double kP = 0.001;
+        public static final double kI = 0.0;
+        public static final double kD = 0.0;
+        public static final double kF = 0.0;
     }
 
     public static final class DeflectorConstants {

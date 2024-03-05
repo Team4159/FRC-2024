@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
 import frc.robot.subsystems.Deflector;
-import frc.robot.Constants.DeflectorConstants;
 import frc.robot.subsystems.Kinesthetics;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;

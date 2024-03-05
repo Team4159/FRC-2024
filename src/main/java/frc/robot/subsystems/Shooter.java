@@ -9,6 +9,7 @@ import com.revrobotics.SparkAbsoluteEncoder;
 import com.revrobotics.CANSparkBase;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,13 +19,15 @@ import frc.robot.Constants.SpinState;
 
 public class Shooter extends SubsystemBase {  
     private CANSparkBase angleMotorController, shooterMLeftController, shooterMRightController, neckMotorController;
-    
+    private PIDController pidController;
+
     public Shooter() {
         angleMotorController = new CANSparkFlex(Constants.Shooter.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
         shooterMLeftController = new CANSparkFlex(Constants.Shooter.shooterMLeftID, CANSparkLowLevel.MotorType.kBrushless);
         shooterMRightController= new CANSparkFlex(Constants.Shooter.shooterMRightID,CANSparkLowLevel.MotorType.kBrushless);
         shooterMRightController.follow(shooterMLeftController, true); // for now, no spin.
         neckMotorController = new CANSparkMax(Constants.Shooter.neckMotorID, CANSparkLowLevel.MotorType.kBrushless);
+        pidController = new PIDController(Constants.Shooter.kP, Constants.Shooter.kI, Constants.Shooter.kD);
     }
 
     /** @return radians */
@@ -35,7 +38,9 @@ public class Shooter extends SubsystemBase {
     /** @param goalPitch radians */
     public void setGoalPitch(double goalPitch) {
         goalPitch = MathUtil.clamp(goalPitch, 0.5, Constants.Shooter.maximumPitch);
-        angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch), CANSparkBase.ControlType.kSmartMotion);
+        //angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch), CANSparkBase.ControlType.kSmartMotion);
+        double ff = Constants.Shooter.kF * Math.cos(this.getPitch()); 
+        angleMotorController.set(pidController.calculate(this.getPitch(), goalPitch) + ff);
     }
 
     /** @return radians / second */
