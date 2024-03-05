@@ -173,9 +173,9 @@ public final class Constants {
         public static final double intakeField = 64; // degrees
 
         public static enum IntakeState {
-            STOW(4.6, SpinState.ST), // starting pos & when moving
-            DOWN(5.1, SpinState.FW), // intaking
-            SPIT(0, SpinState.BW); // outtaking
+            STOW(Units.rotationsToRadians(0.012), SpinState.ST), // starting pos & when moving
+            DOWN(Units.rotationsToRadians(0.465), SpinState.FW), // intaking
+            SPIT(Units.rotationsToRadians(0.465), SpinState.BW); // outtaking
 
             public final double pitch;
             public final SpinState spin;
@@ -223,7 +223,7 @@ public final class Constants {
         public static final double bumperWidth = Units.inchesToMeters(2.75);
 
         public static final double shooterSpinMax = 20; // meters / second
-        public static final double shooterHandoffAngle = Units.degreesToRadians(45);
+        public static final double shooterHandoffAngle = Units.rotationsToRadians(0.04);
         public static final double speakerShooterAngleMax = Units.degreesToRadians(80);
         public static final double speakerAutoOmegaMax = Units.degreesToRadians(15);
 

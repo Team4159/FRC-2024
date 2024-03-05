@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import java.util.ArrayList;
+
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -30,7 +32,7 @@ public class SwerveAuto extends Command {
     public SwerveAuto(Kinesthetics k, Swerve s, RobotState end) {
         kinesthetics = k;
         swerve = s;
-        trajectory = TrajectoryGenerator.generateTrajectory(kinesthetics.getPose(), null, end, new TrajectoryConfig(AutoConfig.kMaxAccelerationMetersPerSecondSquared, AutoConfig.kMaxAccelerationMetersPerSecondSquared));
+        trajectory = TrajectoryGenerator.generateTrajectory(kinesthetics.getPose(), new ArrayList<>(), end, new TrajectoryConfig(AutoConfig.kMaxAccelerationMetersPerSecondSquared, AutoConfig.kMaxAccelerationMetersPerSecondSquared));
         addRequirements(swerve);
     }
 

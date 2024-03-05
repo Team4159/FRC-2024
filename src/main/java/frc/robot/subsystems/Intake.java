@@ -16,7 +16,7 @@ public class Intake extends SubsystemBase {
     private CANSparkBase angleMotorController, intakeMotorController, feederMotorController;
 
     public Intake() {
-        angleMotorController = new CANSparkMax(Constants.Intake.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
+        angleMotorController = new CANSparkFlex(Constants.Intake.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
         intakeMotorController = new CANSparkFlex(Constants.Intake.intakeMotorID, CANSparkLowLevel.MotorType.kBrushless);
         intakeMotorController.setInverted(true);
         feederMotorController = new CANSparkMax(Constants.Intake.feederMotorID, CANSparkLowLevel.MotorType.kBrushless);
