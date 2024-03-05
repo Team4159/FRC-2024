@@ -39,8 +39,8 @@ public class Shooter extends SubsystemBase {
     public void setGoalPitch(double goalPitch) {
         goalPitch = MathUtil.clamp(goalPitch, 0.5, Constants.Shooter.maximumPitch);
         //angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch) + Constants.Shooter.pitchOffset, CANSparkBase.ControlType.kSmartMotion);
-        double ff = Constants.Shooter.kF * Math.cos(this.getPitch()); 
-        angleMotorController.set(pidController.calculate(this.getPitch(), goalPitch + Constants.Shooter.pitchOffset) + ff);
+        double ff = Constants.Shooter.kF * Math.cos(this.getPitch() + Constants.Shooter.pitchOffset); 
+        angleMotorController.set(pidController.calculate(this.getPitch() + Constants.Shooter.pitchOffset, goalPitch) + ff);
     }
 
     /** @return radians / second */
