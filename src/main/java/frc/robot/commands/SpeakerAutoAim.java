@@ -42,23 +42,35 @@ public class SpeakerAutoAim extends Command {
         double strafeVal = MathUtil.applyDeadband(desiredStrafe.getAsDouble(), Constants.stickDeadband);
 
         Transform3d transform = getDifference(kinesthetics);
-        double roottwogh = Math.sqrt(2*Constants.Environment.G*transform.getZ()); // Z is vertical
-        desiredPitch = Math.atan(roottwogh / (
-            (transform.getY()*Constants.Environment.G)
-            / roottwogh
-            - kinesthetics.getVelocity().get(1, 0) // y velocity
-        ));
+
+        double roottwoh = Math.sqrt(2*transform.getZ()); // Z, up +
+        double rootg = Math.sqrt(Constants.Environment.G);
+        boolean speakerIsOnRight = transform.getY() > 0;
+
+        double relativex  = Math.abs(transform.getY()); // left right
+        double relativey  = (speakerIsOnRight ? -1 : 1) * transform.getX(); // forward backward
+        double relativexv = (speakerIsOnRight ? -1 : 1) * kinesthetics.getVelocity().get(1, 0);
+        double relativeyv = (speakerIsOnRight ? -1 : 1) * kinesthetics.getVelocity().get(0, 0);
+        
+        double n = relativex * rootg / roottwoh - relativexv;
+        double m = relativey * rootg / roottwoh + relativeyv;
+
+        desiredPitch = Math.atan((roottwoh * rootg) / n);
         if (desiredPitch < 0) desiredPitch += Math.PI;
-        desiredYaw = Math.atan(transform.getY()/transform.getX()); // TODO: Calculate angle offset to account for velocity and anglular velocity
+        desiredYaw = Math.atan(- ((rootg * relativey) / roottwoh + relativeyv) / n);
+        desiredYaw -= Math.PI / 2; // zero degrees is forwards, the equation assumes it's right
+        if (!speakerIsOnRight) desiredYaw += Math.PI; // flip it around
         desiredNoteVel = Math.sqrt(
             2*Constants.Environment.G*transform.getZ()
-            +
-            Math.pow(
-                (transform.getY()*Constants.Environment.G)
-                / roottwogh
-                - kinesthetics.getVelocity().get(1, 0) // y velocity
-            , 2)
-        );
+            + n*n + m*m
+        ) + Math.sqrt(Math.sqrt(
+            Constants.Environment.B * 54481/300000
+            * (
+                2 * Constants.Environment.G * transform.getZ()
+                + n*n + m*m
+            ) *
+            Math.sqrt(transform.getZ()*transform.getZ() + relativex * relativex + relativey * relativey)
+        ) * 400/47 );
 
         s_Swerve.drive(
             new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed),
@@ -79,7 +91,7 @@ public class SpeakerAutoAim extends Command {
     @Override
     public void end(boolean interrupted) {
         if (interrupted) {
-            s_Shooter.setGoalPitch(Constants.Shooter.restingPitch);
+            s_Shooter.setGoalPitch(0);
             s_Shooter.stopSpin();
         }
         super.end(interrupted);
@@ -87,6 +99,6 @@ public class SpeakerAutoAim extends Command {
 
     public static boolean isInRange(Kinesthetics k) {
         Translation2d offset = getDifference(k).getTranslation().toTranslation2d();
-        return offset.getY() < 0.1 && offset.getX() < 3; // TODO: plot out valid range
+        return Math.abs(offset.getY()) < 5;
     }
 }
