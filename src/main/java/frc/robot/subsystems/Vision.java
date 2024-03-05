@@ -15,7 +15,7 @@ public class Vision {
         if (!limelightTable.getEntry("botpose").exists()) return null;
         double[] ntdata = limelightTable.getEntry("botpose").getDoubleArray(new double[6]);
         return new Pose3d(ntdata[0], ntdata[1], ntdata[2], new Rotation3d(ntdata[3], ntdata[4], ntdata[5]));
-    } // limelight translation is y 12.947", z 7.03", pitch 64 deg
+    } // limelight translation is y 12.947", z 8.03", pitch 64 deg
 
     public static double getLimelightPing() {
         return limelightTable.getEntry("cl").getDouble(-1);

@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -32,14 +31,10 @@ public class RobotContainer {
     private static final JoystickButton manualIntake = new JoystickButton(secondary, 2);
     private static final JoystickButton manualOuttake = new JoystickButton(secondary, 3);
 
-    private static final JoystickButton dumpData = new JoystickButton(secondary, 16);
-    private static final JoystickButton clearData = new JoystickButton(secondary, 15);
-
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
     private final Shooter s_Shooter = new Shooter();
     private final Intake s_Intake = new Intake();
-    private final Photogates s_Photogates = new Photogates(s_Shooter);
 
     private final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve);
 
@@ -112,14 +107,6 @@ public class RobotContainer {
         manualOuttake.debounce(0.1)
             .whileTrue(s_Intake.new ChangeState(IntakeState.SPIT))
             .onFalse(s_Intake.new ChangeState(IntakeState.STOW));
-
-        dumpData.debounce(0.1)
-            .onTrue(new InstantCommand(() -> {new Thread(() -> {
-                var ff = s_Photogates.calculateRegression();
-                SmartDashboard.putString("regression", "y = "+ff.kv+"x + "+ff.ks);
-            }).start();}, s_Photogates));
-        clearData
-            .onTrue(new InstantCommand(s_Photogates::clearData, s_Photogates));
     }
 
     public Command getAutonomousCommand() {

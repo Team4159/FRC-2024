@@ -208,7 +208,7 @@ public final class Constants {
         public static final SimpleMotorFeedforward shooterFeedForward = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
     }
 
-    public static final class CommandConstants { // TODO: This must be tuned to specific robot
+    public static final class CommandConstants {
         public static final double bumperWidth = Units.inchesToMeters(2.75);
 
         public static final double shooterSpinMax = 30; // meters / second
