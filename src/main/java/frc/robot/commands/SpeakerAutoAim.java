@@ -45,33 +45,31 @@ public class SpeakerAutoAim extends Command {
 
         double roottwoh = Math.sqrt(2*transform.getZ()); // Z, up +
         double rootg = Math.sqrt(Constants.Environment.G);
+        boolean speakerIsOnRight = transform.getY() > 0;
 
-        double relativex = Math.abs(transform.getY()); // Y
-        double relativey = (transform.getY() > 0 ? -1 : 1) * Math.abs(transform.getX());
-        double relativexv = (transform.getY() > 0 ? 1 : -1) * Math.abs(kinesthetics.getVelocity().get(1, 0));
-        double relativeyv = (transform.getY() > 0 ? -1 : 1) * Math.abs(kinesthetics.getVelocity().get(0, 0));
+        double relativex  = Math.abs(transform.getY()); // left right
+        double relativey  = (speakerIsOnRight ? -1 : 1) * transform.getX(); // forward backward
+        double relativexv = (speakerIsOnRight ? -1 : 1) * kinesthetics.getVelocity().get(1, 0);
+        double relativeyv = (speakerIsOnRight ? -1 : 1) * kinesthetics.getVelocity().get(0, 0);
         
-        double n = (rootg * relativex) / roottwoh - relativexv;
-        double m = Math.pow(p * rootg / roottwoh + relativeyv, 2);
+        double n = relativex * rootg / roottwoh - relativexv;
+        double m = relativey * rootg / roottwoh + relativeyv;
 
         desiredPitch = Math.atan((roottwoh * rootg) / n);
         if (desiredPitch < 0) desiredPitch += Math.PI;
-        desiredYaw = Math.atan(((rootg * p) / roottwoh + relativeyv) / n);
+        desiredYaw = Math.atan(- ((rootg * relativey) / roottwoh + relativeyv) / n);
+        if (!speakerIsOnRight) desiredYaw += Math.PI;
         desiredNoteVel = Math.sqrt(
             2*Constants.Environment.G*transform.getZ()
-            + n*n
-            + m
-        ) + Math.sqrt(
-            Math.sqrt(
-                b * 54481/300000 *
-                (
-                    2 * Constants.Environment.G * transform.getZ() +
-                    n * n +
-                    m
-                ) *
-                Math.sqrt(transform.getZ()*transform.getZ() + relativex * relativex + p * p)
-            ) * 400/47
-        );
+            + n*n + m*m
+        ) + Math.sqrt(Math.sqrt(
+            Constants.Environment.B * 54481/300000 *
+            (
+                2 * Constants.Environment.G * transform.getZ()
+                + n*n + m*m
+            ) *
+            Math.sqrt(transform.getZ()*transform.getZ() + relativex * relativex + relativey * relativey)
+        ) * 400/47 );
 
         s_Swerve.drive(
             new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed),

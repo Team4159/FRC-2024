@@ -234,8 +234,14 @@ public final class Constants {
             Alliance.Red, new Pose2d(14.7008, 8.2042, Rotation2d.fromDegrees(0)),
             Alliance.Blue, new Pose2d(1.842, 8.2042, Rotation2d.fromDegrees(0))
         );
-        /** @param G meters / second squared */
+        /** @param G meters / second squared
+         * Acceleration due to gravity
+        */
         public static final float G = 9.8f;
+        /** @param B ??? / ???
+         * Some sort of aerodynamic constant
+        */
+        public static final double B = 0.096;
     }
 
     public static enum SpinState {
