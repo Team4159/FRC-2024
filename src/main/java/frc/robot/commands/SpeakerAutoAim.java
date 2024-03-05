@@ -58,7 +58,8 @@ public class SpeakerAutoAim extends Command {
         desiredPitch = Math.atan((roottwoh * rootg) / n);
         if (desiredPitch < 0) desiredPitch += Math.PI;
         desiredYaw = Math.atan(- ((rootg * relativey) / roottwoh + relativeyv) / n);
-        if (!speakerIsOnRight) desiredYaw += Math.PI;
+        desiredYaw -= Math.PI / 2; // zero degrees is forwards, the equation assumes it's left
+        if (!speakerIsOnRight) desiredYaw += Math.PI; // flip it around
         desiredNoteVel = Math.sqrt(
             2*Constants.Environment.G*transform.getZ()
             + n*n + m*m
