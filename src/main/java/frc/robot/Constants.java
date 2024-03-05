@@ -169,6 +169,7 @@ public final class Constants {
         public static final double spinTolerance = Math.PI/16; // radians
 
         public static final double intakeSpin = 0.5; // -1 to 1
+        public static final double feederSpin = 0.3; // -1 to 1
 
         public static final double intakeRange = 0.2; // meters
         public static final double intakeField = 64; // degrees
@@ -204,7 +205,7 @@ public final class Constants {
         public static final double neckSpeed = 0.3; // volts / 12, -1 to 1
         
         /** @param shooterFeedForward kS radians / second, kV radians / second per meter / second */
-        public static final SimpleMotorFeedforward shooterFeedForward = new SimpleMotorFeedforward(0, 1);
+        public static final SimpleMotorFeedforward shooterFeedForward = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
     }
 
     public static final class CommandConstants { // TODO: This must be tuned to specific robot

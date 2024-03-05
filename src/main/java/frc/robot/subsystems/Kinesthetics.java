@@ -94,7 +94,7 @@ public class Kinesthetics extends SubsystemBase {
         poseEstimator.resetPosition(getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d(getPose().getTranslation(), new Rotation2d()));
     }
 
-    /** @return v_x meters / second, v_y meters / second, ω radians / second */
+    /** @return v_x meters / second (forward +), v_y meters / second (left +), ω radians / second (ccw +)*/
     public Vector<N3> getVelocity() {
         var speeds = Constants.Swerve.swerveKinematics.toChassisSpeeds(s_Swerve.getModuleStates());
         var vec = new Vector<N3>(Nat.N3());

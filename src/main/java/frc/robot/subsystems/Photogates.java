@@ -22,28 +22,28 @@ public class Photogates extends SubsystemBase {
     private DoubleSupplier xValue;
     public Photogates(Shooter s) {xValue = s::getSpin;}
 
-    private boolean lastA = false, lastB = false;
+    private boolean lastA = true, lastB = true;
 
     @Override
     public void periodic() {
         var nowA = a.get();
         if (lastA != nowA) {
-            if (nowA) { // false to true
+            if (!nowA) { // true to false
                 timerFirst.restart();
-            } else { // true to false
+            } else { // false to false
                 timerFirst.stop();
-                SmartDashboard.putNumber("first", NOTE_DIAMETER / timerFirst.get());
+                SmartDashboard.putNumber("first", timerFirst.get());
                 data.add(new PhotogateData(PhotogateDataMode.FIRST, xValue.getAsDouble(), NOTE_DIAMETER / timerFirst.get()));
             }
             lastA = nowA;
         }
         var nowB = b.get();
         if (lastB != nowB) {
-            if (nowB) {
+            if (!nowB) {
                 timerSecond.restart();
             } else {
                 timerSecond.stop();
-                SmartDashboard.putNumber("second", NOTE_DIAMETER / timerSecond.get());
+                SmartDashboard.putNumber("second", timerSecond.get());
                 data.add(new PhotogateData(PhotogateDataMode.SECOND, xValue.getAsDouble(), NOTE_DIAMETER / timerSecond.get()));
             }
             lastB = nowB;
@@ -55,19 +55,18 @@ public class Photogates extends SubsystemBase {
         data.clear();
     }
 
-    public SimpleMotorFeedforward calculateRegression(PhotogateDataMode mode) {
-        var points = mode == null ? data : data.stream().filter(n -> n.mode() == mode).toList();
+    public SimpleMotorFeedforward calculateRegression() {
         double a = 0, b = 0;
         double sumx = 0, sumy = 0;
-        for (PhotogateData point : points) {
+        for (PhotogateData point : data) {
             sumx += point.shooterRadPerSec();
             sumy += point.photogateMetPerSec();
             a += point.shooterRadPerSec() * point.photogateMetPerSec();
             b += point.shooterRadPerSec() * point.shooterRadPerSec();
         }
         // slope in meters / radian
-        double inverseSlope = (points.size() * b - sumx * sumx) / (points.size() * a - sumx * sumy);
-        return new SimpleMotorFeedforward(((sumx/inverseSlope - sumy) / points.size()) * inverseSlope, inverseSlope);
+        double inverseSlope = (data.size() * b - sumx * sumx) / (data.size() * a - sumx * sumy);
+        return new SimpleMotorFeedforward(((sumx/inverseSlope - sumy) / data.size()) * inverseSlope, inverseSlope);
     }
 
     public static enum PhotogateDataMode {FIRST, SECOND}

@@ -44,7 +44,8 @@ public class Shooter extends SubsystemBase {
     /** @param goalNoteVel meters / second */
     public void setGoalSpin(double goalNoteVel) {
         shooterMLeftController.getPIDController().setReference(
-            Conversions.MPSToRPS(goalNoteVel, Units.inchesToMeters(4) * Math.PI) * 60,
+            Conversions.RadiansPSToRPM(Constants.Shooter.shooterFeedForward.calculate(goalNoteVel)),
+            // Conversions.MPSToRPS(goalNoteVel, Units.inchesToMeters(4) * Math.PI) * 60,
             CANSparkBase.ControlType.kSmartVelocity
         );
     }

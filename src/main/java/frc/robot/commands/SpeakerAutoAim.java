@@ -42,22 +42,35 @@ public class SpeakerAutoAim extends Command {
         double strafeVal = MathUtil.applyDeadband(desiredStrafe.getAsDouble(), Constants.stickDeadband);
 
         Transform3d transform = getDifference(kinesthetics);
-        double roottwogh = Math.sqrt(2*Constants.Environment.G*transform.getZ()); // Z is vertical
-        desiredPitch = Math.atan(roottwogh / (
-            (transform.getY()*Constants.Environment.G)
-            / roottwogh
-            - kinesthetics.getVelocity().get(1, 0) // y velocity
-        ));
+
+        double roottwoh = Math.sqrt(2*transform.getZ()); // Z, up +
+        double rootg = Math.sqrt(Constants.Environment.G);
+
+        double relativex = Math.abs(transform.getY()); // Y
+        double relativey = (transform.getY() > 0 ? -1 : 1) * Math.abs(transform.getX());
+        double relativexv = (transform.getY() > 0 ? 1 : -1) * Math.abs(kinesthetics.getVelocity().get(1, 0));
+        double relativeyv = (transform.getY() > 0 ? -1 : 1) * Math.abs(kinesthetics.getVelocity().get(0, 0));
+        
+        double n = (rootg * relativex) / roottwoh - relativexv;
+        double m = Math.pow(p * rootg / roottwoh + relativeyv, 2);
+
+        desiredPitch = Math.atan((roottwoh * rootg) / n);
         if (desiredPitch < 0) desiredPitch += Math.PI;
-        desiredYaw = Math.atan(transform.getY()/transform.getX()); // TODO: Calculate angle offset to account for velocity and anglular velocity
+        desiredYaw = Math.atan(((rootg * p) / roottwoh + relativeyv) / n);
         desiredNoteVel = Math.sqrt(
             2*Constants.Environment.G*transform.getZ()
-            +
-            Math.pow(
-                (transform.getY()*Constants.Environment.G)
-                / roottwogh
-                - kinesthetics.getVelocity().get(1, 0) // y velocity
-            , 2)
+            + n*n
+            + m
+        ) + Math.sqrt(
+            Math.sqrt(
+                b * 54481/300000 *
+                (
+                    2 * Constants.Environment.G * transform.getZ() +
+                    n * n +
+                    m
+                ) *
+                Math.sqrt(transform.getZ()*transform.getZ() + relativex * relativex + p * p)
+            ) * 400/47
         );
 
         s_Swerve.drive(
@@ -87,6 +100,6 @@ public class SpeakerAutoAim extends Command {
 
     public static boolean isInRange(Kinesthetics k) {
         Translation2d offset = getDifference(k).getTranslation().toTranslation2d();
-        return offset.getY() < 0.1 && offset.getX() < 3; // TODO: plot out valid range
+        return Math.abs(offset.getY()) < 5;
     }
 }

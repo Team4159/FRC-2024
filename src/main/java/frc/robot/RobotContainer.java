@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -44,12 +43,6 @@ public class RobotContainer {
 
     private final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve);
 
-    private static final SendableChooser<Photogates.PhotogateDataMode> photogateDataMode = new SendableChooser<>() {{
-        setDefaultOption("all", null);
-        addOption("first", Photogates.PhotogateDataMode.FIRST);
-        addOption("second",Photogates.PhotogateDataMode.SECOND);
-    }};
-
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         s_Swerve.setDefaultCommand(
@@ -61,8 +54,6 @@ public class RobotContainer {
                 () -> false 
             )
         );
-
-        SmartDashboard.putData("Photogate Mode", photogateDataMode);
 
         // Configure the button bindings
         configureButtonBindings();
@@ -123,10 +114,10 @@ public class RobotContainer {
             .onFalse(s_Intake.new ChangeState(IntakeState.STOW));
 
         dumpData.debounce(0.1)
-            .onTrue(new InstantCommand(() -> {
-                var ff = s_Photogates.calculateRegression(photogateDataMode.getSelected());
+            .onTrue(new InstantCommand(() -> {new Thread(() -> {
+                var ff = s_Photogates.calculateRegression();
                 SmartDashboard.putString("regression", "y = "+ff.kv+"x + "+ff.ks);
-        }, s_Photogates));
+            }).start();}, s_Photogates));
         clearData
             .onTrue(new InstantCommand(s_Photogates::clearData, s_Photogates));
     }

@@ -20,7 +20,6 @@ public class Intake extends SubsystemBase {
         intakeMotorController = new CANSparkFlex(Constants.Intake.intakeMotorID, CANSparkLowLevel.MotorType.kBrushless);
         intakeMotorController.setInverted(true);
         feederMotorController = new CANSparkMax(Constants.Intake.feederMotorID, CANSparkLowLevel.MotorType.kBrushless);
-        feederMotorController.follow(intakeMotorController, true);
     }
     
     /** @return radians */
@@ -40,6 +39,7 @@ public class Intake extends SubsystemBase {
 
     private void setSpin(SpinState ss) {
         intakeMotorController.set(ss.multiplier * Constants.Intake.intakeSpin);
+        feederMotorController.set(ss.multiplier * Constants.Intake.feederSpin);
     }
 
     public class ChangeState extends Command {
