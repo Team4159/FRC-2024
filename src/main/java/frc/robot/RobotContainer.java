@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -85,13 +86,17 @@ public class RobotContainer {
         //         new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter),
         //         s_Intake.new ChangeState(IntakeState.STOW)
         // //     ));
-        manualShoot.debounce(0.1) // does not check if kinesthetics has note- because this should also work when kinesthetics fails
-            .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
+        manualShoot.debounce(0.1) // does not check if kinesthetics has note- because this should also work when kinesthetics fails    
+        .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
             .whileTrue(s_Shooter.new ChangeState(
                 () -> (1-secondary.getThrottle())/2 * Constants.CommandConstants.speakerShooterAngleMax + Constants.CommandConstants.speakerShooterAngleMin,
                 () -> Math.abs(secondary.getY()) * Constants.CommandConstants.shooterSpinMax,
                 true
             )).onFalse(new SequentialCommandGroup(
+                new InstantCommand(() -> {
+                    SmartDashboard.putNumber("shooter angle", s_Shooter.getPitch());
+                    SmartDashboard.putNumber("shooter spin", s_Shooter.getSpin());
+                }, s_Shooter),
                 new ParallelCommandGroup(
                     s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
                     new WaitCommand(1)
