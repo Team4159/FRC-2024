@@ -107,11 +107,22 @@ public class RobotContainer {
         manualOuttake.debounce(0.1)
             .whileTrue(s_Intake.new ChangeState(IntakeState.SPIT))
             .onFalse(s_Intake.new ChangeState(IntakeState.STOW));
+
+
+        // // temp
+        // new JoystickButton(secondary, 4).debounce(0.1)
+        //     .whileTrue(new InstantCommand(() -> s_Shooter.setGoalSpin(15), s_Shooter))
+        //     .onFalse(new SequentialCommandGroup(
+        //         s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
+        //         new WaitCommand(1),
+        //         s_Shooter.new ChangeNeck(SpinState.ST),
+        //         new InstantCommand(() -> s_Shooter.setGoalSpin(0), s_Shooter)
+        //         ));
     }
 
     public Command getAutonomousCommand() {
         return new SequentialCommandGroup(
-            Commands.runOnce(() -> kinesthetics.setPose(new Pose2d()))
+            Commands.runOnce(() -> kinesthetics.setPose(Vision.getBotPose().toPose2d()))
         ); // add auto here
     }
 }
