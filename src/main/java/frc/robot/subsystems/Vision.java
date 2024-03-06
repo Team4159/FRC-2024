@@ -43,4 +43,12 @@ public class Vision {
     public static double getRpiPing() {
         return rpiTable.getEntry("cl").getDouble(-1);
     }
+
+    public static void switchToPipeline(int pipeline) {
+        limelightTable.getEntry("pipeline").setNumber(pipeline);
+    }
+
+    public static double getPipeline() {
+        return limelightTable.getEntry("pipeline").getDouble(-1);
+    }
 }
