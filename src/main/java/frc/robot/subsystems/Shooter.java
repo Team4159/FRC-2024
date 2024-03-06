@@ -11,6 +11,7 @@ import com.revrobotics.CANSparkBase;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.Conversions;
@@ -37,10 +38,12 @@ public class Shooter extends SubsystemBase {
 
     /** @param goalPitch radians */
     public void setGoalPitch(double goalPitch) {
-        goalPitch = MathUtil.clamp(goalPitch, 0.5, Constants.Shooter.maximumPitch);
+        goalPitch = MathUtil.clamp(goalPitch/*  + Constants.Shooter.pitchOffset*/, Constants.Shooter.restingPitch, Constants.Shooter.maximumPitch);
         //angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch) + Constants.Shooter.pitchOffset, CANSparkBase.ControlType.kSmartMotion);
-        double ff = Constants.Shooter.kF * Math.cos(this.getPitch() + Constants.Shooter.pitchOffset); 
-        angleMotorController.set(pidController.calculate(this.getPitch() + Constants.Shooter.pitchOffset, goalPitch) + ff);
+        double ff = Constants.Shooter.kF * Math.cos(this.getPitch()); 
+        double motorSpeed = pidController.calculate(this.getPitch(), goalPitch) + ff;
+        angleMotorController.set(motorSpeed);
+        System.out.println("Motor speed " + motorSpeed);
     }
 
     /** @return radians / second */
@@ -71,6 +74,11 @@ public class Shooter extends SubsystemBase {
 
     public ChangeState toSpin(double spin) {
         return new ChangeState(null, () -> spin);
+    }
+
+    @Override
+    public void periodic(){
+        SmartDashboard.putNumber("encoder angle", Units.radiansToDegrees(getPitch()));
     }
 
     public class ChangeState extends Command {
