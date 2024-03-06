@@ -21,6 +21,8 @@ import frc.robot.Constants.SpinState;
 public class Shooter extends SubsystemBase {  
     private CANSparkBase angleMotorController, shooterMLeftController, shooterMRightController, neckMotorController;
     private PIDController pidController;
+    //test shooter angle accuracy
+    private double targetPitch = 0.0;
 
     public Shooter() {
         angleMotorController = new CANSparkFlex(Constants.Shooter.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
@@ -43,7 +45,7 @@ public class Shooter extends SubsystemBase {
         double ff = Constants.Shooter.kF * Math.cos(this.getPitch()); 
         double motorSpeed = pidController.calculate(this.getPitch(), goalPitch) + ff;
         angleMotorController.set(motorSpeed);
-        System.out.println("Motor speed " + motorSpeed);
+        targetPitch = Units.radiansToDegrees(goalPitch);
     }
 
     /** @return radians / second */
@@ -78,7 +80,9 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic(){
-        SmartDashboard.putNumber("encoder angle", Units.radiansToDegrees(getPitch()));
+        //TODO: remove once done testing pitch accuracy
+        SmartDashboard.putNumber("Encoder Angle", Units.radiansToDegrees(getPitch()));
+        SmartDashboard.putNumber("Goal Position", targetPitch);
     }
 
     public class ChangeState extends Command {
