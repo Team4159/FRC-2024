@@ -31,7 +31,7 @@ public class IntakeAuto extends SequentialCommandGroup {
             }
         }
         addCommands(
-            sh.toPitch(Constants.CommandConstants.shooterHandoffAngle),
+            sh.toPitch(Constants.Shooter.minimumPitch),
             sh.new ChangeNeck(SpinState.FW),
             i.new ChangeState(IntakeState.DOWN),
             new WaitUntilCommand(k::shooterHasNote).withTimeout(2),
