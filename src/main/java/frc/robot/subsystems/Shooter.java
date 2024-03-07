@@ -1,13 +1,12 @@
 package frc.robot.subsystems;
 
-import java.util.function.DoubleSupplier;
-
+import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkAbsoluteEncoder;
-import com.revrobotics.CANSparkBase;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -41,13 +40,14 @@ public class Shooter extends SubsystemBase {
         return Units.rotationsPerMinuteToRadiansPerSecond(shooterMLeftController.getEncoder().getVelocity());
     }
 
+    /** @param goalSpin radians / second */
+    private void setGoalSpin(double goalSpin) {
+        shooterMLeftController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalSpin), CANSparkBase.ControlType.kSmartVelocity); 
+    }
+
     /** @param goalNoteVel meters / second */
-    public void setGoalSpin(double goalNoteVel) {
-        shooterMLeftController.getPIDController().setReference(
-            Conversions.RadiansPSToRPM(Constants.Shooter.shooterFeedForward.calculate(goalNoteVel)),
-            // Conversions.MPSToRPS(goalNoteVel, Units.inchesToMeters(4) * Math.PI) * 60,
-            CANSparkBase.ControlType.kSmartVelocity
-        );
+    private double velocityToSpin(double goalNoteVel) {
+        return Constants.Shooter.shooterFeedForward.calculate(goalNoteVel);
     }
 
     public void stopSpin() {
@@ -59,41 +59,41 @@ public class Shooter extends SubsystemBase {
     }
 
     public ChangeState toPitch(double pitch) {
-        return new ChangeState(() -> pitch, null);
+        return new ChangeState(() -> new Pair<>(pitch, null), false);
     }
 
     public ChangeState toSpin(double spin) {
-        return new ChangeState(null, () -> spin);
+        return new ChangeState(() -> new Pair<>(null, spin), false);
     }
 
     public class ChangeState extends Command {
         private boolean continuous = false;
-        private DoubleSupplier desiredPitch, desiredSpin;
-
-        public ChangeState(DoubleSupplier pitchSupplier, DoubleSupplier spinSupplier) {
-            desiredPitch = pitchSupplier;
-            desiredSpin = spinSupplier;
-            addRequirements(Shooter.this);
+        /** @param desiredState Pair< radians , meters / second > */
+        private ShooterStateSupplier desiredState;
+        
+        public ChangeState(ShooterStateSupplier shooterStateSupplier) {
+            this(shooterStateSupplier, false);
         }
 
-        public ChangeState(DoubleSupplier pitchSupplier, DoubleSupplier spinSupplier, boolean continuous) {
-            desiredPitch = pitchSupplier;
-            desiredSpin = spinSupplier;
+        public ChangeState(ShooterStateSupplier shooterStateSupplier, boolean continuous) {
+            desiredState = shooterStateSupplier;
             this.continuous = continuous;
             addRequirements(Shooter.this);
         }
         
         @Override
         public void execute() {
-            if (desiredPitch != null) setGoalPitch(desiredPitch.getAsDouble());
-            if (desiredSpin != null) setGoalSpin(desiredSpin.getAsDouble());
+            var state = desiredState.get();
+            if (state.getFirst() != null) setGoalPitch(state.getFirst());
+            if (state.getSecond() != null) setGoalSpin(velocityToSpin(state.getSecond()));
         }
     
         @Override
         public boolean isFinished() {
             if (continuous) return false;
-            return (desiredPitch == null || (Math.abs(getPitch() - desiredPitch.getAsDouble()) < Constants.Shooter.pitchTolerance))
-                && (desiredSpin == null || (Math.abs(getSpin() - desiredSpin.getAsDouble()) < Constants.Shooter.spinTolerance));
+            var state = desiredState.get();
+            return (state.getFirst() == null || (Math.abs(getPitch() - state.getFirst()) < Constants.Shooter.pitchTolerance))
+                && (state.getSecond() == null || (Math.abs(getSpin() - velocityToSpin(state.getSecond())) < Constants.Shooter.spinTolerance));
         }
     
         @Override
@@ -103,6 +103,11 @@ public class Shooter extends SubsystemBase {
                 stopSpin();
             }
             super.end(interrupted);
+        }
+
+        @FunctionalInterface
+        public interface ShooterStateSupplier {
+            public Pair<Double, Double> get();
         }
     }
 

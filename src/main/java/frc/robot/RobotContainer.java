@@ -1,6 +1,6 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -86,17 +86,17 @@ public class RobotContainer {
         // //     ));
         manualShoot.debounce(0.1) // does not check if kinesthetics has note- because this should also work when kinesthetics fails
             .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
-            .whileTrue(s_Shooter.new ChangeState(
-                () -> (1-secondary.getThrottle())/2 * Constants.CommandConstants.speakerShooterAngleMax + Constants.CommandConstants.speakerShooterAngleMin,
-                () -> Math.abs(secondary.getY()) * Constants.CommandConstants.shooterSpinMax,
-                true
-            )).onFalse(new SequentialCommandGroup(
+            .whileTrue(s_Shooter.new ChangeState(() -> new Pair<>(
+                    (1-secondary.getThrottle())/2 * Constants.CommandConstants.speakerShooterAngleMax + Constants.CommandConstants.speakerShooterAngleMin,
+                    Math.abs(secondary.getY()) * Constants.CommandConstants.shooterSpinMax
+            ), true))
+            .onFalse(new SequentialCommandGroup(
                 new ParallelCommandGroup(
                     s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
                     new WaitCommand(1)
                 ),
                 s_Shooter.new ChangeNeck(SpinState.ST),
-                s_Shooter.new ChangeState(() -> 0, () -> 0)
+                s_Shooter.new ChangeState(() -> new Pair<>(0d, 0d))
             ));
         manualIntake.debounce(0.1)
             .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true))
@@ -107,17 +107,6 @@ public class RobotContainer {
         manualOuttake.debounce(0.1)
             .whileTrue(s_Intake.new ChangeState(IntakeState.SPIT))
             .onFalse(s_Intake.new ChangeState(IntakeState.STOW));
-
-
-        // // temp
-        // new JoystickButton(secondary, 4).debounce(0.1)
-        //     .whileTrue(new InstantCommand(() -> s_Shooter.setGoalSpin(15), s_Shooter))
-        //     .onFalse(new SequentialCommandGroup(
-        //         s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
-        //         new WaitCommand(1),
-        //         s_Shooter.new ChangeNeck(SpinState.ST),
-        //         new InstantCommand(() -> s_Shooter.setGoalSpin(0), s_Shooter)
-        //         ));
     }
 
     public Command getAutonomousCommand() {
