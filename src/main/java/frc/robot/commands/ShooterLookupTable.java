@@ -1,9 +1,9 @@
 package frc.robot.commands;
 
-import java.util.Map;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Shooter.ChangeState.ShooterStateSupplier;
 import frc.robot.Constants;
 import frc.robot.subsystems.Kinesthetics;
 
@@ -21,9 +22,6 @@ public class ShooterLookupTable extends Command{
 
     private DoubleSupplier desiredTranslation;
     private DoubleSupplier desiredStrafe;
-    private double desiredYaw;
-    private double desiredPitch;
-    private double desiredSpin;
 
     public ShooterLookupTable(Kinesthetics k, Shooter s, Swerve sw, DoubleSupplier dt, DoubleSupplier ds){
         s_Kinesthetics = k;
@@ -44,9 +42,8 @@ public class ShooterLookupTable extends Command{
         double strafeVal = MathUtil.applyDeadband(desiredStrafe.getAsDouble(), Constants.stickDeadband);
 
         ShooterCommand sc = getBestCommand();
-
-        s_Shooter.setGoalSpin(sc.speed());
-        s_Shooter.setGoalPitch(sc.pitch());
+        
+        s_Shooter.new ChangeState(() -> new Pair<>(sc.speed(), sc.pitch()), true);
         s_Swerve.drive(new Translation2d(translationVal, strafeVal), sc.yaw(), true, false);
     }
 

@@ -7,9 +7,12 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
@@ -83,6 +86,30 @@ public class Swerve extends SubsystemBase {
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " CANcoder", mod.getCANcoder().getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
             SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
+        }
+    }
+
+    public class ChangeYaw extends Command {
+        private DoubleSupplier passthroughTranslation, passthroughStrafe, desiredYaw;
+
+        public ChangeYaw(DoubleSupplier translation, DoubleSupplier strafe, DoubleSupplier yaw) {
+            passthroughTranslation = translation;
+            passthroughStrafe = strafe;
+            desiredYaw = yaw;
+            addRequirements(Swerve.this);
+        }
+
+        @Override
+        public void execute() {
+            drive(
+                new Translation2d(passthroughTranslation.getAsDouble(), passthroughStrafe.getAsDouble()).times(Constants.Swerve.maxSpeed),
+                desiredYaw.getAsDouble(), true, false
+            );
+        }
+
+        @Override
+        public boolean isFinished() {
+            return Math.abs(kinesthetics.getHeading().getRadians() - desiredYaw.getAsDouble()) < Constants.Swerve.yawTolerance;
         }
     }
 }

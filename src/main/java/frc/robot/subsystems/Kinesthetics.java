@@ -11,6 +11,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -20,7 +22,7 @@ public class Kinesthetics extends SubsystemBase {
 
     // Sensor Information
     private Pigeon2 gyro;
-    private DigitalInput feederBeamBreak;
+    // private DigitalInput feederBeamBreak;
     private DigitalInput shooterBeamBreak;
 
     // Data Fields
@@ -31,11 +33,14 @@ public class Kinesthetics extends SubsystemBase {
         s_Swerve = s;
         s_Swerve.setKinesthetics(this);
 
-        gyro = new Pigeon2(Constants.Swerve.pigeonID);
+        gyro = new Pigeon2(Constants.Swerve.pigeonID, Constants.Swerve.canBus);
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.setYaw(0);
 
-        feederBeamBreak = new DigitalInput(Constants.Intake.beamBreakID);
+        Timer.delay(0.1);
+        s_Swerve.resetModulesToAbsolute();
+
+        // feederBeamBreak = new DigitalInput(Constants.Intake.beamBreakID);
         shooterBeamBreak = new DigitalInput(Constants.Shooter.beamBreakID);
 
         alliance = DriverStation.getAlliance().orElse(null);
@@ -44,8 +49,11 @@ public class Kinesthetics extends SubsystemBase {
 
     @Override
     public void periodic() {
+        SmartDashboard.putBoolean("shoter", shooterBeamBreak.get());
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
-        poseEstimator.addVisionMeasurement(Vision.getBotPose().toPose2d(), Vision.getLimelightPing());
+        var visionPose = Vision.getBotPose();
+        if (visionPose != null)
+            poseEstimator.addVisionMeasurement(visionPose.toPose2d(), Vision.getLimelightPing());
         super.periodic();
     }
 
@@ -58,9 +66,9 @@ public class Kinesthetics extends SubsystemBase {
         return alliance;
     }
 
-    public boolean feederHasNote() {
-        return feederBeamBreak.get();
-    }
+    // public boolean feederHasNote() {
+    //     return feederBeamBreak.get();
+    // }
 
     public boolean shooterHasNote() {
         return shooterBeamBreak.get();
@@ -86,7 +94,7 @@ public class Kinesthetics extends SubsystemBase {
         poseEstimator.resetPosition(getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d(getPose().getTranslation(), new Rotation2d()));
     }
 
-    /** @return v_x meters / second, v_y meters / second, ω radians / second */
+    /** @return v_x meters / second (forward +), v_y meters / second (left +), ω radians / second (ccw +)*/
     public Vector<N3> getVelocity() {
         var speeds = Constants.Swerve.swerveKinematics.toChassisSpeeds(s_Swerve.getModuleStates());
         var vec = new Vector<N3>(Nat.N3());
