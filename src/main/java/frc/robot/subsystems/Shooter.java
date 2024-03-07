@@ -6,6 +6,7 @@ import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkAbsoluteEncoder;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,7 +17,7 @@ import frc.robot.Constants.SpinState;
 
 public class Shooter extends SubsystemBase {  
     private CANSparkBase angleMotorController, shooterMLeftController, shooterMRightController, neckMotorController;
-    
+
     public Shooter() {
         angleMotorController = new CANSparkFlex(Constants.Shooter.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
         shooterMLeftController = new CANSparkFlex(Constants.Shooter.shooterMLeftID, CANSparkLowLevel.MotorType.kBrushless);
@@ -32,7 +33,13 @@ public class Shooter extends SubsystemBase {
 
     /** @param goalPitch radians */
     public void setGoalPitch(double goalPitch) {
-        angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch) + Constants.Shooter.pitchOffset, CANSparkBase.ControlType.kSmartMotion);
+        goalPitch = MathUtil.clamp(goalPitch, 0, Constants.Shooter.maximumPitch);
+        angleMotorController.set(
+            Constants.Shooter.shooterPID.calculate(getPitch(), goalPitch)
+            + Constants.Shooter.kF * Math.cos(getPitch())
+            + Constants.Shooter.pitchOffset
+        );
+        //angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch) + Constants.Shooter.pitchOffset, CANSparkBase.ControlType.kSmartMotion);
     }
 
     /** @return radians / second */
