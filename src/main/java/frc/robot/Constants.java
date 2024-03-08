@@ -206,6 +206,7 @@ public final class Constants {
         public static final double spinTolerance = Math.PI/256;
 
         public static final double pitchOffset = Units.degreesToRotations(-3);
+        public static final double minimumPitch = Units.degreesToRadians(17);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
         public static final double neckSpeed = 0.3; // volts / 12, -1 to 1
         
@@ -224,7 +225,6 @@ public final class Constants {
         public static final double bumperWidth = Units.inchesToMeters(2.75);
 
         public static final double shooterSpinMax = 30; // meters / second
-        public static final double shooterHandoffAngle = Units.rotationsToRadians(0.04);
         public static final double speakerShooterAngleMax = Units.rotationsToRadians(0.2);
         public static final double speakerShooterAngleMin = Units.rotationsToRadians(0.0);
         public static final double speakerAutoOmegaMax = Units.degreesToRadians(15);
