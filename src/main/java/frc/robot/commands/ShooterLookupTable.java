@@ -34,8 +34,17 @@ public class ShooterLookupTable extends Command{
         return Math.sqrt(Math.pow(xDif, 2) + Math.pow(yDif, 2));
     }
 
+    /** @return radians */
+    private double getYaw(Kinesthetics k){
+        Transform3d dif = getDifference(k);
+        double xDif = dif.getX();
+        double yDif = dif.getY();
+        return Math.atan(yDif / xDif);
+    }
+
     @Override
     public void execute(){        
+        s_Swerve.new ChangeYaw(null, null, () -> getYaw(s_Kinesthetics));
         s_Shooter.new ChangeState(() -> new frc.lib.util.Triple<>(getBestCommand(), 0.8, 0.4), true);
     }
 
