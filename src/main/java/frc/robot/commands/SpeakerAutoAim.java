@@ -44,7 +44,7 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                     Math.sqrt(transform.getZ()*transform.getZ() + relativex * relativex + relativey * relativey)
                 ) * 400/47 );
 
-                return new Pair<>(desiredPitch, desiredNoteVel);
+                return new frc.lib.util.Triple<>(desiredPitch, desiredNoteVel, desiredNoteVel);
             }),
             sw.new ChangeYaw(translationSup, strafeSup, () -> {
                 Transform3d transform = getDifference(k);

@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.Conversions;
 import frc.robot.Constants;
 import frc.robot.Constants.SpinState;
+import frc.lib.util.Triple;
 
 public class Shooter extends SubsystemBase {  
     private CANSparkBase angleMotorController, shooterMLeftController, shooterMRightController, neckMotorController;
@@ -22,7 +23,8 @@ public class Shooter extends SubsystemBase {
         angleMotorController = new CANSparkFlex(Constants.Shooter.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
         shooterMLeftController = new CANSparkFlex(Constants.Shooter.shooterMLeftID, CANSparkLowLevel.MotorType.kBrushless);
         shooterMRightController= new CANSparkFlex(Constants.Shooter.shooterMRightID,CANSparkLowLevel.MotorType.kBrushless);
-        shooterMRightController.follow(shooterMLeftController, true); // for now, no spin.
+        //shooterMRightController.follow(shooterMLeftController, true); // for now, no spin.
+        shooterMRightController.setInverted(true);
         neckMotorController = new CANSparkMax(Constants.Shooter.neckMotorID, CANSparkLowLevel.MotorType.kBrushless);
     }
 
@@ -52,6 +54,12 @@ public class Shooter extends SubsystemBase {
         shooterMLeftController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalSpin), CANSparkBase.ControlType.kSmartVelocity); 
     }
 
+    /** @param goalSpin1 radians / second  @param goalSpin2 radians / second*/
+    private void setGoalSpin(double goalSpin1, double goalSpin2) {
+        shooterMLeftController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalSpin1), CANSparkBase.ControlType.kSmartVelocity);
+        shooterMRightController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalSpin2), CANSparkBase.ControlType.kSmartVelocity);  
+    }
+
     /** @param goalNoteVel meters / second */
     private double velocityToSpin(double goalNoteVel) {
         return Constants.Shooter.shooterFeedForward.calculate(goalNoteVel);
@@ -66,11 +74,15 @@ public class Shooter extends SubsystemBase {
     }
 
     public ChangeState toPitch(double pitch) {
-        return new ChangeState(() -> new Pair<>(pitch, null), false);
+        return new ChangeState(() -> new Triple<>(pitch, 0d, 0d), false);
     }
 
-    public ChangeState toSpin(double spin) {
-        return new ChangeState(() -> new Pair<>(null, spin), false);
+        public ChangeState toSpin(double spin) {
+        return new ChangeState(() -> new Triple<>(null, spin, spin), false);
+    }
+
+    public ChangeState toSpin(double spin1, double spin2) {
+        return new ChangeState(() -> new Triple<>(null, spin1, spin2), false);
     }
 
     public class ChangeState extends Command {
@@ -92,7 +104,7 @@ public class Shooter extends SubsystemBase {
         public void execute() {
             var state = desiredState.get();
             if (state.getFirst() != null) setGoalPitch(state.getFirst());
-            if (state.getSecond() != null) setGoalSpin(velocityToSpin(state.getSecond()));
+            if (state.getLast() != null && state.getMiddle() != null) setGoalSpin(velocityToSpin(state.getLast()));
         }
     
         @Override
@@ -100,7 +112,7 @@ public class Shooter extends SubsystemBase {
             if (continuous) return false;
             var state = desiredState.get();
             return (state.getFirst() == null || (Math.abs(getPitch() - state.getFirst()) < Constants.Shooter.pitchTolerance))
-                && (state.getSecond() == null || (Math.abs(getSpin() - velocityToSpin(state.getSecond())) < Constants.Shooter.spinTolerance));
+                && (state.getLast() == null || (Math.abs(getSpin() - velocityToSpin(state.getLast())) < Constants.Shooter.spinTolerance));
         }
     
         @Override
@@ -113,8 +125,8 @@ public class Shooter extends SubsystemBase {
         }
 
         @FunctionalInterface
-        public interface ShooterStateSupplier {
-            public Pair<Double, Double> get();
+        public interface ShooterStateSupplier{
+            public Triple<Double, Double, Double> get();
         }
     }
 

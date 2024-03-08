@@ -7,6 +7,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,7 +23,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.util.COTSTalonFXSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
-import frc.robot.commands.ShooterCommand;
 
 public final class Constants {
     public static final double stickDeadband = 0.1;
@@ -216,7 +216,7 @@ public final class Constants {
         public static final PIDController shooterPID = new PIDController(0.7, 0, 0);
         public static final double kF = 0.0;
 
-        public static final Map<Transform2d, ShooterCommand> shooterTable = new HashMap<>();
+        public static final Map<Double, Double> shooterTable = new HashMap<>();
         // add map values below
     }
 
@@ -262,5 +262,17 @@ public final class Constants {
         private SpinState(int mult) {
             multiplier = mult;
         }
+    }
+
+    /** @param x = x input 
+     * @param x1 = first given x 
+     * @param x2 = second given x 
+     * @param y1 = first given y 
+     * @param y2 = second given y
+     * @return y output*/
+    public static double linearInterpolation(double x, double x1, double x2, double y1, double y2){
+        double slope = Math.abs((y1 - y2)/(x1 - x2));
+        double yInt = y1 - slope * x1;
+        return x * slope + yInt;
     }
 }
