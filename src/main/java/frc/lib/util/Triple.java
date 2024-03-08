@@ -14,8 +14,4 @@ package frc.lib.util;
         public F getFirst(){return f;}
         public M getMiddle(){return m;}
         public L getLast(){return l;}
-
-        public static <F, M, L> Triple<F, M, L> of(F f, M m, L l) {
-            return new Triple<F, M, L>(f,m, l);
-        }
     }
