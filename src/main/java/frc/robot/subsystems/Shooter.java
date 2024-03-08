@@ -49,9 +49,20 @@ public class Shooter extends SubsystemBase {
         return Units.rotationsPerMinuteToRadiansPerSecond(shooterMLeftController.getEncoder().getVelocity());
     }
 
+    /** @return radians / second */
+    public double getSpin1(){
+        return Units.rotationsPerMinuteToRadiansPerSecond(shooterMLeftController.getEncoder().getVelocity());
+    }
+
+        /** @return radians / second */
+    public double getSpin2(){
+        return Units.rotationsPerMinuteToRadiansPerSecond(shooterMRightController.getEncoder().getVelocity());
+    }
+
     /** @param goalSpin radians / second */
     private void setGoalSpin(double goalSpin) {
         shooterMLeftController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalSpin), CANSparkBase.ControlType.kSmartVelocity); 
+        shooterMRightController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalSpin), CANSparkBase.ControlType.kSmartVelocity);
     }
 
     /** @param goalSpin1 radians / second  @param goalSpin2 radians / second*/
@@ -77,7 +88,7 @@ public class Shooter extends SubsystemBase {
         return new ChangeState(() -> new Triple<>(pitch, 0d, 0d), false);
     }
 
-        public ChangeState toSpin(double spin) {
+    public ChangeState toSpin(double spin) {
         return new ChangeState(() -> new Triple<>(null, spin, spin), false);
     }
 
@@ -104,7 +115,7 @@ public class Shooter extends SubsystemBase {
         public void execute() {
             var state = desiredState.get();
             if (state.getFirst() != null) setGoalPitch(state.getFirst());
-            if (state.getLast() != null && state.getMiddle() != null) setGoalSpin(velocityToSpin(state.getLast()));
+            if (state.getLast() != null && state.getMiddle() != null) setGoalSpin(velocityToSpin(state.getMiddle()), velocityToSpin(state.getLast()));
         }
     
         @Override
@@ -112,7 +123,8 @@ public class Shooter extends SubsystemBase {
             if (continuous) return false;
             var state = desiredState.get();
             return (state.getFirst() == null || (Math.abs(getPitch() - state.getFirst()) < Constants.Shooter.pitchTolerance))
-                && (state.getLast() == null || (Math.abs(getSpin() - velocityToSpin(state.getLast())) < Constants.Shooter.spinTolerance));
+                && (state.getMiddle() == null || (Math.abs(getSpin1() - velocityToSpin(state.getMiddle())) < Constants.Shooter.spinTolerance))
+                && (state.getLast() == null || (Math.abs(getSpin2() - velocityToSpin(state.getLast())) < Constants.Shooter.spinTolerance));
         }
     
         @Override

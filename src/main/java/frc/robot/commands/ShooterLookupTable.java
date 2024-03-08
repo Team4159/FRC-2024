@@ -46,7 +46,7 @@ public class ShooterLookupTable extends Command{
     @Override
     public void execute(){        
         s_Swerve.new ChangeYaw(null, null, () -> getRequiredYaw(s_Kinesthetics));
-        s_Shooter.new ChangeState(() -> new frc.lib.util.Triple<>(getBestCommand(), 0.8, 0.4), true);
+        s_Shooter.new ChangeState(() -> new frc.lib.util.Triple<>(getBestCommand(), Constants.Shooter.leftSpeed, Constants.Shooter.rightSpeed), true);
     }
 
     /** @return shooter pitch */

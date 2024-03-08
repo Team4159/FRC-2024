@@ -217,6 +217,11 @@ public final class Constants {
         public static final PIDController shooterPID = new PIDController(0.7, 0, 0);
         public static final double kF = 0.0;
 
+        //Fixed speed constants
+        //TODO: find a good speed for both sides that works well in all positions
+        public static final double leftSpeed = 250;
+        public static final double rightSpeed = 125;
+
         public static final Map<Double, Double> shooterTable = new HashMap<>();
         // add map values below
     }
