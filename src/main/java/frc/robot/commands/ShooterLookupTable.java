@@ -27,6 +27,7 @@ public class ShooterLookupTable extends Command{
         return new Pose3d(k.getPose()).minus(Constants.Environment.speakers.get(k.getAlliance()));
     }
 
+    /** @return meters */
     private static double getDistance(Kinesthetics k){
         Transform3d dif = getDifference(k);
         double xDif = dif.getX();
@@ -34,8 +35,8 @@ public class ShooterLookupTable extends Command{
         return Math.sqrt(Math.pow(xDif, 2) + Math.pow(yDif, 2));
     }
 
-    /** @return radians */
-    private double getYaw(Kinesthetics k){
+    /** @return required yaw in radians */
+    private double getRequiredYaw(Kinesthetics k){
         Transform3d dif = getDifference(k);
         double xDif = dif.getX();
         double yDif = dif.getY();
@@ -44,7 +45,7 @@ public class ShooterLookupTable extends Command{
 
     @Override
     public void execute(){        
-        s_Swerve.new ChangeYaw(null, null, () -> getYaw(s_Kinesthetics));
+        s_Swerve.new ChangeYaw(null, null, () -> getRequiredYaw(s_Kinesthetics));
         s_Shooter.new ChangeState(() -> new frc.lib.util.Triple<>(getBestCommand(), 0.8, 0.4), true);
     }
 
