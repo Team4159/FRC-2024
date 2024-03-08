@@ -62,6 +62,6 @@ public class ShooterLookupTable extends Command{
             }
         }
         // Use linear interpolation on the two closest matches
-        return Constants.linearInterpolation(getDistance(s_Kinesthetics), closestAccuracy, secClosestAccuracy, Constants.Shooter.shooterTable.get(closestAccuracy), Constants.Shooter.shooterTable.get(secClosestAccuracy));
+        return Constants.linearInterpolation(getDistance(s_Kinesthetics), closestMatch, secClosestMatch, Constants.Shooter.shooterTable.get(closestMatch), Constants.Shooter.shooterTable.get(secClosestMatch));
     }
 }
