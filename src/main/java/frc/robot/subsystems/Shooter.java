@@ -35,7 +35,7 @@ public class Shooter extends SubsystemBase {
 
     /** @param goalPitch radians */
     public void setGoalPitch(double goalPitch) {
-        goalPitch = MathUtil.clamp(goalPitch, 0, Constants.Shooter.maximumPitch);
+        goalPitch = MathUtil.clamp(goalPitch, Constants.Shooter.minimumPitch, Constants.Shooter.maximumPitch);
         angleMotorController.set(
             Constants.Shooter.shooterPID.calculate(getPitch(), goalPitch)
             + Constants.Shooter.kF * Math.cos(getPitch())
@@ -85,6 +85,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public ChangeState toPitch(double pitch) {
+<<<<<<< HEAD
         return new ChangeState(() -> new Triple<>(pitch, 0d, 0d), false);
     }
 
@@ -94,6 +95,13 @@ public class Shooter extends SubsystemBase {
 
     public ChangeState toSpin(double spin1, double spin2) {
         return new ChangeState(() -> new Triple<>(null, spin1, spin2), false);
+=======
+        return new ChangeState(() -> new Pair<>(pitch, null));
+    }
+
+    public ChangeState toSpin(double spin) {
+        return new ChangeState(() -> new Pair<>(null, spin));
+>>>>>>> 9739089a6374c196da2e446bc2ffca93c9199a35
     }
 
     public class ChangeState extends Command {
@@ -130,7 +138,7 @@ public class Shooter extends SubsystemBase {
         @Override
         public void end(boolean interrupted) {
             if (interrupted && !continuous) {
-                setGoalPitch(0);
+                setGoalPitch(Constants.Shooter.minimumPitch);
                 stopSpin();
             }
             super.end(interrupted);

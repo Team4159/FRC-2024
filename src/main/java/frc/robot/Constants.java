@@ -192,7 +192,10 @@ public final class Constants {
             }
         }
 
-        public static final Translation3d luxonisTranslation = new Translation3d(); // TODO: This must be tuned to specific robot
+        public static final Pose3d luxonisTranslation = new Pose3d(
+            new Translation3d(),
+            new Rotation3d()
+        ); // TODO: This must be tuned to specific robot
     } 
 
     public static final class Shooter {
@@ -224,6 +227,13 @@ public final class Constants {
 
         public static final Map<Double, Double> shooterTable = new HashMap<>();
         // add map values below
+    }
+
+    public static final class Deflector {
+        public static final int rMotorID = 8;
+        public static final int lMotorID = 9;
+
+        public static final double maximumPitch = Units.rotationsToRadians(0.2); // TODO: tune
     }
 
     public static final class CommandConstants {

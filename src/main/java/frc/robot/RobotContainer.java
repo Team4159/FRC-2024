@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.Intake.IntakeState;
 import frc.robot.Constants.SpinState;
@@ -23,18 +22,20 @@ public class RobotContainer {
     private static final Joystick secondary = new Joystick(1);
 
     /* Driver Buttons */
-    private static final JoystickButton zeroGyro = new JoystickButton(driver, 5);
-    private static final JoystickButton autoSpk = new JoystickButton(driver, 1);
+    private static final JoystickButton zeroGyro = new JoystickButton(driver, 1);
     private static final JoystickButton autoAmp = new JoystickButton(driver, 2);
-    // private static final JoystickButton autoIntake = new JoystickButton(secondary, 2);
-    private static final JoystickButton manualShoot = new JoystickButton(secondary, 1);
-    private static final JoystickButton manualIntake = new JoystickButton(secondary, 2);
-    private static final JoystickButton manualOuttake = new JoystickButton(secondary, 3);
+
+    private static final JoystickButton autoSpk = new JoystickButton(secondary, 1);
+    private static final JoystickButton autoIntake = new JoystickButton(secondary, 2);
+    private static final JoystickButton manualShoot = new JoystickButton(secondary, 7);
+    private static final JoystickButton manualIntake = new JoystickButton(secondary, 8);
+    private static final JoystickButton manualOuttake = new JoystickButton(secondary, 9);
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
     private final Shooter s_Shooter = new Shooter();
     private final Intake s_Intake = new Intake();
+    private final Deflector s_Deflector = new Deflector();
 
     private final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve);
 
@@ -66,7 +67,7 @@ public class RobotContainer {
         /* Driver Buttons */
         zeroGyro.onTrue(new InstantCommand(kinesthetics::zeroHeading));
         //uses lookup table
-        autoSpk.debounce(0.3).and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
+        autoSpk.debounce(0.1).and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
             .whileTrue(new SequentialCommandGroup(
                  s_Shooter.new ChangeNeck(SpinState.ST),
                  new ShooterLookupTable(kinesthetics, s_Shooter, s_Swerve),
@@ -75,31 +76,16 @@ public class RobotContainer {
         autoAmp.debounce(0.1).and(kinesthetics::shooterHasNote).and(() -> AmpAuto.isInRange(kinesthetics))
             .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
             .whileTrue(new SequentialCommandGroup(
-                new AmpAuto(kinesthetics, s_Swerve, s_Shooter),
+                new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector),
                 s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW)
             ));
-        // autoIntake.debounce(0.3).and(() -> !kinesthetics.shooterHasNote()) // && !kinesthetics.feederHasNote()
-        //     .and(() -> IntakeAuto.canRun(kinesthetics))
-        //     .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake))
-        //     .onFalse(new ParallelCommandGroup(
-        //         new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter),
-        //         s_Intake.new ChangeState(IntakeState.STOW)
-        // //     ));
-        // manualShoot.debounce(0.1) // does not check if kinesthetics has note- because this should also work when kinesthetics fails
-        //     .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
-        //     .whileTrue(s_Shooter.new ChangeState(() -> new Pair<>(
-        //             (1-secondary.getThrottle())/2 * Constants.CommandConstants.speakerShooterAngleMax + Constants.CommandConstants.speakerShooterAngleMin,
-        //             Math.abs(secondary.getY()) * Constants.CommandConstants.shooterSpinMax
-        //     ), true))
-        //     .onFalse(new SequentialCommandGroup(
-        //         new ParallelCommandGroup(
-        //             s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
-        //             new WaitCommand(1)
-        //         ),
-        //         s_Shooter.new ChangeNeck(SpinState.ST),
-        //         s_Shooter.new ChangeState(() -> new Pair<>(0d, 0d))
-        //     ));
-        // temporary subwoofer shoot
+        autoIntake.debounce(0.1).and(() -> !kinesthetics.shooterHasNote()) // && !kinesthetics.feederHasNote()
+            .and(() -> IntakeAuto.canRun(kinesthetics))
+            .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake))
+            .onFalse(new ParallelCommandGroup(
+                s_Shooter.new ChangeNeck(SpinState.ST),
+                s_Intake.new ChangeState(IntakeState.STOW)
+            ));
         manualShoot.debounce(0.1) // does not check if kinesthetics has note- because this should also work when kinesthetics fails
             .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
             .whileTrue(s_Shooter.new ChangeState(() -> new ShooterCommand(
@@ -108,10 +94,7 @@ public class RobotContainer {
                     0.4 * Constants.CommandConstants.shooterSpinMax
             ), true))
             .onFalse(new SequentialCommandGroup(
-                new ParallelCommandGroup(
-                    s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
-                    new WaitCommand(1)
-                ),
+                s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW).withTimeout(1.5),
                 s_Shooter.new ChangeNeck(SpinState.ST),
                 s_Shooter.new ChangeState(() -> new ShooterCommand(0d, 0d, 0d))
             ));

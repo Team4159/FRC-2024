@@ -71,7 +71,7 @@ public class Kinesthetics extends SubsystemBase {
     // }
 
     public boolean shooterHasNote() {
-        return shooterBeamBreak.get();
+        return !shooterBeamBreak.get();
     }
 
     public Pose2d getPose() {
