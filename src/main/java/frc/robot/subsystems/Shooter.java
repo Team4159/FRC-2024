@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.Conversions;
 import frc.robot.Constants;
 import frc.robot.Constants.SpinState;
-import frc.lib.util.Triple;
+import frc.robot.commands.ShooterCommand;
 
 public class Shooter extends SubsystemBase {  
     private CANSparkBase angleMotorController, shooterMLeftController, shooterMRightController, neckMotorController;
@@ -85,23 +85,15 @@ public class Shooter extends SubsystemBase {
     }
 
     public ChangeState toPitch(double pitch) {
-<<<<<<< HEAD
-        return new ChangeState(() -> new Triple<>(pitch, 0d, 0d), false);
+        return new ChangeState(() -> new ShooterCommand(pitch, getSpin1(), getSpin2()), false);
     }
 
     public ChangeState toSpin(double spin) {
-        return new ChangeState(() -> new Triple<>(null, spin, spin), false);
+        return new ChangeState(() -> new ShooterCommand(getPitch(), spin, spin), false);
     }
 
     public ChangeState toSpin(double spin1, double spin2) {
-        return new ChangeState(() -> new Triple<>(null, spin1, spin2), false);
-=======
-        return new ChangeState(() -> new Pair<>(pitch, null));
-    }
-
-    public ChangeState toSpin(double spin) {
-        return new ChangeState(() -> new Pair<>(null, spin));
->>>>>>> 9739089a6374c196da2e446bc2ffca93c9199a35
+        return new ChangeState(() -> new ShooterCommand(getPitch(), spin1, spin2), false);
     }
 
     public class ChangeState extends Command {
@@ -122,31 +114,32 @@ public class Shooter extends SubsystemBase {
         @Override
         public void execute() {
             var state = desiredState.get();
-            if (state.getFirst() != null) setGoalPitch(state.getFirst());
-            if (state.getLast() != null && state.getMiddle() != null) setGoalSpin(velocityToSpin(state.getMiddle()), velocityToSpin(state.getLast()));
+            setGoalPitch(state.pitch());
+            setGoalSpin(velocityToSpin(state.speed1()), velocityToSpin(state.speed2()));
         }
     
         @Override
         public boolean isFinished() {
             if (continuous) return false;
             var state = desiredState.get();
-            return (state.getFirst() == null || (Math.abs(getPitch() - state.getFirst()) < Constants.Shooter.pitchTolerance))
-                && (state.getMiddle() == null || (Math.abs(getSpin1() - velocityToSpin(state.getMiddle())) < Constants.Shooter.spinTolerance))
-                && (state.getLast() == null || (Math.abs(getSpin2() - velocityToSpin(state.getLast())) < Constants.Shooter.spinTolerance));
+            return (Math.abs(getPitch() - state.pitch()) < Constants.Shooter.pitchTolerance)
+                && (Math.abs(getSpin1() - velocityToSpin(state.speed1())) < Constants.Shooter.spinTolerance)
+                && (Math.abs(getSpin2() - velocityToSpin(state.speed2())) < Constants.Shooter.spinTolerance);
         }
     
         @Override
         public void end(boolean interrupted) {
             if (interrupted && !continuous) {
-                setGoalPitch(Constants.Shooter.minimumPitch);
+                setGoalPitch(0);
                 stopSpin();
             }
             super.end(interrupted);
         }
 
-        @FunctionalInterface
+        //@FunctionalInterface
         public interface ShooterStateSupplier{
-            public Triple<Double, Double, Double> get();
+            //public Triple<Double, Double, Double> get();
+            public ShooterCommand get();
         }
     }
 

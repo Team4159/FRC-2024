@@ -284,10 +284,9 @@ public final class Constants {
      * @param x2 = second given x 
      * @param y1 = first given y 
      * @param y2 = second given y
-     * @return y output
-     * @see the slope is always positive(uses Math.abs()), can be changed if needed*/
+     * @return y output */
     public static double linearInterpolation(double x, double x1, double x2, double y1, double y2){
-        double slope = Math.abs((y1 - y2)/(x1 - x2));
+        double slope = (y1 - y2)/(x1 - x2);
         double yInt = y1 - slope * x1;
         return x * slope + yInt;
     }
