@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -27,6 +28,8 @@ public class RobotContainer {
 
     private static final JoystickButton autoSpk = new JoystickButton(secondary, 1);
     private static final JoystickButton autoIntake = new JoystickButton(secondary, 2);
+    private static final JoystickButton manualAmp = new JoystickButton(secondary, 3);
+    private static final JoystickButton manualNeck = new JoystickButton(secondary, 5);
     private static final JoystickButton manualShoot = new JoystickButton(secondary, 7);
     private static final JoystickButton manualIntake = new JoystickButton(secondary, 8);
     private static final JoystickButton manualOuttake = new JoystickButton(secondary, 9);
@@ -96,6 +99,26 @@ public class RobotContainer {
                 s_Shooter.new ChangeNeck(SpinState.ST),
                 s_Shooter.new ChangeState(() -> new Pair<>(Constants.Shooter.minimumPitch, 0d))
             ));
+        manualAmp.debounce(0.05)
+            .onTrue(new ParallelCommandGroup(
+                s_Shooter.new ChangeState(() -> new Pair<>(Constants.Shooter.minimumPitch, 0d))
+            ))
+            .whileTrue( new ParallelCommandGroup(
+                s_Shooter.new ChangeState(() -> new Pair<>(
+                    Constants.CommandConstants.ampShooterAngle,
+                    Constants.CommandConstants.ampShooterSpin
+                ), true),
+                s_Deflector.new Raise()
+            ))
+            .onFalse(new ParallelCommandGroup(
+                //s_Deflector.new Raise(),
+                //new InstantCommand( () -> s_Shooter.setNeckSpin(SpinState.FW, 0.7))
+                new InstantCommand( () -> s_Shooter.setNeckPercentage(SpinState.ST, 0)),
+                s_Shooter.new ChangeState(() -> new Pair<>(Constants.Shooter.minimumPitch, 0d))
+            ));
+        manualNeck.debounce(0.05)
+            .whileTrue(new InstantCommand(() -> s_Shooter.setNeckPercentage(SpinState.FW, 0.7)))
+            .onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
         manualIntake.debounce(0.1)
             .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true))
             .onFalse(new ParallelCommandGroup(
@@ -105,6 +128,18 @@ public class RobotContainer {
         manualOuttake.debounce(0.1)
             .whileTrue(s_Intake.new ChangeState(IntakeState.SPIT))
             .onFalse(s_Intake.new ChangeState(IntakeState.STOW));
+        // temporary vision logging, update numbers on each click
+        new JoystickButton(secondary, 4)
+            .onTrue(new InstantCommand(
+                () -> {
+                    kinesthetics.setPose(Vision.getBotPose().toPose2d());
+                    SmartDashboard.putNumber("Limelight Bot X", Vision.getBotPose().toPose2d().getX());
+                    SmartDashboard.putNumber("Limelight Bot Y", Vision.getBotPose().toPose2d().getY());
+                    SmartDashboard.putNumber("Kinesthetics Bot X", kinesthetics.getPose().getX());
+                    SmartDashboard.putNumber("Kinesthetics Bot Y", kinesthetics.getPose().getY());
+                }
+
+            ));
     }
 
     public Command getAutonomousCommand() {
