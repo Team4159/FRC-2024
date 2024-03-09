@@ -102,7 +102,7 @@ public class RobotContainer {
         // temporary subwoofer shoot
         manualShoot.debounce(0.1) // does not check if kinesthetics has note- because this should also work when kinesthetics fails
             .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
-            .whileTrue(s_Shooter.new ChangeState(() -> new frc.lib.util.Triple<>(
+            .whileTrue(s_Shooter.new ChangeState(() -> new ShooterCommand(
                     1.00,
                     0.8 * Constants.CommandConstants.shooterSpinMax,
                     0.4 * Constants.CommandConstants.shooterSpinMax
@@ -113,7 +113,7 @@ public class RobotContainer {
                     new WaitCommand(1)
                 ),
                 s_Shooter.new ChangeNeck(SpinState.ST),
-                s_Shooter.new ChangeState(() -> new frc.lib.util.Triple<>(0d, 0d, 0d))
+                s_Shooter.new ChangeState(() -> new ShooterCommand(0d, 0d, 0d))
             ));
         manualIntake.debounce(0.1)
             .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true))
