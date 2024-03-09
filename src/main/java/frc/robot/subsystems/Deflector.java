@@ -15,7 +15,7 @@ public class Deflector extends SubsystemBase{
     public Deflector(){
         angleMotorControllerL = new CANSparkMax(Constants.Deflector.lMotorID, MotorType.kBrushless);
         angleMotorControllerR = new CANSparkMax(Constants.Deflector.rMotorID, MotorType.kBrushless);
-        angleMotorControllerR.follow(angleMotorControllerL);
+        angleMotorControllerR.follow(angleMotorControllerL, true);
     }
 
     /** @return radians */
@@ -25,23 +25,31 @@ public class Deflector extends SubsystemBase{
     
     /** @param goalPitch radians */
     private void setGoalPitch(double goalPitch) {
-        angleMotorControllerL.getPIDController().setReference(Units.radiansToRotations(goalPitch), CANSparkBase.ControlType.kSmartMotion);
+        angleMotorControllerL.getPIDController().setReference(Units.radiansToRotations(goalPitch), CANSparkBase.ControlType.kPosition);
     }
 
     public class Raise extends Command {
+        private double desiredPitch;
         public Raise() {
+            desiredPitch = Constants.Deflector.maximumPitch;
+            addRequirements(Deflector.this);
+        }
+
+        public Raise(double pitch) {
+            desiredPitch = pitch;
             addRequirements(Deflector.this);
         }
 
         @Override
         public void initialize(){
-            setGoalPitch(Constants.Deflector.maximumPitch);
+            setGoalPitch(desiredPitch);
             super.initialize();
         }
 
         @Override
         public boolean isFinished() {
-            return false;
+            return Math.abs(desiredPitch - Units.rotationsToRadians(angleMotorControllerL.getEncoder().getPosition())) < Constants.Deflector.pitchTolerance;
+            //return false;
         }
 
         @Override
