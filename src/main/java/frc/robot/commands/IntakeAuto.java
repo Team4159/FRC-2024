@@ -31,10 +31,20 @@ public class IntakeAuto extends SequentialCommandGroup {
             }
         }
         addCommands(
-            // sh.toPitch(Constants.Shooter.minimumPitch),
+            sh.toPitch(Constants.Shooter.minimumPitch),
             sh.new ChangeNeck(SpinState.FW),
             i.new ChangeState(IntakeState.DOWN),
-            new WaitUntilCommand(k::shooterHasNote).withTimeout(2),
+            new WaitUntilCommand(k::shooterHasNote).withTimeout(2)
+        );
+        // if the beambreak works, reverse the neck until it reopens
+        if (k.shooterHasNote()) {
+            addCommands(
+                sh.new ChangeNeck(SpinState.BW),
+                new WaitUntilCommand(() -> !k.shooterHasNote()),
+                sh.new ChangeNeck(SpinState.ST)
+            );
+        }
+        addCommands(
             new ParallelCommandGroup( // ending commands
                 i.new ChangeState(IntakeState.STOW),
                 sh.new ChangeNeck(SpinState.ST)

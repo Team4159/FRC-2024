@@ -50,4 +50,12 @@ public class Conversions {
         double wheelRotations = wheelMeters / circumference;
         return wheelRotations;
     }
+
+    /**
+     * @param millimeters Distance: (in Millimeters)
+     * @return Distance: (in Meters)
+     */
+    public static double millimetersToMeters(double millimeters) {
+        return millimeters / 1000;
+    }
 }
