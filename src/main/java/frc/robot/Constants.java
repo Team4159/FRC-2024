@@ -209,24 +209,23 @@ public final class Constants {
         public static final double spinTolerance = Math.PI/256;
 
         public static final double pitchOffset = Units.degreesToRotations(-3);
-        public static final double minimumPitch = Units.degreesToRadians(17);
+        public static final double minimumPitch = Units.degreesToRadians(15);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
+        public static final double subwooferPitch = 1;
+        public static final double podiumPitch = 0;
         public static final double neckSpeed = 0.3; // volts / 12, -1 to 1
         
         /** @param shooterFeedForward kS radians / second, kV radians / second per meter / second */
         public static final SimpleMotorFeedforward shooterFeedForward = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
 
         // TODO: This must be tuned to specific robot
-        public static final PIDController shooterPID = new PIDController(0.7, 0, 0);
+        public static final PIDController shooterPID = new PIDController(0.8, 0, 0);
         public static final double kF = 0.0;
 
         //Fixed speed constants
         //TODO: find a good speed for both sides that works well in all positions
         public static final double leftSpeed = 250;
         public static final double rightSpeed = 125;
-
-        public static final Map<Double, Double> shooterTable = new HashMap<>();
-        // add map values below
     }
 
     public static final class Deflector {

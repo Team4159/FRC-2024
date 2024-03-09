@@ -5,10 +5,12 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.subsystems.Kinesthetics;
 
 public class ShooterLookupTable extends Command{
@@ -32,7 +34,9 @@ public class ShooterLookupTable extends Command{
         Transform3d dif = getDifference(k);
         double xDif = dif.getX();
         double yDif = dif.getY();
-        return Math.sqrt(Math.pow(xDif, 2) + Math.pow(yDif, 2));
+        double dist = Math.sqrt(Math.pow(xDif, 2) + Math.pow(yDif, 2));
+        SmartDashboard.putNumber("Distance from speaker", dist);
+        return dist;
     }
 
     /** @return required yaw in radians */
@@ -45,8 +49,8 @@ public class ShooterLookupTable extends Command{
 
     @Override
     public void execute(){        
-        s_Swerve.new ChangeYaw(null, null, () -> getRequiredYaw(s_Kinesthetics));
-        s_Shooter.new ChangeState(() -> new ShooterCommand(getBestCommand(), Constants.Shooter.leftSpeed, Constants.Shooter.rightSpeed), true);
+        //s_Swerve.new ChangeYaw(null, null, () -> getRequiredYaw(s_Kinesthetics));
+        //s_Shooter.new ChangeState(() -> new ShooterCommand(getBestCommand(), Constants.Shooter.leftSpeed, Constants.Shooter.rightSpeed), true);
     }
 
     /** @return shooter pitch */
@@ -58,7 +62,7 @@ public class ShooterLookupTable extends Command{
         double secClosestAccuracy = Double.MAX_VALUE;
 
         // Locate closest and second closest match
-        for (double key : Constants.Shooter.shooterTable.keySet()) {
+        for (double key : RobotContainer.shooterTable.keySet()) {
             double accuracy = key;
             if(accuracy < closestAccuracy){
                 secClosestMatch = closestMatch;
@@ -72,6 +76,6 @@ public class ShooterLookupTable extends Command{
             }
         }
         // Use linear interpolation on the two closest matches
-        return Constants.linearInterpolation(getDistance(s_Kinesthetics), closestMatch, secClosestMatch, Constants.Shooter.shooterTable.get(closestMatch), Constants.Shooter.shooterTable.get(secClosestMatch));
+        return Constants.linearInterpolation(getDistance(s_Kinesthetics), closestMatch, secClosestMatch, RobotContainer.shooterTable.get(closestMatch), RobotContainer.shooterTable.get(secClosestMatch));
     }
 }

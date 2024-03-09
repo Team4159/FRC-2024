@@ -9,6 +9,7 @@ import com.revrobotics.SparkAbsoluteEncoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.Conversions;
@@ -18,6 +19,8 @@ import frc.robot.commands.ShooterCommand;
 
 public class Shooter extends SubsystemBase {  
     private CANSparkBase angleMotorController, shooterMLeftController, shooterMRightController, neckMotorController;
+    //for testing
+    private double tPitch;
 
     public Shooter() {
         angleMotorController = new CANSparkFlex(Constants.Shooter.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
@@ -26,6 +29,8 @@ public class Shooter extends SubsystemBase {
         //shooterMRightController.follow(shooterMLeftController, true); // for now, no spin.
         shooterMRightController.setInverted(true);
         neckMotorController = new CANSparkMax(Constants.Shooter.neckMotorID, CANSparkLowLevel.MotorType.kBrushless);
+        // for testing
+        tPitch = 0;
     }
 
     /** @return radians */
@@ -41,6 +46,7 @@ public class Shooter extends SubsystemBase {
             + Constants.Shooter.kF * Math.cos(getPitch())
             + Constants.Shooter.pitchOffset
         );
+        tPitch = Units.radiansToDegrees(goalPitch);
         //angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch) + Constants.Shooter.pitchOffset, CANSparkBase.ControlType.kSmartMotion);
     }
 
@@ -84,6 +90,10 @@ public class Shooter extends SubsystemBase {
         neckMotorController.set(ss.multiplier * Constants.Shooter.neckSpeed);
     }
 
+    public void setNeckCustomSpeed(SpinState ss, double speed) {
+        neckMotorController.set(ss.multiplier * speed);
+    }
+
     public ChangeState toPitch(double pitch) {
         return new ChangeState(() -> new ShooterCommand(pitch, getSpin1(), getSpin2()), false);
     }
@@ -94,6 +104,12 @@ public class Shooter extends SubsystemBase {
 
     public ChangeState toSpin(double spin1, double spin2) {
         return new ChangeState(() -> new ShooterCommand(getPitch(), spin1, spin2), false);
+    }
+
+    @Override
+    public void periodic(){
+        SmartDashboard.putNumber("target pitch", Units.degreesToRadians(tPitch));
+        SmartDashboard.putNumber("current pitch", getPitch());
     }
 
     public class ChangeState extends Command {
