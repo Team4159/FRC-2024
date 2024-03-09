@@ -223,8 +223,11 @@ public final class Constants {
         public static final double shooterHandoffAngle = Units.rotationsToRadians(0.04);
         public static final double speakerShooterAngleMax = Units.degreesToRadians(80);
         public static final double speakerAutoOmegaMax = Units.degreesToRadians(15);
-        public static final double speakerSubwooferPitch = 1; // radians TODO 
-        public static final double speakerSubwooferSpin = 15; // meters / second TODO 
+        public static final double speakerSubwooferPitch = 1; // radians 
+        public static final double speakerSubwooferSpin = 245; // radians / second  
+
+        public static final double sourceShooterIntakePitch = 1; // radians TODO 
+        public static final double sourceShooterIntakeSpin = -10; // radians / second TODO
 
         public static final double ampAutoDistanceMax = 3.0; // meters
         public static final double ampShooterAngle = Units.degreesToRadians(75);
