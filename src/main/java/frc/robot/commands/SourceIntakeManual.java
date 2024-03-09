@@ -7,11 +7,11 @@ import frc.robot.Constants.SpinState;
 import frc.robot.subsystems.Kinesthetics;
 import frc.robot.subsystems.Shooter;
 
-public class SourceIntake extends Command {
+public class SourceIntakeManual extends Command {
     private Kinesthetics kinesthetics;
     private Shooter s_Shooter;
 
-    public SourceIntake(Kinesthetics k, Shooter sh) {
+    public SourceIntakeManual(Kinesthetics k, Shooter sh) {
         kinesthetics = k;
         s_Shooter = sh;
         addRequirements(s_Shooter);
