@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.Constants.SpinState;
@@ -18,8 +19,7 @@ public class SourceIntake extends Command {
 
     @Override
     public void execute() {
-        s_Shooter.setGoalPitch(Constants.CommandConstants.sourceShooterIntakePitch);
-        s_Shooter.setGoalSpin(Constants.CommandConstants.sourceShooterIntakeSpin);
+        s_Shooter.new ChangeState(() -> new Pair<>(Constants.CommandConstants.sourceShooterIntakePitch, Constants.CommandConstants.sourceShooterIntakeSpin));
         if (kinesthetics.shooterHasNote()) {
             s_Shooter.new ChangeNeck(kinesthetics, SpinState.BW);
         } else {
@@ -30,7 +30,7 @@ public class SourceIntake extends Command {
     @Override
     public void end(boolean interrupted) {
         if (interrupted) {
-            s_Shooter.setGoalPitch(Constants.Shooter.restingPitch);
+            s_Shooter.setGoalPitch(Constants.Shooter.minimumPitch);
             s_Shooter.stopSpin();
             s_Shooter.new ChangeNeck(kinesthetics, SpinState.ST);
         }

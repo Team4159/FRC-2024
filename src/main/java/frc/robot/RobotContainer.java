@@ -3,12 +3,12 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
-import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.Pair;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -59,14 +59,14 @@ public class RobotContainer {
         );
 
         // register Named Commands for PathPlanner, must be done before building autos
-        NamedCommands.registerCommand("ampAuto", new AmpAuto(kinesthetics, s_Swerve, s_Shooter));
+        NamedCommands.registerCommand("ampAuto", new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector));
         NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake));
         NamedCommands.registerCommand("intakeStatic", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true));
         NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
-            s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferPitch, () -> Constants.CommandConstants.speakerSubwooferSpin, false),
+            s_Shooter.new ChangeState(() -> new Pair<>(Constants.CommandConstants.speakerSubwooferPitch, Constants.CommandConstants.speakerSubwooferSpin), false),
             s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
-            s_Shooter.new ChangeState(() -> Constants.Shooter.restingPitch, () -> 0)
+            s_Shooter.new ChangeState(() -> new Pair<>(Constants.Shooter.minimumPitch, 0d))
         ));
         NamedCommands.registerCommand("speakerAutoAim", new ParallelCommandGroup(new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, null, null), new SpeakerAutoAimYaw(kinesthetics, s_Swerve, s_Shooter, null, null)));
 
