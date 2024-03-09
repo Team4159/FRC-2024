@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -26,18 +27,20 @@ public class RobotContainer {
     private static final Joystick secondary = new Joystick(1);
 
     /* Driver Buttons */
-    private static final JoystickButton zeroGyro = new JoystickButton(driver, 5);
-    // private static final JoystickButton autoSpk = new JoystickButton(driver, 1);
+    private static final JoystickButton zeroGyro = new JoystickButton(driver, 1);
     private static final JoystickButton autoAmp = new JoystickButton(driver, 2);
-    // private static final JoystickButton autoIntake = new JoystickButton(secondary, 2);
-    private static final JoystickButton manualShoot = new JoystickButton(secondary, 1);
-    private static final JoystickButton manualIntake = new JoystickButton(secondary, 2);
-    private static final JoystickButton manualOuttake = new JoystickButton(secondary, 3);
+
+    private static final JoystickButton autoSpk = new JoystickButton(secondary, 1);
+    private static final JoystickButton autoIntake = new JoystickButton(secondary, 2);
+    private static final JoystickButton manualShoot = new JoystickButton(secondary, 7);
+    private static final JoystickButton manualIntake = new JoystickButton(secondary, 8);
+    private static final JoystickButton manualOuttake = new JoystickButton(secondary, 9);
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
     private final Shooter s_Shooter = new Shooter();
     private final Intake s_Intake = new Intake();
+    private final Deflector s_Deflector = new Deflector();
 
     private final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve);
 
@@ -73,6 +76,8 @@ public class RobotContainer {
         // configure SmartDashboard
         autoChooser = AutoBuilder.buildAutoChooser(); // can accept a default auto by passing in its name as a string
         SmartDashboard.putData("Auto Chooser", autoChooser);
+
+        DriverStation.silenceJoystickConnectionWarning(true);
     }
 
     /**
@@ -84,49 +89,50 @@ public class RobotContainer {
     private void configureButtonBindings() {
         /* Driver Buttons */
         zeroGyro.onTrue(new InstantCommand(kinesthetics::zeroHeading));
-        // autoSpk.debounce(0.3).and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
-        //     .whileTrue(new SequentialCommandGroup(
-        //         new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter),
-        //         new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()),
-        //         new InstantCommand(() -> s_Shooter.setNeck(SpinState.FW))
-        //     )).onFalse(new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter));
-        autoAmp.debounce(0.3).and(kinesthetics::shooterHasNote).and(() -> AmpAuto.isInRange(kinesthetics))
+        autoSpk.debounce(0.1).and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
+            .whileTrue(new SequentialCommandGroup(
+                s_Shooter.new ChangeNeck(SpinState.ST),
+                new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()),
+                s_Shooter.new ChangeNeck(SpinState.FW)
+            )).onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
+        autoAmp.debounce(0.1).and(kinesthetics::shooterHasNote).and(() -> AmpAuto.isInRange(kinesthetics))
             .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
             .whileTrue(new SequentialCommandGroup(
-                new AmpAuto(kinesthetics, s_Swerve, s_Shooter),
+                new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector),
                 s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW)
             ));
-        // autoIntake.debounce(0.3).and(() -> !kinesthetics.shooterHasNote()) // && !kinesthetics.feederHasNote()
-        //     .and(() -> IntakeAuto.canRun(kinesthetics))
-        //     .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake))
-        //     .onFalse(new ParallelCommandGroup(
-        //         new InstantCommand(() -> s_Shooter.setNeck(SpinState.ST), s_Shooter),
-        //         s_Intake.new ChangeState(IntakeState.STOW)
-        // //     ));
-        manualShoot.debounce(0.3) // does not check if kinesthetics has note- because this should also work when kinesthetics fails
-            .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
-            .whileTrue(s_Shooter.new ChangeState(
-                () -> (secondary.getThrottle()+1)/2 * Constants.CommandConstants.speakerShooterAngleMax,
-                () -> Math.abs(secondary.getY()) * Constants.CommandConstants.shooterSpinMax,
-                true
-            )).onFalse(new SequentialCommandGroup(
-                s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
-                s_Shooter.new ChangeState(() -> Constants.Shooter.restingPitch, () -> 0)
+        autoIntake.debounce(0.1).and(() -> !kinesthetics.shooterHasNote()) // && !kinesthetics.feederHasNote()
+            .and(() -> IntakeAuto.canRun(kinesthetics))
+            .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake))
+            .onFalse(new ParallelCommandGroup(
+                s_Shooter.new ChangeNeck(SpinState.ST),
+                s_Intake.new ChangeState(IntakeState.STOW)
             ));
-        manualIntake.debounce(0.3)
+        manualShoot.debounce(0.1) // does not check if kinesthetics has note- because this should also work when kinesthetics fails
+            .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
+            .whileTrue(s_Shooter.new ChangeState(() -> new Pair<>(
+                    (1-secondary.getThrottle())/2 * Constants.CommandConstants.speakerShooterAngleMax + Constants.CommandConstants.speakerShooterAngleMin,
+                    Math.abs(secondary.getY()) * Constants.CommandConstants.shooterSpinMax
+            ), true))
+            .onFalse(new SequentialCommandGroup(
+                s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW).withTimeout(1.5),
+                s_Shooter.new ChangeNeck(SpinState.ST),
+                s_Shooter.new ChangeState(() -> new Pair<>(Constants.Shooter.minimumPitch, 0d))
+            ));
+        manualIntake.debounce(0.1)
             .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true))
             .onFalse(new ParallelCommandGroup(
                 s_Intake.new ChangeState(IntakeState.STOW),
                 s_Shooter.new ChangeNeck(SpinState.ST)
             ));
-        manualOuttake.debounce(0.3)
+        manualOuttake.debounce(0.1)
             .whileTrue(s_Intake.new ChangeState(IntakeState.SPIT))
             .onFalse(s_Intake.new ChangeState(IntakeState.STOW));
     }
 
     public Command getAutonomousCommand() {
         return new SequentialCommandGroup(
-            Commands.runOnce(() -> kinesthetics.setPose(new Pose2d())),
+            Commands.runOnce(() -> kinesthetics.setPose(Vision.getBotPose().toPose2d())),
             autoChooser.getSelected()
         );
     }

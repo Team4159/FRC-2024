@@ -13,6 +13,15 @@ public class Conversions {
     }
 
     /**
+     * @param wheelRPS Wheel Velocity: (in Radians per Second)
+     * @return Wheel Velocity: (in Meters per Second)
+     */
+    public static double RadiansPSToRPM(double wheelRPS){
+        double wheelRPM = wheelRPS * 60 / (2*Math.PI);
+        return wheelRPM;
+    }
+
+    /**
      * @param wheelMPS Wheel Velocity: (in Meters per Second)
      * @param circumference Wheel Circumference: (in Meters)
      * @return Wheel Velocity: (in Rotations per Second)
@@ -40,5 +49,13 @@ public class Conversions {
     public static double metersToRotations(double wheelMeters, double circumference){
         double wheelRotations = wheelMeters / circumference;
         return wheelRotations;
+    }
+
+    /**
+     * @param millimeters Distance: (in Millimeters)
+     * @return Distance: (in Meters)
+     */
+    public static double millimetersToMeters(double millimeters) {
+        return millimeters / 1000;
     }
 }

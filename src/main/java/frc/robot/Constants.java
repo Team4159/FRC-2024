@@ -9,6 +9,8 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -179,7 +181,8 @@ public final class Constants {
         public static final double pitchTolerance = Math.PI/64; // radians
         public static final double spinTolerance = Math.PI/16; // radians
 
-        public static final double intakeSpin = 1; // -1 to 1
+        public static final double intakeSpin = 0.5; // -1 to 1
+        public static final double feederSpin = 0.3; // -1 to 1
 
         public static final double intakeRange = 0.2; // meters
         public static final double intakeField = 64; // degrees
@@ -198,7 +201,10 @@ public final class Constants {
             }
         }
 
-        public static final Translation3d luxonisTranslation = new Translation3d(); // TODO: This must be tuned to specific robot
+        public static final Pose3d luxonisTranslation = new Pose3d(
+            new Translation3d(),
+            new Rotation3d()
+        ); // TODO: This must be tuned to specific robot
     } 
 
     public static final class Shooter {
@@ -211,17 +217,32 @@ public final class Constants {
         public static final double pitchTolerance = Math.PI/512;
         public static final double spinTolerance = Math.PI/256;
 
-        public static final double restingPitch = 0; // radians
-        public static final double maximumPitch = Math.PI/2; // radians
+        public static final double pitchOffset = Units.degreesToRotations(-3);
+        public static final double minimumPitch = Units.degreesToRadians(17);
+        public static final double maximumPitch = Units.rotationsToRadians(0.2);
         public static final double neckSpeed = 0.3; // volts / 12, -1 to 1
+        
+        /** @param shooterFeedForward kS radians / second, kV radians / second per meter / second */
+        public static final SimpleMotorFeedforward shooterFeedForward = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
+
+        // TODO: This must be tuned to specific robot
+        public static final PIDController shooterPID = new PIDController(0.7, 0, 0);
+        public static final double kF = 0.0;
     }
 
-    public static final class CommandConstants { // TODO: This must be tuned to specific robot
+    public static final class Deflector {
+        public static final int rMotorID = 8;
+        public static final int lMotorID = 9;
+
+        public static final double maximumPitch = Units.rotationsToRadians(0.2); // TODO: tune
+    }
+
+    public static final class CommandConstants {
         public static final double bumperWidth = Units.inchesToMeters(2.75);
 
-        public static final double shooterSpinMax = 20; // meters / second
-        public static final double shooterHandoffAngle = Units.rotationsToRadians(0.04);
-        public static final double speakerShooterAngleMax = Units.degreesToRadians(80);
+        public static final double shooterSpinMax = 30; // meters / second
+        public static final double speakerShooterAngleMax = Units.rotationsToRadians(0.2);
+        public static final double speakerShooterAngleMin = Units.rotationsToRadians(0.0);
         public static final double speakerAutoOmegaMax = Units.degreesToRadians(15);
         public static final double speakerSubwooferPitch = 1; // radians 
         public static final double speakerSubwooferSpin = 245; // radians / second  
@@ -246,8 +267,14 @@ public final class Constants {
             Alliance.Red, new Pose2d(14.7008, 8.2042, Rotation2d.fromDegrees(0)),
             Alliance.Blue, new Pose2d(1.842, 8.2042, Rotation2d.fromDegrees(0))
         );
-        /** @param G meters / second squared */
+        /** @param G meters / second squared
+         * Acceleration due to gravity
+        */
         public static final float G = 9.8f;
+        /** @param B ??? / ???
+         * Some sort of aerodynamic constant
+        */
+        public static final double B = 0.096;
     }
 
     public static enum SpinState {
