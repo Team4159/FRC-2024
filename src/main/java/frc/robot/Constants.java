@@ -222,7 +222,8 @@ public final class Constants {
         public static final int rMotorID = 8;
         public static final int lMotorID = 9;
 
-        public static final double maximumPitch = Units.rotationsToRadians(0.2); // TODO: tune
+        public static final double maximumPitch = Units.rotationsToRadians(2.2);
+        public static final double pitchTolerance = Math.PI/128;
     }
 
     public static final class CommandConstants {
@@ -234,8 +235,8 @@ public final class Constants {
         public static final double speakerAutoOmegaMax = Units.degreesToRadians(15);
 
         public static final double ampAutoDistanceMax = 3.0; // meters
-        public static final double ampShooterAngle = Units.degreesToRadians(75);
-        public static final double ampShooterSpin = 12;
+        public static final double ampShooterAngle = Units.degreesToRadians(75); //TODO
+        public static final double ampShooterSpin = 5; //TODO
         public static final double ampAutoDistanceToStartSpinning = 1; // meters
     }
 
