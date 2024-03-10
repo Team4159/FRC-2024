@@ -1,16 +1,19 @@
 package frc.robot;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -131,7 +134,7 @@ public final class Constants {
             public static final int driveMotorID = 3;
             public static final int angleMotorID = 4;
             public static final int canCoderID = 2;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-69); // -69.8
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-69); 
 
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -153,7 +156,7 @@ public final class Constants {
             public static final int driveMotorID = 7;
             public static final int angleMotorID = 8;
             public static final int canCoderID = 4;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(55); // 55.4
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(55); 
 
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -206,16 +209,23 @@ public final class Constants {
         public static final double spinTolerance = Math.PI/256;
 
         public static final double pitchOffset = Units.degreesToRotations(-3);
-        public static final double minimumPitch = Units.degreesToRadians(17);
+        public static final double minimumPitch = Units.degreesToRadians(15);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
+        public static final double subwooferPitch = 1;
+        public static final double podiumPitch = 0;
         public static final double neckSpeed = 0.3; // volts / 12, -1 to 1
         
         /** @param shooterFeedForward kS radians / second, kV radians / second per meter / second */
-        public static final SimpleMotorFeedforward shooterFeedForward = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
+        //public static final SimpleMotorFeedforward shooterFeedForward = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
 
         // TODO: This must be tuned to specific robot
-        public static final PIDController shooterPID = new PIDController(0.7, 0, 0);
+        public static final PIDController shooterPID = new PIDController(0.8, 0, 0);
         public static final double kF = 0.0;
+
+        //Fixed speed constants
+        //TODO: find a good speed for both sides that works well in all positions
+        public static final double leftSpeed = 250;
+        public static final double rightSpeed = 125;
     }
 
     public static final class Deflector {
@@ -259,6 +269,9 @@ public final class Constants {
          * Some sort of aerodynamic constant
         */
         public static final double B = 0.096;
+
+        public static final double fieldWidth = 16.54;
+        public static final double fieldHeight= 8;
     }
 
     public static enum SpinState {
@@ -267,5 +280,17 @@ public final class Constants {
         private SpinState(int mult) {
             multiplier = mult;
         }
+    }
+
+    /** @param x = x input 
+     * @param x1 = first given x 
+     * @param x2 = second given x 
+     * @param y1 = first given y 
+     * @param y2 = second given y
+     * @return y output */
+    public static double linearInterpolation(double x, double x1, double x2, double y1, double y2){
+        double slope = (y1 - y2)/(x1 - x2);
+        double yInt = y1 - slope * x1;
+        return x * slope + yInt;
     }
 }
