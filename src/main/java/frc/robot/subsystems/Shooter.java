@@ -26,7 +26,6 @@ public class Shooter extends SubsystemBase {
         angleMotorController = new CANSparkFlex(Constants.Shooter.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
         shooterMLeftController = new CANSparkFlex(Constants.Shooter.shooterMLeftID, CANSparkLowLevel.MotorType.kBrushless);
         shooterMRightController= new CANSparkFlex(Constants.Shooter.shooterMRightID,CANSparkLowLevel.MotorType.kBrushless);
-        //shooterMRightController.follow(shooterMLeftController, true); // for now, no spin.
         shooterMRightController.setInverted(true);
         neckMotorController = new CANSparkMax(Constants.Shooter.neckMotorID, CANSparkLowLevel.MotorType.kBrushless);
         // for testing
@@ -94,7 +93,7 @@ public class Shooter extends SubsystemBase {
         neckMotorController.set(ss.multiplier * Constants.Shooter.neckSpeed);
     }
 
-    public void setNeckCustomSpeed(SpinState ss, double speed) {
+    public void setNeck(SpinState ss, double speed) {
         neckMotorController.set(ss.multiplier * speed);
     }
 

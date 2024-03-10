@@ -84,7 +84,6 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    RobotContainer.s_Shooter.toSpin(0.005);
   }
 
   @Override
