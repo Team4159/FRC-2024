@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -38,6 +39,9 @@ public class RobotContainer {
     private static final JoystickButton manualNeck = new JoystickButton(secondary, 3);
         private static final JoystickButton manualNeckBw = new JoystickButton(secondary, 4);
     private static final JoystickButton manualOuttake = new JoystickButton(secondary, 0);
+    private static final JoystickButton autoSpk = new JoystickButton(secondary, 8);
+    private static final JoystickButton autoIntake = new JoystickButton(secondary, 9);
+    private static final JoystickButton manualAmp = new JoystickButton(secondary, 10);
 
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
@@ -96,6 +100,39 @@ public class RobotContainer {
                 s_Shooter.new ChangeNeck(SpinState.ST),
                 s_Intake.new ChangeState(IntakeState.STOW)
             ));*/
+        manualShoot.debounce(0.1) // does not check if kinesthetics has note- because this should also work when kinesthetics fails
+            .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
+            .whileTrue(s_Shooter.new ChangeState(() -> new ShooterCommand(
+                    (1-secondary.getThrottle())/2 * Constants.CommandConstants.speakerShooterAngleMax + Constants.CommandConstants.speakerShooterAngleMin,
+                    Math.abs(secondary.getY()) * Constants.CommandConstants.shooterSpinMax,
+                    Math.abs(secondary.getY()) * Constants.CommandConstants.shooterSpinMax
+            ), true))
+            .onFalse(new SequentialCommandGroup(
+                s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW).withTimeout(1.5),
+                s_Shooter.new ChangeNeck(SpinState.ST),
+                s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 0d, 0d))
+            ));
+        manualAmp.debounce(0.05)
+            .onTrue(new ParallelCommandGroup(
+                s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 0d, 0d))
+            ))
+            .whileTrue( new ParallelCommandGroup(
+                s_Shooter.new ChangeState(() -> new ShooterCommand(
+                    Constants.CommandConstants.ampShooterAngle,
+                    Constants.CommandConstants.ampShooterSpin,
+                    Constants.CommandConstants.ampShooterSpin
+                ), true),
+                s_Deflector.new Raise()
+            ))
+            .onFalse(new ParallelCommandGroup(
+                //s_Deflector.new Raise(),
+                //new InstantCommand( () -> s_Shooter.setNeckSpin(SpinState.FW, 0.7))
+                new InstantCommand( () -> s_Shooter.setNeckPercentage(SpinState.ST, 0)),
+                s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 0d, 0d))
+            ));
+        manualNeck.debounce(0.05)
+            .whileTrue(new InstantCommand(() -> s_Shooter.setNeckPercentage(SpinState.FW, 0.7)))
+            .onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
         manualIntake.debounce(0.1)
             .whileTrue(new ParallelCommandGroup(
                 s_Shooter.new ChangeNeck(SpinState.FW),

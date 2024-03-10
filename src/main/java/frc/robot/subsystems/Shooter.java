@@ -50,6 +50,10 @@ public class Shooter extends SubsystemBase {
         //angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch) + Constants.Shooter.pitchOffset, CANSparkBase.ControlType.kSmartMotion);
     }
 
+    public void setNeckPercentage(SpinState ss, double desiredPercentage) {
+        neckMotorController.set(desiredPercentage * ss.multiplier);
+    }
+
     /** @return radians / second */
     public double getSpin() {
         return Units.rotationsPerMinuteToRadiansPerSecond(shooterMLeftController.getEncoder().getVelocity());
