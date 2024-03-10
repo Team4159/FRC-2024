@@ -268,6 +268,9 @@ public final class Constants {
          * Some sort of aerodynamic constant
         */
         public static final double B = 0.096;
+
+        public static final double fieldWidth = 16.54;
+        public static final double fieldHeight= 8;
     }
 
     public static enum SpinState {
