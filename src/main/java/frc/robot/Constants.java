@@ -222,7 +222,7 @@ public final class Constants {
         public static final int rMotorID = 8;
         public static final int lMotorID = 9;
 
-        public static final double maximumPitch = Units.rotationsToRadians(2.2);
+        public static final double maximumPitch = Units.rotationsToRadians(2.3);
         public static final double pitchTolerance = Math.PI/128;
     }
 

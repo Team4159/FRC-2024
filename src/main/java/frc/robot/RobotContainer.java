@@ -108,17 +108,15 @@ public class RobotContainer {
                     Constants.CommandConstants.ampShooterAngle,
                     Constants.CommandConstants.ampShooterSpin
                 ), true),
-                s_Deflector.new Raise()
+                s_Deflector.new Raise() // on end, resets pitch to 0
             ))
             .onFalse(new ParallelCommandGroup(
-                //s_Deflector.new Raise(),
-                //new InstantCommand( () -> s_Shooter.setNeckSpin(SpinState.FW, 0.7))
                 new InstantCommand( () -> s_Shooter.setNeckPercentage(SpinState.ST, 0)),
                 s_Shooter.new ChangeState(() -> new Pair<>(Constants.Shooter.minimumPitch, 0d))
             ));
         manualNeck.debounce(0.05)
             .whileTrue(new InstantCommand(() -> s_Shooter.setNeckPercentage(SpinState.FW, 0.7)))
-            .onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
+            .onFalse(new InstantCommand( () -> s_Shooter.setNeckPercentage(SpinState.ST, 0)));
         manualIntake.debounce(0.1)
             .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true))
             .onFalse(new ParallelCommandGroup(
