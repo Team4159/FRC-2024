@@ -109,14 +109,14 @@ public class Swerve extends SubsystemBase {
 
     // override the path rotation if robot is currently shooting into speaker
     public Optional<Rotation2d> getRotationTargetOverride(){
-    if (CommandScheduler.getInstance().isScheduled(SpeakerAutoAimYaw.instance)) {
-        // return an optional containing the speaker's rotation override (field relative rotation)
-        return Optional.of(new Rotation2d(SpeakerAutoAimYaw.instance.getDesiredYaw()));
-    } else {
-        // return an empty optional when path rotation should not be overriden
-        return Optional.empty();
+        if (CommandScheduler.getInstance().isScheduled(SpeakerAutoAimYaw.instance)) {
+            // return an optional containing the speaker's rotation override (field relative rotation)
+            return Optional.of(new Rotation2d(SpeakerAutoAimYaw.instance.getDesiredYaw()));
+        } else {
+            // return an empty optional when path rotation should not be overriden
+            return Optional.empty();
+        }
     }
-}
 
     @Override
     public void periodic(){
