@@ -35,6 +35,10 @@ public class SpeakerGetYaw extends Command {
         OverrideYaw = desiredYaw;
     }
 
+    public double getDesiredYaw() {
+        return OverrideYaw;
+    }
+
     private static Transform3d getDifference(Kinesthetics k) {
         return new Pose3d(k.getPose()).minus(Constants.Environment.speakers.get(k.getAlliance()));
     }

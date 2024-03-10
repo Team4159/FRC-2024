@@ -1,7 +1,7 @@
 package frc.robot.subsystems;
 
 import frc.robot.SwerveModule;
-import frc.robot.auto.SpeakerAutoAimYaw;
+import frc.robot.auto.SpeakerGetYaw;
 import frc.robot.Constants;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -109,9 +109,9 @@ public class Swerve extends SubsystemBase {
 
     // override the path rotation if robot is currently shooting into speaker
     public Optional<Rotation2d> getRotationTargetOverride(){
-        if (CommandScheduler.getInstance().isScheduled(SpeakerAutoAimYaw.instance)) {
+        if (CommandScheduler.getInstance().isScheduled(SpeakerGetYaw.instance)) {
             // return an optional containing the speaker's rotation override (field relative rotation)
-            return Optional.of(new Rotation2d(SpeakerAutoAimYaw.instance.getDesiredYaw()));
+            return Optional.of(new Rotation2d(SpeakerGetYaw.instance.getDesiredYaw()));
         } else {
             // return an empty optional when path rotation should not be overriden
             return Optional.empty();
