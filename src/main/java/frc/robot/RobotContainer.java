@@ -119,7 +119,7 @@ public class RobotContainer {
             .onFalse(s_Intake.new ChangeState(IntakeState.STOW));
 
         manualNeck.debounce(0.1)
-            .whileTrue(new InstantCommand(() -> s_Shooter.setNeckCustomSpeed(SpinState.FW, 0.5)))
+            .whileTrue(new InstantCommand(() -> s_Shooter.setNeckCustomSpeed(SpinState.FW, 0.1)))
             .onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
         manualNeckBw.debounce(0.1)
             .whileTrue(s_Shooter.new ChangeNeck(SpinState.BW))
