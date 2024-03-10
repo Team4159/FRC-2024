@@ -78,9 +78,9 @@ public class Shooter extends SubsystemBase {
     }
 
     /** @param goalNoteVel meters / second */
-    private double velocityToSpin(double goalNoteVel) {
-        return Constants.Shooter.shooterFeedForward.calculate(goalNoteVel);
-    }
+    // private double velocityToSpin(double goalNoteVel) {
+    //     return Constants.Shooter.shooterFeedForward.calculate(goalNoteVel);
+    // }
 
     public void stopSpin() {
         shooterMLeftController.stopMotor();
@@ -114,9 +114,9 @@ public class Shooter extends SubsystemBase {
 
     public class ChangeState extends Command {
         private boolean continuous = false;
-        /** @param desiredState Pair< radians , meters / second > */
         private ShooterStateSupplier desiredState;
-        
+
+        /** @param desiredState ShooterCommand(radians , radians / second)*/
         public ChangeState(ShooterStateSupplier shooterStateSupplier) {
             this(shooterStateSupplier, false);
         }
@@ -131,7 +131,7 @@ public class Shooter extends SubsystemBase {
         public void execute() {
             var state = desiredState.get();
             setGoalPitch(state.pitch());
-            setGoalSpin(velocityToSpin(state.speed1()), velocityToSpin(state.speed2()));
+            setGoalSpin(state.speed1(), state.speed2());
         }
     
         @Override
@@ -139,8 +139,8 @@ public class Shooter extends SubsystemBase {
             if (continuous) return false;
             var state = desiredState.get();
             return (Math.abs(getPitch() - state.pitch()) < Constants.Shooter.pitchTolerance)
-                && (Math.abs(getSpin1() - velocityToSpin(state.speed1())) < Constants.Shooter.spinTolerance)
-                && (Math.abs(getSpin2() - velocityToSpin(state.speed2())) < Constants.Shooter.spinTolerance);
+                && (Math.abs(getSpin1() - state.speed1()) < Constants.Shooter.spinTolerance)
+                && (Math.abs(getSpin2() - state.speed2()) < Constants.Shooter.spinTolerance);
         }
     
         @Override

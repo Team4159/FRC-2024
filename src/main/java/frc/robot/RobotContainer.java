@@ -77,12 +77,12 @@ public class RobotContainer {
         /* Driver Buttons */
         zeroGyro.onTrue(new InstantCommand(kinesthetics::zeroHeading));
         //uses lookup table
-        /*autoSpk.debounce(0.1).and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
-            .whileTrue(new SequentialCommandGroup(
-                 s_Shooter.new ChangeNeck(SpinState.ST),
-                 new ShooterLookupTable(kinesthetics, s_Shooter, s_Swerve),
-                 s_Shooter.new ChangeNeck(SpinState.FW)
-             )).onFalse(s_Shooter.new ChangeNeck(SpinState.ST));*/
+        // autoSpk.debounce(0.1).and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
+        //     .whileTrue(new SequentialCommandGroup(
+        //          s_Shooter.new ChangeNeck(SpinState.ST),
+        //          new ShooterLookupTable(kinesthetics, s_Shooter, s_Swerve),
+        //          s_Shooter.new ChangeNeck(SpinState.FW)
+        //      )).onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
         // autoAmp.debounce(0.1).and(kinesthetics::shooterHasNote).and(() -> AmpAuto.isInRange(kinesthetics))
         //     .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
         //     .whileTrue(new SequentialCommandGroup(
@@ -128,7 +128,9 @@ public class RobotContainer {
         manualShoot.debounce(0.1) // does not check if kinesthetics has note- because this should also work when kinesthetics fails
             .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
             .whileTrue(s_Shooter.new ChangeState(() -> new ShooterCommand(
-                    Constants.Shooter.subwooferPitch,
+                    //Constants.Shooter.subwooferPitch,
+                    //for getting lookup table constants
+                    (1 - secondary.getThrottle()) / 2 * Constants.Shooter.maximumPitch + Constants.Shooter.minimumPitch,
                     0.8 * Constants.CommandConstants.shooterSpinMax,
                     0.4 * Constants.CommandConstants.shooterSpinMax
                     ), true))

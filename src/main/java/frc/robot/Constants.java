@@ -216,7 +216,7 @@ public final class Constants {
         public static final double neckSpeed = 0.3; // volts / 12, -1 to 1
         
         /** @param shooterFeedForward kS radians / second, kV radians / second per meter / second */
-        public static final SimpleMotorFeedforward shooterFeedForward = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
+        //public static final SimpleMotorFeedforward shooterFeedForward = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
 
         // TODO: This must be tuned to specific robot
         public static final PIDController shooterPID = new PIDController(0.8, 0, 0);
