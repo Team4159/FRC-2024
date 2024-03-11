@@ -7,7 +7,9 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -49,12 +51,28 @@ public class Kinesthetics extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("shoter", shooterBeamBreak.get());
+        SmartDashboard.putBoolean("shooter", shooterHasNote());
+        SmartDashboard.putNumber("Position X", getDifference().getX());
+        SmartDashboard.putNumber("Position Y", getDifference().getY());
+        SmartDashboard.putNumber("Distance from speaker", getDistance());
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
         var visionPose = Vision.getBotPose();
         if (visionPose != null)
             poseEstimator.addVisionMeasurement(visionPose.toPose2d(), Vision.getLimelightPing());
         super.periodic();
+    }
+
+    private Transform3d getDifference() {
+        return new Pose3d(getPose()).minus(Constants.Environment.speakers.get(getAlliance()));
+    }
+
+    /** @return meters */
+    private double getDistance(){
+        Transform3d dif = getDifference();
+        double xDif = dif.getX();
+        double yDif = dif.getY();
+        double dist = Math.sqrt(Math.pow(xDif, 2) + Math.pow(yDif, 2));
+        return dist;
     }
 
     private Rotation2d getGyroYaw() {

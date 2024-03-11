@@ -37,7 +37,7 @@ public class Intake extends SubsystemBase {
         return Units.rotationsPerMinuteToRadiansPerSecond(intakeMotorController.getEncoder().getVelocity());
     }
 
-    private void setSpin(SpinState ss) {
+    public void setSpin(SpinState ss) {
         intakeMotorController.set(ss.multiplier * Constants.Intake.intakeSpin);
         feederMotorController.set(ss.multiplier * Constants.Intake.feederSpin);
     }
