@@ -70,17 +70,30 @@ public class RobotContainer {
         );
 
         // register Named Commands for PathPlanner, must be done before building autos
-        NamedCommands.registerCommand("ampAuto", new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector));
-        NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake));
         NamedCommands.registerCommand("intakeStatic", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true));
         NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
-            s_Shooter.new ChangeState(() -> new Pair<>(Constants.CommandConstants.speakerSubwooferPitch, Constants.CommandConstants.speakerSubwooferSpin), false),
+            s_Shooter.new ChangeState(() -> new ShooterCommand(
+                Constants.CommandConstants.speakerSubwooferPitch, 
+                Constants.CommandConstants.speakerSubwooferSpin, 
+                Constants.CommandConstants.speakerSubwooferSpin), 
+                false),
             s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
-            s_Shooter.new ChangeState(() -> new Pair<>(Constants.Shooter.minimumPitch, 0d))
+            s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 0d, 0d))
         ));
-        NamedCommands.registerCommand("speakerAutoAim", new ParallelCommandGroup(new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, null, null), new SpeakerAutoAimYaw(kinesthetics, s_Swerve, s_Shooter, null, null)));
+        NamedCommands.registerCommand("speakerLookupTable", new ParallelCommandGroup(
+            new ShooterLookupTable(kinesthetics, s_Shooter, s_Swerve), 
+            new SpeakerGetYaw(kinesthetics, s_Swerve, s_Shooter, null, null)
+        ));
+        //NamedCommands.registerCommand("ampAuto", new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector));
+        // NamedCommands.registerCommand("speakerAutoAim", new ParallelCommandGroup(
+        //     new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, null, null), 
+        //     new SpeakerGetYaw(kinesthetics, s_Swerve, s_Shooter, null, null)
+        // ));
+        //NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake));
+        
         configureShooterMap();
+
         // Configure the button bindings
         configureButtonBindings();
 
