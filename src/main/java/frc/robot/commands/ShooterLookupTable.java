@@ -1,8 +1,5 @@
 package frc.robot.commands;
 
-import java.util.function.DoubleSupplier;
-
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -49,8 +46,8 @@ public class ShooterLookupTable extends Command{
 
     @Override
     public void execute(){        
-        //s_Swerve.new ChangeYaw(null, null, () -> getRequiredYaw(s_Kinesthetics));
-        //s_Shooter.new ChangeState(() -> new ShooterCommand(getBestCommand(), Constants.Shooter.leftSpeed, Constants.Shooter.rightSpeed), true);
+        s_Swerve.new ChangeYaw(null, null, () -> getRequiredYaw(s_Kinesthetics));
+        s_Shooter.new ChangeState(() -> new ShooterCommand(getBestCommand(), Constants.Shooter.leftSpeed, Constants.Shooter.rightSpeed), true);
     }
 
     /** @return shooter pitch */

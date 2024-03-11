@@ -7,7 +7,6 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkAbsoluteEncoder;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -69,13 +68,13 @@ public class Shooter extends SubsystemBase {
     }
 
     /** @param goalSpin radians / second */
-    private void setGoalSpin(double goalSpin) {
+    public void setGoalSpin(double goalSpin) {
         shooterMLeftController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalSpin), CANSparkBase.ControlType.kSmartVelocity); 
         shooterMRightController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalSpin), CANSparkBase.ControlType.kSmartVelocity);
     }
 
     /** @param goalSpin1 radians / second  @param goalSpin2 radians / second*/
-    private void setGoalSpin(double goalSpin1, double goalSpin2) {
+    public void setGoalSpin(double goalSpin1, double goalSpin2) {
         shooterMLeftController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalSpin1), CANSparkBase.ControlType.kSmartVelocity);
         shooterMRightController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalSpin2), CANSparkBase.ControlType.kSmartVelocity);  
     }

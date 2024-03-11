@@ -1,19 +1,15 @@
 package frc.robot;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -226,13 +222,18 @@ public final class Constants {
         //TODO: find a good speed for both sides that works well in all positions
         public static final double leftSpeed = 250;
         public static final double rightSpeed = 125;
+
+        public static enum BBState {
+            
+        }
     }
 
     public static final class Deflector {
         public static final int rMotorID = 8;
         public static final int lMotorID = 9;
 
-        public static final double maximumPitch = Units.rotationsToRadians(2.3);
+        public static final double maximumPitch = Units.rotationsToRadians(2.4);
+        //public static final double rightPitchOffset = Units.rotationsToRadians(1.5);
         public static final double pitchTolerance = Math.PI/128;
     }
 
@@ -245,8 +246,8 @@ public final class Constants {
         public static final double speakerAutoOmegaMax = Units.degreesToRadians(15);
 
         public static final double ampAutoDistanceMax = 3.0; // meters
-        public static final double ampShooterAngle = Units.degreesToRadians(75); //TODO
-        public static final double ampShooterSpin = 5; //TODO
+        public static final double ampShooterAngle = Units.degreesToRadians(55); //TODO
+        public static final double ampShooterSpin = 125; //TODO
         public static final double ampAutoDistanceToStartSpinning = 1; // meters
     }
 

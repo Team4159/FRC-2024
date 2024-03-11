@@ -29,23 +29,23 @@ public class RobotContainer {
 
     private static final JoystickButton manualShoot = new JoystickButton(secondary, 1);
     private static final JoystickButton manualIntake = new JoystickButton(secondary, 2);
-    private static final JoystickButton manualIntakeSpin = new JoystickButton(secondary, 5);
     private static final JoystickButton manualNeck = new JoystickButton(secondary, 3);
     private static final JoystickButton manualNeckBw = new JoystickButton(secondary, 4);
-    private static final JoystickButton manualOuttake = new JoystickButton(secondary, 0);
+    private static final JoystickButton manualIntakeSpin = new JoystickButton(secondary, 5);
+    private static final JoystickButton manualOuttake = new JoystickButton(secondary, 6);
     private static final JoystickButton manualAmp = new JoystickButton(secondary, 10);
 
-    private static final JoystickButton autoAmp = new JoystickButton(driver, 2);
-    private static final JoystickButton autoSpk = new JoystickButton(secondary, 8);
-    private static final JoystickButton autoIntake = new JoystickButton(secondary, 9);
+    // private static final JoystickButton autoAmp = new JoystickButton(driver, 2);
+    // private static final JoystickButton autoSpk = new JoystickButton(secondary, 8);
+    // private static final JoystickButton autoIntake = new JoystickButton(secondary, 9);
     
     /* Subsystems */
-    private final Swerve s_Swerve = new Swerve();
+    private static final Swerve s_Swerve = new Swerve();
     public static final Shooter s_Shooter = new Shooter();
     private final Intake s_Intake = new Intake();
     private final Deflector s_Deflector = new Deflector();
 
-    private final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve);
+    public static final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve);
 
     public static final Map<Double, Double> shooterTable = new HashMap<>();
 
@@ -87,25 +87,40 @@ public class RobotContainer {
                     Constants.CommandConstants.ampShooterSpin,
                     Constants.CommandConstants.ampShooterSpin
                 ), true),
-                s_Deflector.new Raise() // on end, resets pitch to 0
+                s_Deflector.new Raise()//.repeatedly() // on end, resets pitch to 0
             ))
             .onFalse(new ParallelCommandGroup(
                 new InstantCommand( () -> s_Shooter.setNeckPercentage(SpinState.ST, 0)),
                 s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 0d, 0d))
             ));
-        manualNeck.debounce(0.05)
-            .whileTrue(new InstantCommand(() -> s_Shooter.setNeckPercentage(SpinState.FW, 0.7)))
-            .onFalse(new InstantCommand( () -> s_Shooter.setNeckPercentage(SpinState.ST, 0)));
+        // manualIntake.debounce(0.1)
+        //     .whileTrue(/*new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true)
+        //         new ParallelCommandGroup(
+        //         s_Shooter.new ChangeNeck(SpinState.FW),
+        //         s_Intake.new ChangeState(IntakeState.DOWN)*/
+        //         new ConditionalCommand(
+        //             new ParallelCommandGroup(
+        //                 s_Shooter.new ChangeNeck(SpinState.ST),
+        //                 s_Intake.new ChangeState(IntakeState.STOW)
+        //             ),
+        //             /*new ParallelCommandGroup(
+        //                 s_Shooter.new ChangeNeck(SpinState.ST),
+        //                 s_Intake.new ChangeState(IntakeState.STOW)
+        //             )*/
+        //             new ParallelCommandGroup(
+        //                 s_Shooter.new ChangeNeck(SpinState.FW),
+        //                 s_Intake.new ChangeState(IntakeState.DOWN)
+        //             ), 
+        //             kinesthetics::shooterHasNote).repeatedly()
+        //     )
         manualIntake.debounce(0.1)
-            .whileTrue(/*new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true)*/
-                new ParallelCommandGroup(
-                s_Shooter.new ChangeNeck(SpinState.FW),
-                s_Intake.new ChangeState(IntakeState.DOWN)
-            ))
+            .onTrue(
+                new ManualIntakeBB(kinesthetics, s_Shooter, s_Intake)
+            )
             .onFalse(new ParallelCommandGroup(
                 s_Intake.new ChangeState(IntakeState.STOW),
                 s_Shooter.new ChangeNeck(SpinState.ST)
-            ));
+        ));
         manualIntakeSpin.debounce(0.1)
             .whileTrue(new ParallelCommandGroup(
                 new InstantCommand(()-> s_Intake.setSpin(SpinState.FW)),
@@ -120,7 +135,7 @@ public class RobotContainer {
             .onFalse(s_Intake.new ChangeState(IntakeState.STOW));
 
         manualNeck.debounce(0.1)
-            .whileTrue(new InstantCommand(() -> s_Shooter.setNeck(SpinState.FW, 0.1)))
+            .whileTrue(new InstantCommand(() -> s_Shooter.setNeck(SpinState.FW, 0.5)))
             .onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
         manualNeckBw.debounce(0.1)
             .whileTrue(s_Shooter.new ChangeNeck(SpinState.BW))
