@@ -77,7 +77,8 @@ public class RobotContainer {
         /* Driver Buttons */
         zeroGyro.onTrue(new InstantCommand(kinesthetics::zeroHeading));
    
-        manualAmp.debounce(0.05)
+        // only sets shooter and deflector to correct setpoint. in order to shoot, requires pressing manualNeck
+        manualAmp.debounce(0.1)
             .onTrue(new ParallelCommandGroup(
                 s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 0d, 0d))
             ))
@@ -87,40 +88,25 @@ public class RobotContainer {
                     Constants.CommandConstants.ampShooterSpin,
                     Constants.CommandConstants.ampShooterSpin
                 ), true),
-                s_Deflector.new Raise()//.repeatedly() // on end, resets pitch to 0
+                s_Deflector.new Raise() // on end, resets pitch to 0, no need to reset pitch in onFalse block
             ))
             .onFalse(new ParallelCommandGroup(
                 new InstantCommand( () -> s_Shooter.setNeckPercentage(SpinState.ST, 0)),
                 s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 0d, 0d))
             ));
-        // manualIntake.debounce(0.1)
-        //     .whileTrue(/*new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true)
-        //         new ParallelCommandGroup(
-        //         s_Shooter.new ChangeNeck(SpinState.FW),
-        //         s_Intake.new ChangeState(IntakeState.DOWN)*/
-        //         new ConditionalCommand(
-        //             new ParallelCommandGroup(
-        //                 s_Shooter.new ChangeNeck(SpinState.ST),
-        //                 s_Intake.new ChangeState(IntakeState.STOW)
-        //             ),
-        //             /*new ParallelCommandGroup(
-        //                 s_Shooter.new ChangeNeck(SpinState.ST),
-        //                 s_Intake.new ChangeState(IntakeState.STOW)
-        //             )*/
-        //             new ParallelCommandGroup(
-        //                 s_Shooter.new ChangeNeck(SpinState.FW),
-        //                 s_Intake.new ChangeState(IntakeState.DOWN)
-        //             ), 
-        //             kinesthetics::shooterHasNote).repeatedly()
-        //     )
+        
+        // uses beam break to stop note but does not use vision to move Swerve
         manualIntake.debounce(0.1)
-            .onTrue(
-                new ManualIntakeBB(kinesthetics, s_Shooter, s_Intake)
-            )
+            .whileTrue(new ParallelCommandGroup(
+                /*originally new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true)*/
+                s_Intake.new ChangeState(IntakeState.DOWN),
+                s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW)
+            ))
             .onFalse(new ParallelCommandGroup(
                 s_Intake.new ChangeState(IntakeState.STOW),
-                s_Shooter.new ChangeNeck(SpinState.ST)
+                s_Shooter.new ChangeNeck(kinesthetics, SpinState.ST)
         ));
+
         manualIntakeSpin.debounce(0.1)
             .whileTrue(new ParallelCommandGroup(
                 new InstantCommand(()-> s_Intake.setSpin(SpinState.FW)),
@@ -130,6 +116,7 @@ public class RobotContainer {
                 new InstantCommand(()-> s_Intake.setSpin(SpinState.ST)),
                 s_Shooter.new ChangeNeck(SpinState.ST))
             );
+
         manualOuttake.debounce(0.1)
             .whileTrue(s_Intake.new ChangeState(IntakeState.SPIT))
             .onFalse(s_Intake.new ChangeState(IntakeState.STOW));
@@ -137,6 +124,7 @@ public class RobotContainer {
         manualNeck.debounce(0.1)
             .whileTrue(new InstantCommand(() -> s_Shooter.setNeck(SpinState.FW, 0.5)))
             .onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
+
         manualNeckBw.debounce(0.1)
             .whileTrue(s_Shooter.new ChangeNeck(SpinState.BW))
             .onFalse(s_Shooter.new ChangeNeck(SpinState.ST));

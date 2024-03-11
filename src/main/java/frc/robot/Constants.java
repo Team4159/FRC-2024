@@ -229,11 +229,10 @@ public final class Constants {
     }
 
     public static final class Deflector {
-        public static final int rMotorID = 8;
+        //public static final int rMotorID = 8;
         public static final int lMotorID = 9;
 
         public static final double maximumPitch = Units.rotationsToRadians(2.4);
-        //public static final double rightPitchOffset = Units.rotationsToRadians(1.5);
         public static final double pitchTolerance = Math.PI/128;
     }
 
@@ -246,9 +245,9 @@ public final class Constants {
         public static final double speakerAutoOmegaMax = Units.degreesToRadians(15);
 
         public static final double ampAutoDistanceMax = 3.0; // meters
-        public static final double ampShooterAngle = Units.degreesToRadians(55); //TODO
-        public static final double ampShooterSpin = 125; //TODO
-        public static final double ampAutoDistanceToStartSpinning = 1; // meters
+        public static final double ampShooterAngle = Units.degreesToRadians(55);
+        public static final double ampShooterSpin = 125;
+        //public static final double ampAutoDistanceToStartSpinning = 1; // meters
     }
 
     public static final class Environment {
