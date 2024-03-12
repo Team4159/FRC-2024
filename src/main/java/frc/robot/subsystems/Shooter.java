@@ -157,7 +157,7 @@ public class Shooter extends SubsystemBase {
         }
 
         @Override
-        public boolean isFinished() { // this needs to be changed if it runs before initialize does
+        public boolean isFinished() {
             return !beamBreakMode || !kinesthetics.shooterHasNote();
         }
 

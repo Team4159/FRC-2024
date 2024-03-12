@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
@@ -31,7 +32,7 @@ public class AmpAuto extends ParallelCommandGroup {
                     Constants.CommandConstants.ampShooterCommand.lSpin(),
                     Constants.CommandConstants.ampShooterCommand.rSpin()
                 ),
-                new ParallelCommandGroup(
+                new ParallelDeadlineGroup(
                     sh.new ChangeNeck(k, SpinState.FW),
                     d.new Raise()
                 ),
