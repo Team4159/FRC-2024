@@ -77,7 +77,7 @@ public final class Constants {
         public static final double angleKD = chosenModule.angleKD;
 
         /* Drive Motor PID Values */
-        public static final double driveKP = 0.12; //TODO: This must be tuned to specific robot
+        public static final double driveKP = 0.07; //TODO: This must be tuned to specific robot
         public static final double driveKI = 0.0;
         public static final double driveKD = 0.0;
         public static final double driveKF = 0.0;
@@ -208,7 +208,7 @@ public final class Constants {
         public static final double minimumPitch = Units.degreesToRadians(15);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
         public static final double subwooferPitch = 1;
-        public static final double podiumPitch = 0;
+        public static final double podiumPitch = 0.7; // TODO
         public static final double neckSpeed = 0.3; // volts / 12, -1 to 1
         
         /** @param shooterFeedForward kS radians / second, kV radians / second per meter / second */
@@ -239,7 +239,8 @@ public final class Constants {
     public static final class CommandConstants {
         public static final double bumperWidth = Units.inchesToMeters(2.75);
 
-        public static final double shooterSpinMax = 30; // meters / second
+        public static final double shooterSpinMax = 750; 
+        public static final double shooterSpinPassiveMax = 400; 
         public static final double speakerShooterAngleMax = Units.rotationsToRadians(0.2);
         public static final double speakerShooterAngleMin = Units.rotationsToRadians(0.0);
         public static final double speakerAutoOmegaMax = Units.degreesToRadians(15);

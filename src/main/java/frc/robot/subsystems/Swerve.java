@@ -9,6 +9,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -17,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
     private Kinesthetics kinesthetics;
+    private Rotation2d gyroOffset;
 
     public SwerveModule[] mSwerveMods;
 
@@ -27,6 +29,7 @@ public class Swerve extends SubsystemBase {
             new SwerveModule(2, Constants.Swerve.Mod2.constants),
             new SwerveModule(3, Constants.Swerve.Mod3.constants)
         };
+        gyroOffset = Rotation2d.fromDegrees(0);
     }
 
     public void setKinesthetics(Kinesthetics k) {
@@ -41,7 +44,7 @@ public class Swerve extends SubsystemBase {
                                     translation.getX(), 
                                     translation.getY(), 
                                     rotation, 
-                                    kinesthetics.getHeading()
+                                    kinesthetics.getHeading().plus(gyroOffset)
                                 )
                                 : new ChassisSpeeds(
                                     translation.getX(), 
@@ -52,6 +55,10 @@ public class Swerve extends SubsystemBase {
 
         for(SwerveModule mod : mSwerveMods) mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
     }    
+
+    public void zeroGyroOffset() {
+        gyroOffset = Rotation2d.fromDegrees(0).minus(kinesthetics.getGyroYaw());
+    }
 
     /* Used by SwerveControllerCommand in Auto */
     public void setModuleStates(SwerveModuleState[] desiredStates) {

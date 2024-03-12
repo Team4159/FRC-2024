@@ -75,7 +75,7 @@ public class Kinesthetics extends SubsystemBase {
         return dist;
     }
 
-    private Rotation2d getGyroYaw() {
+    public Rotation2d getGyroYaw() {
         return Rotation2d.fromDegrees(gyro.getYaw().getValue());
     }
 
