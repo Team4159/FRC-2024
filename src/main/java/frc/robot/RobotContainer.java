@@ -39,6 +39,9 @@ public class RobotContainer {
     private final Deflector s_Deflector = new Deflector();
 
     private final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve);
+    
+    @SuppressWarnings("unused")
+    private final Vision s_Vision = new Vision(kinesthetics);
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
