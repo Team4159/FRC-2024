@@ -1,19 +1,16 @@
 package frc.robot;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -23,6 +20,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.util.COTSTalonFXSwerveConstants;
 import frc.lib.util.SwerveModuleConstants;
+import frc.robot.subsystems.Shooter.ShooterCommand;
 
 public final class Constants {
     public static final double stickDeadband = 0.1;
@@ -46,7 +44,7 @@ public final class Constants {
             new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
             new Translation2d(-wheelBase / 2.0, trackWidth / 2.0),
             new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0));
-        public static final double yawTolerance = Math.PI/256; // Radians
+        public static final double yawTolerance = Math.PI/32; // Radians
 
         /* Module Gear Ratios */
         public static final double driveGearRatio = chosenModule.driveGearRatio;
@@ -87,7 +85,7 @@ public final class Constants {
         public static final double driveKF = 0.0;
 
         /* Drive Motor Characterization Values From SYSID */
-        public static final double driveKS = 0.32; //TODO: This must be tuned to specific robot
+        public static final double driveKS = 0.32;
         public static final double driveKV = 1.51;
         public static final double driveKA = 0.27;
 
@@ -167,7 +165,7 @@ public final class Constants {
         public static final int angleMotorID = 1;
         public static final int intakeMotorID = 2;
         public static final int feederMotorID = 3;
-        public static final int beamBreakID = 1; // PWM
+        // public static final int beamBreakID = 1; // PWM
 
         public static final double pitchTolerance = Math.PI/64; // radians
         public static final double spinTolerance = Math.PI/16; // radians
@@ -176,7 +174,7 @@ public final class Constants {
         public static final double feederSpin = 0.3; // -1 to 1
 
         public static final double intakeRange = 0.2; // meters
-        public static final double intakeField = 64; // degrees
+        public static final double intakeAngleRange = Units.degreesToRadians(64);
 
         public static enum IntakeState {
             STOW(Units.rotationsToRadians(0.012), SpinState.ST), // starting pos & when moving
@@ -211,21 +209,14 @@ public final class Constants {
         public static final double pitchOffset = Units.degreesToRotations(-3);
         public static final double minimumPitch = Units.degreesToRadians(15);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
-        public static final double subwooferPitch = 1;
-        public static final double podiumPitch = 0;
-        public static final double neckSpeed = 0.3; // volts / 12, -1 to 1
+        public static final double neckSpeed = 0.3; // -1 to 1
         
         /** @param shooterFeedForward kS radians / second, kV radians / second per meter / second */
-        //public static final SimpleMotorFeedforward shooterFeedForward = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
+        public static final SimpleMotorFeedforward shooterFeedForward = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
 
         // TODO: This must be tuned to specific robot
-        public static final PIDController shooterPID = new PIDController(0.8, 0, 0);
+        public static final PIDController shooterPID = new PIDController(0.8, 0, 0.001);
         public static final double kF = 0.0;
-
-        //Fixed speed constants
-        //TODO: find a good speed for both sides that works well in all positions
-        public static final double leftSpeed = 250;
-        public static final double rightSpeed = 125;
     }
 
     public static final class Deflector {
@@ -242,11 +233,14 @@ public final class Constants {
         public static final double shooterSpinMax = 30; // meters / second
         public static final double speakerShooterAngleMax = Units.rotationsToRadians(0.2);
         public static final double speakerShooterAngleMin = Units.rotationsToRadians(0.0);
-        public static final double speakerAutoOmegaMax = Units.degreesToRadians(15);
+
+        public static final double speakerAutoOmegaMax = Units.degreesToRadians(15); // radians / second
+        public static final ShooterCommand speakerPodiumShooterCommand = new ShooterCommand(
+            Units.degreesToRadians(75), 26d, 13d);
 
         public static final double ampAutoDistanceMax = 3.0; // meters
-        public static final double ampShooterAngle = Units.degreesToRadians(75); //TODO
-        public static final double ampShooterSpin = 5; //TODO
+        public static final ShooterCommand ampShooterCommand = new ShooterCommand(
+            Units.degreesToRadians(75), 5d);
         public static final double ampAutoDistanceToStartSpinning = 1; // meters
     }
 
@@ -269,9 +263,6 @@ public final class Constants {
          * Some sort of aerodynamic constant
         */
         public static final double B = 0.096;
-
-        public static final double fieldWidth = 16.54;
-        public static final double fieldHeight= 8;
     }
 
     public static enum SpinState {
@@ -280,17 +271,5 @@ public final class Constants {
         private SpinState(int mult) {
             multiplier = mult;
         }
-    }
-
-    /** @param x = x input 
-     * @param x1 = first given x 
-     * @param x2 = second given x 
-     * @param y1 = first given y 
-     * @param y2 = second given y
-     * @return y output */
-    public static double linearInterpolation(double x, double x1, double x2, double y1, double y2){
-        double slope = (y1 - y2)/(x1 - x2);
-        double yInt = y1 - slope * x1;
-        return x * slope + yInt;
     }
 }

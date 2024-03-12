@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,7 +20,7 @@ public class Deflector extends SubsystemBase{
     }
 
     /** @return radians */
-    public double getPitch() {
+    private double getPitch() {
         return Units.rotationsToRadians(angleMotorControllerL.getEncoder().getPosition());
     }
     
@@ -29,27 +30,19 @@ public class Deflector extends SubsystemBase{
     }
 
     public class Raise extends Command {
-        private double desiredPitch;
         public Raise() {
-            desiredPitch = Constants.Deflector.maximumPitch;
-            addRequirements(Deflector.this);
-        }
-
-        public Raise(double pitch) {
-            desiredPitch = pitch;
             addRequirements(Deflector.this);
         }
 
         @Override
         public void initialize(){
-            setGoalPitch(desiredPitch);
+            setGoalPitch(Constants.Deflector.maximumPitch);
             super.initialize();
         }
 
         @Override
         public boolean isFinished() {
-            return Math.abs(desiredPitch - Units.rotationsToRadians(angleMotorControllerL.getEncoder().getPosition())) < Constants.Deflector.pitchTolerance;
-            //return false;
+            return MathUtil.isNear(Constants.Deflector.maximumPitch, getPitch(), Constants.Deflector.pitchTolerance);
         }
 
         @Override

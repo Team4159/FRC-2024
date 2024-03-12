@@ -7,20 +7,15 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkAbsoluteEncoder;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.Conversions;
 import frc.robot.Constants;
 import frc.robot.Constants.SpinState;
-import frc.robot.commands.ShooterCommand;
 
 public class Shooter extends SubsystemBase {  
     private CANSparkBase angleMotorController, shooterMLeftController, shooterMRightController, neckMotorController;
-    //for testing
-    private double tPitch;
 
     public Shooter() {
         angleMotorController = new CANSparkFlex(Constants.Shooter.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
@@ -28,101 +23,77 @@ public class Shooter extends SubsystemBase {
         shooterMRightController= new CANSparkFlex(Constants.Shooter.shooterMRightID,CANSparkLowLevel.MotorType.kBrushless);
         shooterMRightController.setInverted(true);
         neckMotorController = new CANSparkMax(Constants.Shooter.neckMotorID, CANSparkLowLevel.MotorType.kBrushless);
-        // for testing
-        tPitch = 0;
     }
 
     /** @return radians */
-    public double getPitch() {
+    private double getPitch() {
         return Units.rotationsToRadians(angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition() - Constants.Shooter.pitchOffset);
     }
 
     /** @param goalPitch radians */
-    public void setGoalPitch(double goalPitch) {
+    private void setGoalPitch(double goalPitch) {
         goalPitch = MathUtil.clamp(goalPitch, Constants.Shooter.minimumPitch, Constants.Shooter.maximumPitch);
         angleMotorController.set(
             Constants.Shooter.shooterPID.calculate(getPitch(), goalPitch)
             + Constants.Shooter.kF * Math.cos(getPitch())
             + Constants.Shooter.pitchOffset
         );
-        tPitch = Units.radiansToDegrees(goalPitch);
         //angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch) + Constants.Shooter.pitchOffset, CANSparkBase.ControlType.kSmartMotion);
     }
 
-    public void setNeckPercentage(SpinState ss, double desiredPercentage) {
-        neckMotorController.set(desiredPercentage * ss.multiplier);
-    }
-
     /** @return radians / second */
-    public double getSpin() {
+    private double getLSpin() {
         return Units.rotationsPerMinuteToRadiansPerSecond(shooterMLeftController.getEncoder().getVelocity());
     }
 
     /** @return radians / second */
-    public double getSpin1(){
-        return Units.rotationsPerMinuteToRadiansPerSecond(shooterMLeftController.getEncoder().getVelocity());
-    }
-
-        /** @return radians / second */
-    public double getSpin2(){
+    private double getRSpin() {
         return Units.rotationsPerMinuteToRadiansPerSecond(shooterMRightController.getEncoder().getVelocity());
     }
 
-    /** @param goalSpin radians / second */
-    private void setGoalSpin(double goalSpin) {
-        shooterMLeftController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalSpin), CANSparkBase.ControlType.kSmartVelocity); 
-        shooterMRightController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalSpin), CANSparkBase.ControlType.kSmartVelocity);
-    }
-
-    /** @param goalSpin1 radians / second  @param goalSpin2 radians / second*/
-    private void setGoalSpin(double goalSpin1, double goalSpin2) {
-        shooterMLeftController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalSpin1), CANSparkBase.ControlType.kSmartVelocity);
-        shooterMRightController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalSpin2), CANSparkBase.ControlType.kSmartVelocity);  
-    }
-
-    /** @param goalNoteVel meters / second */
-    // private double velocityToSpin(double goalNoteVel) {
-    //     return Constants.Shooter.shooterFeedForward.calculate(goalNoteVel);
-    // }
-
-    public void stopSpin() {
-        shooterMLeftController.stopMotor();
+    /**
+     * @param goalLSpin radians / second
+     * @param goalRSpin radians / second 
+     * */
+    private void setGoalSpin(double goalLSpin, double goalRSpin) {
+        shooterMLeftController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalLSpin), CANSparkBase.ControlType.kSmartVelocity);
+        shooterMRightController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalRSpin), CANSparkBase.ControlType.kSmartVelocity);  
     }
 
     private void setNeck(SpinState ss) {
         neckMotorController.set(ss.multiplier * Constants.Shooter.neckSpeed);
     }
 
-    public void setNeck(SpinState ss, double speed) {
-        neckMotorController.set(ss.multiplier * speed);
-    }
-
     public ChangeState toPitch(double pitch) {
-        return new ChangeState(() -> new ShooterCommand(pitch, getSpin1(), getSpin2()), false);
+        return new ChangeState(() -> new ShooterCommand(pitch, null, null), false);
     }
 
-    public ChangeState toSpin(double spin) {
-        return new ChangeState(() -> new ShooterCommand(getPitch(), spin, spin), false);
+    public ChangeState toSpin(double lSpin, double rSpin) {
+        return new ChangeState(() -> new ShooterCommand(null, lSpin, rSpin), false);
     }
 
-    public ChangeState toSpin(double spin1, double spin2) {
-        return new ChangeState(() -> new ShooterCommand(getPitch(), spin1, spin2), false);
+    public ChangeState stopShooter() {
+        return new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 0d), false);
     }
 
-    @Override
-    public void periodic(){
-        SmartDashboard.putNumber("target pitch", Units.degreesToRadians(tPitch));
-        SmartDashboard.putNumber("current pitch", getPitch());
+    /**
+     * @param pitch radians
+     * @param lSpin radians / second
+     * @param rSpin radians / second
+     * */
+    public static record ShooterCommand(Double pitch, Double lSpin, Double rSpin) {
+        public ShooterCommand(Double pitch, Double spin) {
+            this(pitch, spin, spin);
+        }
+
+        public boolean hasSpin() {
+            return lSpin != null || rSpin != null;
+        }
     }
 
     public class ChangeState extends Command {
         private boolean continuous = false;
         private ShooterStateSupplier desiredState;
-
-        /** @param desiredState ShooterCommand(radians , radians / second)*/
-        public ChangeState(ShooterStateSupplier shooterStateSupplier) {
-            this(shooterStateSupplier, false);
-        }
 
         public ChangeState(ShooterStateSupplier shooterStateSupplier, boolean continuous) {
             desiredState = shooterStateSupplier;
@@ -133,31 +104,31 @@ public class Shooter extends SubsystemBase {
         @Override
         public void execute() {
             var state = desiredState.get();
-            setGoalPitch(state.pitch());
-            setGoalSpin(state.speed1(), state.speed2());
+            if (state.pitch() != null) setGoalPitch(state.pitch());
+            if (state.hasSpin()) setGoalSpin(state.lSpin(), state.rSpin());
         }
     
         @Override
         public boolean isFinished() {
             if (continuous) return false;
             var state = desiredState.get();
-            return (Math.abs(getPitch() - state.pitch()) < Constants.Shooter.pitchTolerance)
-                && (Math.abs(getSpin1() - state.speed1()) < Constants.Shooter.spinTolerance)
-                && (Math.abs(getSpin2() - state.speed2()) < Constants.Shooter.spinTolerance);
+            return MathUtil.isNear(state.pitch(), getPitch(), Constants.Shooter.pitchTolerance)
+                && MathUtil.isNear(state.lSpin(), getLSpin(), Constants.Shooter.spinTolerance)
+                && MathUtil.isNear(state.rSpin(), getRSpin(), Constants.Shooter.spinTolerance);
         }
     
         @Override
         public void end(boolean interrupted) {
             if (interrupted && !continuous) {
-                setGoalPitch(0);
-                stopSpin();
+                setGoalPitch(Constants.Shooter.minimumPitch);
+                shooterMLeftController.stopMotor();
+                shooterMRightController.stopMotor();
             }
             super.end(interrupted);
         }
 
-        //@FunctionalInterface
+        @FunctionalInterface
         public interface ShooterStateSupplier{
-            //public Triple<Double, Double, Double> get();
             public ShooterCommand get();
         }
     }

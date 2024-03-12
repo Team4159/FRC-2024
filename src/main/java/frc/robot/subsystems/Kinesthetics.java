@@ -7,13 +7,10 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -39,9 +36,6 @@ public class Kinesthetics extends SubsystemBase {
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.setYaw(0);
 
-        Timer.delay(0.1);
-        s_Swerve.resetModulesToAbsolute();
-
         // feederBeamBreak = new DigitalInput(Constants.Intake.beamBreakID);
         shooterBeamBreak = new DigitalInput(Constants.Shooter.beamBreakID);
 
@@ -51,28 +45,12 @@ public class Kinesthetics extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("shooter", shooterHasNote());
-        SmartDashboard.putNumber("Position X", getDifference().getX());
-        SmartDashboard.putNumber("Position Y", getDifference().getY());
-        SmartDashboard.putNumber("Distance from speaker", getDistance());
+        SmartDashboard.putBoolean("Shooter Note?", shooterHasNote());
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
         var visionPose = Vision.getBotPose();
         if (visionPose != null)
             poseEstimator.addVisionMeasurement(visionPose.toPose2d(), Vision.getLimelightPing());
         super.periodic();
-    }
-
-    private Transform3d getDifference() {
-        return new Pose3d(getPose()).minus(Constants.Environment.speakers.get(getAlliance()));
-    }
-
-    /** @return meters */
-    private double getDistance(){
-        Transform3d dif = getDifference();
-        double xDif = dif.getX();
-        double yDif = dif.getY();
-        double dist = Math.sqrt(Math.pow(xDif, 2) + Math.pow(yDif, 2));
-        return dist;
     }
 
     private Rotation2d getGyroYaw() {
