@@ -2,33 +2,50 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
 import frc.robot.subsystems.Kinesthetics;
 import frc.robot.subsystems.Swerve;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
-public class SpkAlign extends SequentialCommandGroup{
-    private Kinesthetics k;
-    private Swerve s;
-    
-    public SpkAlign(Kinesthetics k, Swerve s){
-        this.k = k;
-        this.s = s;
-        addRequirements(k, s);
-        addCommands(s.new ChangeYaw(() -> k.getPose().getX(), () -> k.getPose().getY(), () -> getRequiredYaw(k)));
+public class SpkAlign extends SequentialCommandGroup {
+
+    /**
+     * Constructs the SpkAlign command to orient the robot towards the alliance speaker
+     *
+     * @param kinesthetics The kinesthetics subsystem to obtain the robot's current pose
+     * @param swerve       The swerve drive subsystem to execute the yaw change
+     */
+    public SpkAlign(Kinesthetics kinesthetics, Swerve swerve) {
+        // Require the kinesthetics and swerve subsystems
+        addRequirements(kinesthetics, swerve);
+
+        // Change yaw towards the target
+        addCommands(swerve.new ChangeYaw(
+            () -> kinesthetics.getPose().getX(),
+            () -> kinesthetics.getPose().getY(),
+            () -> calculateRequiredYaw(kinesthetics)));
     }
 
-    private static Transform3d getDifference(Kinesthetics k) {
-        return new Pose3d(k.getPose()).minus(Constants.Environment.speakers.get(k.getAlliance()));
+    /**
+     * Calculates the required yaw to face the alliance speaker
+     *
+     * @param kinesthetics The kinesthetics subsystem to get the current pose
+     * @return The required yaw in radians
+     */
+    private double calculateRequiredYaw(Kinesthetics kinesthetics) {
+        Transform3d difference = calculatePoseDifference(kinesthetics);
+        return Math.atan2(difference.getY(), difference.getX());
     }
 
-    /** @return required yaw in radians */
-    private double getRequiredYaw(Kinesthetics k){
-        Transform3d dif = getDifference(k);
-        double xDif = dif.getX();
-        double yDif = dif.getY();
-        return Math.atan2(yDif, xDif);
+    /**
+     * Calculates the difference between the robot's current pose and the target speaker pose
+     *
+     * @param kinesthetics The kinesthetics subsystem to get the current pose
+     * @return The Transform3d representing the difference to the target
+     */
+    private static Transform3d calculatePoseDifference(Kinesthetics kinesthetics) {
+        Pose3d currentPose = new Pose3d(kinesthetics.getPose());
+        Pose3d speakerPose = Constants.Environment.speakers.get(kinesthetics.getAlliance());
+        return currentPose.minus(speakerPose);
     }
 }
