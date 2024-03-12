@@ -215,11 +215,10 @@ public final class Constants {
     }
 
     public static final class Deflector {
-        // public static final int rMotorID = 8;
-        public static final int lMotorID = 9;
+        public static final int motorID = 9;
 
         public static final double maximumPitch = Units.rotationsToRadians(2.4);
-        public static final double pitchTolerance = Math.PI/128;
+        public static final double pitchTolerance = Math.PI/32;
     }
 
     public static final class CommandConstants {

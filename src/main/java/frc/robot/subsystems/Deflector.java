@@ -11,10 +11,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Deflector extends SubsystemBase{
-    private CANSparkMax angleMotorControllerL;
+    private CANSparkMax angleMotorController;
 
-    public Deflector(){
-        angleMotorControllerL = new CANSparkMax(Constants.Deflector.lMotorID, MotorType.kBrushless);
+    public Deflector() {
+        angleMotorController = new CANSparkMax(Constants.Deflector.motorID, MotorType.kBrushless);
     }
 
     // /** @return radians */
@@ -24,7 +24,7 @@ public class Deflector extends SubsystemBase{
     
     /** @param goalPitch radians */
     private void setGoalPitch(double goalPitch) {
-        angleMotorControllerL.getPIDController().setReference(Units.radiansToRotations(goalPitch), CANSparkBase.ControlType.kPosition);
+        angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch), CANSparkBase.ControlType.kPosition);
     }
 
     public class Raise extends Command {
