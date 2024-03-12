@@ -45,7 +45,7 @@ public class SwerveAuto extends Command {
 
     @Override
     public void initialize() {
-        timer.reset();
+        timer.restart();
         super.initialize();
     }
 

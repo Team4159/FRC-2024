@@ -5,16 +5,41 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.Conversions;
 import frc.robot.Constants;
 
-public class Vision {
+public class Vision extends SubsystemBase {
     private static final AprilTagFieldLayout apriltagField = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
 
     private static final NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
     private static final NetworkTable rpiTable = NetworkTableInstance.getDefault().getTable("raspberrypi");
+
+    private Kinesthetics kinesthetics;
+    private final GenericEntry isSingleTarget;
+
+    public Vision(Kinesthetics k) {
+        this.kinesthetics = k;
+
+        var table = Shuffleboard.getTab("Vision");
+
+        isSingleTarget = table
+            .add("Single-Target", false)
+            .withWidget(BuiltInWidgets.kBooleanBox).getEntry("boolean");
+        table.addDouble("Vision Error (meters)",
+            () -> kinesthetics.getPose().getTranslation().getDistance(Vision.getBotPose().getTranslation().toTranslation2d()));
+    }
+
+    @Override
+    public void periodic() {
+        int desiredPipeline = isSingleTarget.getBoolean(false) ? 1 : 0;
+        if (getLimelightPipe() != desiredPipeline) setLimelightPipe(desiredPipeline);
+    }
 
     public static Pose3d getBotPose() {
         if (!limelightTable.getEntry("botpose").exists()) return null;
@@ -28,6 +53,14 @@ public class Vision {
 
     public static double getLimelightPing() {
         return limelightTable.getEntry("cl").getDouble(-1);
+    }
+
+    public static void setLimelightPipe(int pipeline) {
+        limelightTable.getEntry("pipeline").setNumber(pipeline);
+    }
+
+    public static double getLimelightPipe() {
+        return limelightTable.getEntry("pipeline").getDouble(-1);
     }
 
     public static Translation3d getNoteTranslation() {
