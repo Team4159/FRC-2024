@@ -64,7 +64,7 @@ public class Vision extends SubsystemBase {
     }
 
     public static Translation3d getNoteTranslation() {
-        if (!limelightTable.getEntry("notetrans").exists()) return null;
+        if (!rpiTable.getEntry("notetrans").exists()) return null;
         double[] ntdata = rpiTable.getEntry("notetrans").getDoubleArray(new double[3]);
         return Constants.Intake.luxonisTranslation.getTranslation().plus(new Translation3d(
             Conversions.millimetersToMeters(ntdata[0]),

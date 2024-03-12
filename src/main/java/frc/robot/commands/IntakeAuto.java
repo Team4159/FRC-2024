@@ -5,6 +5,7 @@ import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -55,8 +56,8 @@ public class IntakeAuto extends SequentialCommandGroup {
     }
 
     public static boolean canRun(Kinesthetics k) { // is there a note in view and does it seem close enough to grab
-        var notetrans = Vision.getNoteTranslation().toTranslation2d();
+        Translation3d notetrans = Vision.getNoteTranslation();
         if (notetrans == null) return false;
-        return notetrans.getNorm() < Constants.Intake.intakeRange*5;
+        return notetrans.toTranslation2d().getNorm() < Constants.Intake.intakeRange * 5;
     }
 }
