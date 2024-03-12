@@ -187,7 +187,7 @@ public final class Constants {
 
         public static final Pose3d luxonisTranslation = new Pose3d(
             new Translation3d(),
-            new Rotation3d()
+            new Rotation3d(Math.toRadians(90), 0, 0)
         ); // TODO: This must be tuned to specific robot
     } 
 
