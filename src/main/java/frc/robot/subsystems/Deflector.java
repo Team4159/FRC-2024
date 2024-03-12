@@ -4,25 +4,23 @@ import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
-import edu.wpi.first.math.MathUtil;
+// import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Deflector extends SubsystemBase{
-    private CANSparkMax angleMotorControllerL, angleMotorControllerR;
+    private CANSparkMax angleMotorControllerL;
 
     public Deflector(){
         angleMotorControllerL = new CANSparkMax(Constants.Deflector.lMotorID, MotorType.kBrushless);
-        angleMotorControllerR = new CANSparkMax(Constants.Deflector.rMotorID, MotorType.kBrushless);
-        angleMotorControllerR.follow(angleMotorControllerL, true);
     }
 
-    /** @return radians */
-    private double getPitch() {
-        return Units.rotationsToRadians(angleMotorControllerL.getEncoder().getPosition());
-    }
+    // /** @return radians */
+    // private double getPitch() {
+    //     return Units.rotationsToRadians(angleMotorControllerL.getEncoder().getPosition());
+    // }
     
     /** @param goalPitch radians */
     private void setGoalPitch(double goalPitch) {
@@ -42,7 +40,8 @@ public class Deflector extends SubsystemBase{
 
         @Override
         public boolean isFinished() {
-            return MathUtil.isNear(Constants.Deflector.maximumPitch, getPitch(), Constants.Deflector.pitchTolerance);
+            return false;
+            // return MathUtil.isNear(Constants.Deflector.maximumPitch, getPitch(), Constants.Deflector.pitchTolerance);
         }
 
         @Override

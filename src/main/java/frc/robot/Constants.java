@@ -8,12 +8,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -79,7 +74,7 @@ public final class Constants {
         public static final double angleKD = chosenModule.angleKD;
 
         /* Drive Motor PID Values */
-        public static final double driveKP = 0.12; //TODO: This must be tuned to specific robot
+        public static final double driveKP = 0.07; //TODO: This must be tuned to specific robot
         public static final double driveKI = 0.0;
         public static final double driveKD = 0.0;
         public static final double driveKF = 0.0;
@@ -220,17 +215,18 @@ public final class Constants {
     }
 
     public static final class Deflector {
-        public static final int rMotorID = 8;
+        // public static final int rMotorID = 8;
         public static final int lMotorID = 9;
 
-        public static final double maximumPitch = Units.rotationsToRadians(2.2);
+        public static final double maximumPitch = Units.rotationsToRadians(2.4);
         public static final double pitchTolerance = Math.PI/128;
     }
 
     public static final class CommandConstants {
         public static final double bumperWidth = Units.inchesToMeters(2.75);
 
-        public static final double shooterSpinMax = 30; // meters / second
+        public static final double shooterSpinMax = 750; 
+        public static final double shooterSpinPassiveMax = 400; 
         public static final double speakerShooterAngleMax = Units.rotationsToRadians(0.2);
         public static final double speakerShooterAngleMin = Units.rotationsToRadians(0.0);
 
