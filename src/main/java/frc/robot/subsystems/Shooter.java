@@ -86,6 +86,7 @@ public class Shooter extends SubsystemBase {
 
     public void stopSpin() {
         shooterMLeftController.stopMotor();
+        shooterMRightController.stopMotor();
     }
 
     private void setNeck(SpinState ss) {
@@ -106,6 +107,12 @@ public class Shooter extends SubsystemBase {
 
     public ChangeState toSpin(double spin1, double spin2) {
         return new ChangeState(() -> new ShooterCommand(getPitch(), spin1, spin2), false);
+    }
+
+    public boolean atState(double p, double s1, double s2){
+        return Math.abs(p - getPitch()) < Constants.Shooter.pitchTolerance &&
+               Math.abs(s1 - getSpin1()) < Constants.Shooter.spinTolerance &&
+               Math.abs(s2 - getSpin2()) < Constants.Shooter.spinTolerance;
     }
 
     @Override

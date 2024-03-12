@@ -4,22 +4,34 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
+import frc.robot.Constants.SpinState;
 import frc.robot.subsystems.Kinesthetics;
 
-public class ShooterLookupTable extends Command{
+public class ShooterLookupTable extends SequentialCommandGroup{
     private Kinesthetics s_Kinesthetics;
     private Shooter s_Shooter;
     private Swerve s_Swerve;
+    private double desiredPitch;
 
     public ShooterLookupTable(Kinesthetics k, Shooter s, Swerve sw){
         s_Kinesthetics = k;
         s_Shooter = s;
         s_Swerve = sw;
+        desiredPitch = getBestCommand();
         addRequirements(s_Kinesthetics, s_Shooter, s_Swerve);
+        addCommands(
+            new ParallelCommandGroup(
+                s_Shooter.new ChangeState(() -> new ShooterCommand(desiredPitch, Constants.Shooter.leftSpeed, Constants.Shooter.rightSpeed), true),
+                s_Swerve.new ChangeYaw(() -> s_Kinesthetics.getPose().getX(), () -> s_Kinesthetics.getPose().getY(), () -> getRequiredYaw(s_Kinesthetics)),
+                new WaitUntilCommand(() -> s_Shooter.atState(desiredPitch, Constants.Shooter.leftSpeed, Constants.Shooter.rightSpeed))),
+                s_Shooter.new ChangeNeck(SpinState.FW));
     }
 
     private static Transform3d getDifference(Kinesthetics k) {
@@ -31,7 +43,7 @@ public class ShooterLookupTable extends Command{
         Transform3d dif = getDifference(k);
         double xDif = dif.getX();
         double yDif = dif.getY();
-        double dist = Math.sqrt(Math.pow(xDif, 2) + Math.pow(yDif, 2));
+        double dist = Math.hypot(xDif, yDif);
         SmartDashboard.putNumber("Distance from speaker", dist);
         return dist;
     }
@@ -41,13 +53,7 @@ public class ShooterLookupTable extends Command{
         Transform3d dif = getDifference(k);
         double xDif = dif.getX();
         double yDif = dif.getY();
-        return Math.atan(yDif / xDif);
-    }
-
-    @Override
-    public void execute(){        
-        s_Swerve.new ChangeYaw(null, null, () -> getRequiredYaw(s_Kinesthetics));
-        s_Shooter.new ChangeState(() -> new ShooterCommand(getBestCommand(), Constants.Shooter.leftSpeed, Constants.Shooter.rightSpeed), true);
+        return Math.atan2(yDif, xDif);
     }
 
     /** @return shooter pitch */

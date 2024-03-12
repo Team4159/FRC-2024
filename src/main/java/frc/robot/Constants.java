@@ -239,7 +239,7 @@ public final class Constants {
     public static final class CommandConstants {
         public static final double bumperWidth = Units.inchesToMeters(2.75);
 
-        public static final double shooterSpinMax = 30; // meters / second
+        public static final double shooterSpinMax = 150;
         public static final double speakerShooterAngleMax = Units.rotationsToRadians(0.2);
         public static final double speakerShooterAngleMin = Units.rotationsToRadians(0.0);
         public static final double speakerAutoOmegaMax = Units.degreesToRadians(15);

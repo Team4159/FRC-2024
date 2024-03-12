@@ -3,6 +3,8 @@ package frc.robot;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.management.ConstructorParameters;
+
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -27,13 +29,15 @@ public class RobotContainer {
     /* Driver Buttons */
     private static final JoystickButton zeroGyro = new JoystickButton(driver, 1);
 
-    private static final JoystickButton manualShoot = new JoystickButton(secondary, 1);
+    private static final JoystickButton manualShoot = new JoystickButton(secondary, 7);
+    private static final JoystickButton autoSpk = new JoystickButton(secondary, 1);
     private static final JoystickButton manualIntake = new JoystickButton(secondary, 2);
     private static final JoystickButton manualNeck = new JoystickButton(secondary, 3);
     private static final JoystickButton manualNeckBw = new JoystickButton(secondary, 4);
     private static final JoystickButton manualIntakeSpin = new JoystickButton(secondary, 5);
     private static final JoystickButton manualOuttake = new JoystickButton(secondary, 6);
     private static final JoystickButton manualAmp = new JoystickButton(secondary, 10);
+    private static final JoystickButton autoAlign = new JoystickButton(secondary, 9);
 
     // private static final JoystickButton autoAmp = new JoystickButton(driver, 2);
     // private static final JoystickButton autoSpk = new JoystickButton(secondary, 8);
@@ -78,6 +82,10 @@ public class RobotContainer {
         zeroGyro.onTrue(new InstantCommand(kinesthetics::zeroHeading));
    
         // only sets shooter and deflector to correct setpoint. in order to shoot, requires pressing manualNeck
+        autoSpk.debounce(0.1)
+            .onTrue(new ShooterLookupTable(kinesthetics, s_Shooter, s_Swerve))
+            .onFalse(s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 0, 0)));
+            
         manualAmp.debounce(0.1)
             .onTrue(new ParallelCommandGroup(
                 s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 0d, 0d))
@@ -141,6 +149,9 @@ public class RobotContainer {
                     s_Shooter.new ChangeNeck(SpinState.ST),
                     s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 0.05, 0.05)))
             );
+        autoAlign.debounce(0.1).onTrue(
+            new SpkAlign(kinesthetics, s_Swerve)
+        );
     }
 
     public Command getAutonomousCommand() {
@@ -151,5 +162,7 @@ public class RobotContainer {
 
     public void configureShooterMap(){
         shooterTable.put(Units.inchesToMeters(51), 1.0);
+        //TEMPORARY VALUE FOR TESTING
+        shooterTable.put(Units.inchesToMeters(63), 0.95);
     }
 }

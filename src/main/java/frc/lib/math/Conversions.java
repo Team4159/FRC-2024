@@ -14,7 +14,7 @@ public class Conversions {
 
     /**
      * @param wheelRPS Wheel Velocity: (in Radians per Second)
-     * @return Wheel Velocity: (in Meters per Second)
+     * @return Wheel Velocity: (in RPM)
      */
     public static double RadiansPSToRPM(double wheelRPS){
         double wheelRPM = wheelRPS * 60 / (2*Math.PI);

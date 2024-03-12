@@ -55,6 +55,7 @@ public class Kinesthetics extends SubsystemBase {
         SmartDashboard.putNumber("Position X", getDifference().getX());
         SmartDashboard.putNumber("Position Y", getDifference().getY());
         SmartDashboard.putNumber("Distance from speaker", getDistance());
+        SmartDashboard.putNumber("Angle required", getRequiredYaw());
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
         var visionPose = Vision.getBotPose();
         if (visionPose != null)
@@ -71,8 +72,16 @@ public class Kinesthetics extends SubsystemBase {
         Transform3d dif = getDifference();
         double xDif = dif.getX();
         double yDif = dif.getY();
-        double dist = Math.sqrt(Math.pow(xDif, 2) + Math.pow(yDif, 2));
+        double dist = Math.hypot(xDif, yDif);
         return dist;
+    }
+
+    /** @return required yaw in radians */
+    private double getRequiredYaw(){
+        Transform3d dif = getDifference();
+        double xDif = dif.getX();
+        double yDif = dif.getY();
+        return Math.atan2(yDif, xDif);
     }
 
     private Rotation2d getGyroYaw() {
