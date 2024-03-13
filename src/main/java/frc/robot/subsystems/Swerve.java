@@ -10,6 +10,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,15 +29,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Swerve extends SubsystemBase {
     private Kinesthetics kinesthetics;
 
-    public SwerveModule[] mSwerveMods;
-
-    public Swerve() {
-        mSwerveMods = new SwerveModule[] {
-            new SwerveModule(0, Constants.Swerve.Mod0.constants),
-            new SwerveModule(1, Constants.Swerve.Mod1.constants),
-            new SwerveModule(2, Constants.Swerve.Mod2.constants),
-            new SwerveModule(3, Constants.Swerve.Mod3.constants)
-        };
+    private SwerveModule[] mSwerveMods = new SwerveModule[] {
+        new SwerveModule(0, Constants.Swerve.Mod0.constants),
+        new SwerveModule(1, Constants.Swerve.Mod1.constants),
+        new SwerveModule(2, Constants.Swerve.Mod2.constants),
+        new SwerveModule(3, Constants.Swerve.Mod3.constants)
+    };
         
         // PathPlanner setup
         AutoBuilder.configureHolonomic(
@@ -54,10 +53,12 @@ public class Swerve extends SubsystemBase {
         );
 
         PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
-    }
 
     public void setKinesthetics(Kinesthetics k) {
         kinesthetics = k;
+        
+        Timer.delay(0.1);
+        resetModulesToAbsolute();
     }
 
     /** @param rotation radians / second */
@@ -78,7 +79,7 @@ public class Swerve extends SubsystemBase {
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
 
         for(SwerveModule mod : mSwerveMods) mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
-    }    
+    }
 
     /* Used by SwerveControllerCommand in Auto */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
@@ -103,7 +104,7 @@ public class Swerve extends SubsystemBase {
         return positions;
     }
 
-    public void resetModulesToAbsolute(){
+    private void resetModulesToAbsolute(){
         for(SwerveModule mod : mSwerveMods) mod.resetToAbsolute();
     }
 
@@ -147,7 +148,7 @@ public class Swerve extends SubsystemBase {
 
         @Override
         public boolean isFinished() {
-            return Math.abs(kinesthetics.getHeading().getRadians() - desiredYaw.getAsDouble()) < Constants.Swerve.yawTolerance;
+            return MathUtil.isNear(desiredYaw.getAsDouble(), kinesthetics.getHeading().getRadians(), Constants.Swerve.yawTolerance);
         }
     }
 }

@@ -6,6 +6,7 @@ import com.revrobotics.CANSparkLowLevel;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkAbsoluteEncoder;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -23,7 +24,7 @@ public class Intake extends SubsystemBase {
     }
     
     /** @return radians */
-    public double getPitch() {
+    private double getPitch() {
         return Units.rotationsToRadians(angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
     }
     
@@ -33,11 +34,11 @@ public class Intake extends SubsystemBase {
     }
 
     /** @return radians / second */
-    public double getSpin() {
+    private double getSpin() {
         return Units.rotationsPerMinuteToRadiansPerSecond(intakeMotorController.getEncoder().getVelocity());
     }
 
-    public void setSpin(SpinState ss) {
+    private void setSpin(SpinState ss) {
         intakeMotorController.set(ss.multiplier * Constants.Intake.intakeSpin);
         feederMotorController.set(ss.multiplier * Constants.Intake.feederSpin);
     }
@@ -59,14 +60,16 @@ public class Intake extends SubsystemBase {
 
         @Override
         public boolean isFinished() {
-            return Math.abs(getPitch() - desiredState.pitch) < Constants.Intake.pitchTolerance &&
-                Math.abs(getSpin() - desiredState.spin.multiplier * Constants.Intake.intakeSpin) < Constants.Intake.spinTolerance;
+            return MathUtil.isNear(desiredState.pitch, getPitch(), Constants.Intake.pitchTolerance) &&
+                MathUtil.isNear(desiredState.spin.multiplier * Constants.Intake.intakeSpin, getSpin(), Constants.Intake.spinTolerance);
         }
 
         @Override
         public void end(boolean interrupted) {
-            if (interrupted) setGoalPitch(Constants.Intake.IntakeState.STOW.pitch);
-            setSpin(SpinState.ST);
+            if (interrupted) {
+                setGoalPitch(Constants.Intake.IntakeState.STOW.pitch);
+                setSpin(Constants.Intake.IntakeState.STOW.spin);
+            }
             super.end(interrupted);
         }
     }
