@@ -5,6 +5,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.SpinState;
 import frc.robot.subsystems.Kinesthetics;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Shooter.ShooterCommand;
 
 public class SourceIntakeManual extends Command {
     private Kinesthetics kinesthetics;
@@ -18,7 +19,10 @@ public class SourceIntakeManual extends Command {
 
     @Override
     public void execute() {
-        s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.CommandConstants.sourceShooterIntakePitch, Constants.CommandConstants.sourceShooterIntakeSpin, Constants.CommandConstants.sourceShooterIntakeSpin));
+        s_Shooter.new ChangeState(() -> new ShooterCommand(
+            Constants.CommandConstants.sourceShooterIntakePitch, 
+            Constants.CommandConstants.sourceShooterIntakeSpin), 
+            true);
         if (kinesthetics.shooterHasNote()) {
             s_Shooter.new ChangeNeck(kinesthetics, SpinState.BW);
         } else {
@@ -29,8 +33,7 @@ public class SourceIntakeManual extends Command {
     @Override
     public void end(boolean interrupted) {
         if (interrupted) {
-            s_Shooter.setGoalPitch(Constants.Shooter.minimumPitch);
-            s_Shooter.stopSpin();
+            s_Shooter.stopShooter();
             s_Shooter.new ChangeNeck(kinesthetics, SpinState.ST);
         }
         super.end(interrupted);

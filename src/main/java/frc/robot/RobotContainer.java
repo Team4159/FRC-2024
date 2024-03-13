@@ -23,6 +23,7 @@ import frc.robot.auto.*;
 import frc.robot.Constants.SpinState;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.Shooter.ShooterCommand;
 
 public class RobotContainer {
     /* Controllers */
@@ -71,24 +72,21 @@ public class RobotContainer {
             s_Shooter.new ChangeNeck(SpinState.ST),
             s_Shooter.new ChangeState(() -> new ShooterCommand(
                 Constants.CommandConstants.speakerSubwooferPitch, 
-                Constants.CommandConstants.speakerSubwooferSpin, 
                 Constants.CommandConstants.speakerSubwooferSpin), 
                 false),
             s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
-            s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 0d, 0d))
+            s_Shooter.stopShooter()
         ));
         NamedCommands.registerCommand("speakerLookupTable", new ParallelCommandGroup(
-            new ShooterLookupTable(kinesthetics, s_Shooter, s_Swerve), 
+            new ShooterLookupTable(kinesthetics, s_Shooter, s_Swerve, null, null), 
             new SpeakerGetYaw(kinesthetics, s_Swerve, s_Shooter, null, null)
         ));
-        //NamedCommands.registerCommand("ampAuto", new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector));
-        // NamedCommands.registerCommand("speakerAutoAim", new ParallelCommandGroup(
-        //     new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, null, null), 
-        //     new SpeakerGetYaw(kinesthetics, s_Swerve, s_Shooter, null, null)
-        // ));
-        //NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake));
-        
-        configureShooterMap();
+        NamedCommands.registerCommand("ampAuto", new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector));
+        NamedCommands.registerCommand("speakerAutoAim", new ParallelCommandGroup(
+            new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, null, null), 
+            new SpeakerGetYaw(kinesthetics, s_Swerve, s_Shooter, null, null)
+        ));
+        NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake));
 
         // Configure the button bindings
         configureButtonBindings();
