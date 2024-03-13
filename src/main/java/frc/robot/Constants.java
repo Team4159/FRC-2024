@@ -162,7 +162,7 @@ public final class Constants {
         public static final int feederMotorID = 3;
         // public static final int beamBreakID = 1; // PWM
 
-        public static final double pitchTolerance = Math.PI/64; // radians
+        public static final double pitchTolerance = Math.PI/32; // radians
         public static final double spinTolerance = Math.PI/16; // radians
 
         public static final double intakeSpin = 0.5; // -1 to 1
@@ -174,7 +174,7 @@ public final class Constants {
         public static enum IntakeState {
             STOW(Units.rotationsToRadians(0.012), SpinState.ST), // starting pos & when moving
             DOWN(Units.rotationsToRadians(0.465), SpinState.FW), // intaking
-            SPIT(Units.rotationsToRadians(0.465), SpinState.BW); // outtaking
+            SPIT(Units.rotationsToRadians(0.300), SpinState.BW); // outtaking
 
             public final double pitch;
             public final SpinState spin;
@@ -186,8 +186,8 @@ public final class Constants {
         }
 
         public static final Pose3d luxonisTranslation = new Pose3d(
-            new Translation3d(),
-            new Rotation3d()
+            new Translation3d(0, 0, Units.inchesToMeters(16)),
+            new Rotation3d(Units.degreesToRadians(90), Units.degreesToRadians(26.57), Units.degreesToRadians(-90))
         ); // TODO: This must be tuned to specific robot
     } 
 
@@ -198,7 +198,7 @@ public final class Constants {
         public static final int neckMotorID = 7;
         public static final int beamBreakID = 0; // PWM
 
-        public static final double pitchTolerance = Math.PI/512;
+        public static final double pitchTolerance = Math.PI/128;
         public static final double spinTolerance = Math.PI/256;
 
         public static final double pitchOffset = Units.degreesToRotations(-3);
@@ -210,32 +210,28 @@ public final class Constants {
         public static final SimpleMotorFeedforward shooterFeedForward = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
 
         // TODO: This must be tuned to specific robot
-        public static final PIDController shooterPID = new PIDController(0.8, 0, 0.001);
+        public static final PIDController shooterPID = new PIDController(0.7, 0, 0.02);
         public static final double kF = 0.0;
     }
 
     public static final class Deflector {
         public static final int motorID = 9;
 
-        public static final double maximumPitch = Units.rotationsToRadians(2.4);
-        public static final double pitchTolerance = Math.PI/32;
+        public static final double maximumPitch = Units.rotationsToRadians(2.7);
     }
 
     public static final class CommandConstants {
         public static final double bumperWidth = Units.inchesToMeters(2.75);
 
-        public static final double shooterSpinMax = 750; 
-        public static final double shooterSpinPassiveMax = 400; 
         public static final double speakerShooterAngleMax = Units.rotationsToRadians(0.2);
         public static final double speakerShooterAngleMin = Units.rotationsToRadians(0.0);
 
-        public static final double speakerAutoOmegaMax = Units.degreesToRadians(15); // radians / second
         public static final ShooterCommand speakerPodiumShooterCommand = new ShooterCommand(
-            Units.degreesToRadians(75), 26d, 13d);
+            0.7, 500d, 250d);
 
         public static final double ampAutoDistanceMax = 3.0; // meters
         public static final ShooterCommand ampShooterCommand = new ShooterCommand(
-            Units.degreesToRadians(75), 5d);
+            Units.degreesToRadians(55), 175d);
         public static final double ampAutoDistanceToStartSpinning = 1; // meters
     }
 

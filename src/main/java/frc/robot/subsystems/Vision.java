@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -15,8 +13,6 @@ import frc.lib.math.Conversions;
 import frc.robot.Constants;
 
 public class Vision extends SubsystemBase {
-    private static final AprilTagFieldLayout apriltagField = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
-
     private static final NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
     private static final NetworkTable rpiTable = NetworkTableInstance.getDefault().getTable("raspberrypi");
 
@@ -30,9 +26,13 @@ public class Vision extends SubsystemBase {
 
         isSingleTarget = table
             .add("Single-Target", false)
-            .withWidget(BuiltInWidgets.kBooleanBox).getEntry("boolean");
-        table.addDouble("Vision Error (meters)",
-            () -> kinesthetics.getPose().getTranslation().getDistance(Vision.getBotPose().getTranslation().toTranslation2d()));
+            .withWidget(BuiltInWidgets.kToggleSwitch).getEntry("boolean");
+        table.addDouble("LL Error", () -> {
+            var v = Vision.getBotPose();
+            if (v == null) return -1d;
+            return kinesthetics.getPose().getTranslation().getDistance(v.getTranslation().toTranslation2d());
+        });
+        table.addBoolean("Note Seen", () -> limelightTable.getEntry("notetrans").exists());
     }
 
     @Override
@@ -42,11 +42,10 @@ public class Vision extends SubsystemBase {
     }
 
     public static Pose3d getBotPose() {
-        if (!limelightTable.getEntry("botpose").exists()) return null;
-        double[] ntdata = limelightTable.getEntry("botpose").getDoubleArray(new double[6]);
+        if (!limelightTable.getEntry("botpose_wpiblue").exists()) return null;
+        double[] ntdata = limelightTable.getEntry("botpose_wpiblue").getDoubleArray(new double[6]);
         return new Pose3d(
-            new Translation3d(ntdata[0], ntdata[1], ntdata[2])
-                .minus(apriltagField.getOrigin().getTranslation()),
+            new Translation3d(ntdata[0], ntdata[1], ntdata[2]),
             new Rotation3d(ntdata[3], ntdata[4], ntdata[5])
         );
     } // limelight translation is y 12.947", z 8.03", pitch 64 deg
