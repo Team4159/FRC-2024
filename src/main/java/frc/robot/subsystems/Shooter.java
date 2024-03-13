@@ -8,6 +8,7 @@ import com.revrobotics.SparkAbsoluteEncoder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.Conversions;
@@ -32,12 +33,12 @@ public class Shooter extends SubsystemBase {
 
     /** @param goalPitch radians */
     private void setGoalPitch(double goalPitch) {
-        goalPitch = MathUtil.clamp(goalPitch, Constants.Shooter.minimumPitch, Constants.Shooter.maximumPitch);
+        goalPitch = MathUtil.clamp(MathUtil.angleModulus(goalPitch), Constants.Shooter.minimumPitch, Constants.Shooter.maximumPitch) + Units.rotationsToRadians(Constants.Shooter.pitchOffset);
         angleMotorController.set(
             Constants.Shooter.shooterPID.calculate(getPitch(), goalPitch)
             + Constants.Shooter.kF * Math.cos(getPitch())
-            + Constants.Shooter.pitchOffset
         );
+        SmartDashboard.putNumber("goalangle", Units.radiansToDegrees(goalPitch));
         //angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch) + Constants.Shooter.pitchOffset, CANSparkBase.ControlType.kSmartMotion);
     }
 
@@ -62,6 +63,11 @@ public class Shooter extends SubsystemBase {
 
     private void setNeck(SpinState ss) {
         neckMotorController.set(ss.multiplier * Constants.Shooter.neckSpeed);
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("angle", Units.radiansToDegrees(getPitch()));
     }
 
     public ChangeState toPitch(double pitch) {
@@ -112,9 +118,12 @@ public class Shooter extends SubsystemBase {
         public boolean isFinished() {
             if (continuous) return false;
             var state = desiredState.get();
-            return MathUtil.isNear(state.pitch(), getPitch(), Constants.Shooter.pitchTolerance)
-                && MathUtil.isNear(state.lSpin(), getLSpin(), Constants.Shooter.spinTolerance)
-                && MathUtil.isNear(state.rSpin(), getRSpin(), Constants.Shooter.spinTolerance);
+            return
+                (state.pitch() == null || MathUtil.isNear(state.pitch(), getPitch(), Constants.Shooter.pitchTolerance)) &&
+                (!state.hasSpin() || (
+                    MathUtil.isNear(state.lSpin(), getLSpin(), Constants.Shooter.spinTolerance) &&
+                    MathUtil.isNear(state.rSpin(), getRSpin(), Constants.Shooter.spinTolerance)
+                ));
         }
     
         @Override
