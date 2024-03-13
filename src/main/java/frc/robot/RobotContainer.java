@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.Intake.IntakeState;
@@ -24,7 +25,8 @@ public class RobotContainer {
     private static final JoystickButton zeroGyro = new JoystickButton(driver, 1);
 
     private static final JoystickButton manualAmp = new JoystickButton(secondary, 7);
-    private static final JoystickButton manualShoot = new JoystickButton(secondary, 4);
+    private static final JoystickButton manualShootPodium = new JoystickButton(secondary, 4);
+    private static final JoystickButton manualShootSubwoofer = new JoystickButton(secondary, 3);
     private static final JoystickButton manualIntake = new JoystickButton(secondary, 2);
     private static final JoystickButton manualOuttake = new JoystickButton(secondary, 8);
     private static final JoystickButton manualFeed = new JoystickButton(secondary, 1); 
@@ -72,19 +74,20 @@ public class RobotContainer {
         zeroGyro.onTrue(new InstantCommand(kinesthetics::zeroHeading));
 
         // Automatic Command Groups
-        autoSpk.debounce(0.1).and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
+        autoSpk.and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
             .whileTrue(new SequentialCommandGroup(
+                new PrintCommand("auto speaker"),
                 s_Shooter.new ChangeNeck(SpinState.ST),
                 new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()),
                 s_Shooter.new ChangeNeck(SpinState.FW)
             )).onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
-        autoAmp.debounce(0.1).and(kinesthetics::shooterHasNote).and(() -> AmpAuto.isInRange(kinesthetics))
+        autoAmp.and(kinesthetics::shooterHasNote).and(() -> AmpAuto.isInRange(kinesthetics))
             .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
             .whileTrue(new SequentialCommandGroup(
                 new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector),
                 s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW)
             ));
-        autoIntake.debounce(0.1).and(() -> !kinesthetics.shooterHasNote()) // && !kinesthetics.feederHasNote()
+        autoIntake.and(() -> !kinesthetics.shooterHasNote()) // && !kinesthetics.feederHasNote()
             .and(() -> IntakeAuto.canRun(kinesthetics))
             .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake))
             .onFalse(new ParallelCommandGroup(
@@ -102,9 +105,16 @@ public class RobotContainer {
                 s_Shooter.stopShooter(),
                 s_Deflector.new Lower()
             ));
-        manualShoot
+        manualShootPodium
             .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
             .whileTrue(s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, true))
+            .onFalse(new SequentialCommandGroup(
+                s_Shooter.new ChangeNeck(SpinState.ST),
+                s_Shooter.stopShooter()
+            ));
+        manualShootSubwoofer
+            .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
+            .whileTrue(s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true))
             .onFalse(new SequentialCommandGroup(
                 s_Shooter.new ChangeNeck(SpinState.ST),
                 s_Shooter.stopShooter()

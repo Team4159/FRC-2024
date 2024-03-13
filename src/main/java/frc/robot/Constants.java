@@ -227,7 +227,9 @@ public final class Constants {
         public static final double speakerShooterAngleMin = Units.rotationsToRadians(0.0);
 
         public static final ShooterCommand speakerPodiumShooterCommand = new ShooterCommand(
-            0.7, 500d, 250d);
+            0.7, 500d, 275d);
+        public static final ShooterCommand speakerSubwooferShooterCommand = new ShooterCommand(
+            0.8, 400d, 200d);
 
         public static final double ampAutoDistanceMax = 3.0; // meters
         public static final ShooterCommand ampShooterCommand = new ShooterCommand(

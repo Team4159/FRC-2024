@@ -33,9 +33,9 @@ public class Shooter extends SubsystemBase {
 
     /** @param goalPitch radians */
     private void setGoalPitch(double goalPitch) {
-        goalPitch = MathUtil.clamp(MathUtil.angleModulus(goalPitch), Constants.Shooter.minimumPitch, Constants.Shooter.maximumPitch) + Units.rotationsToRadians(Constants.Shooter.pitchOffset);
+        goalPitch = MathUtil.clamp(MathUtil.angleModulus(goalPitch), Constants.Shooter.minimumPitch, Constants.Shooter.maximumPitch);
         angleMotorController.set(
-            Constants.Shooter.shooterPID.calculate(getPitch(), goalPitch)
+            Constants.Shooter.shooterPID.calculate(getPitch(), goalPitch + Units.rotationsToRadians(Constants.Shooter.pitchOffset))
             + Constants.Shooter.kF * Math.cos(getPitch())
         );
         SmartDashboard.putNumber("goalangle", Units.radiansToDegrees(goalPitch));

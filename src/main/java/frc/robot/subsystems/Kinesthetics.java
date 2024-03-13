@@ -91,7 +91,7 @@ public class Kinesthetics extends SubsystemBase {
     }
 
     public void smartInvert() {
-        poseEstimator.resetPosition(getGyroYaw().times(-1), s_Swerve.getModulePositions(), new Pose2d(getPose().getTranslation(), getGyroYaw().times(-1)));
+        poseEstimator.resetPosition(getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d(getPose().getTranslation(), new Rotation2d().minus(getHeading())));
     }
 
     /** @return v_x meters / second (forward +), v_y meters / second (left +), ω radians / second (ccw +)*/
