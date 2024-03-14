@@ -32,7 +32,8 @@ public class Swerve extends SubsystemBase {
             new SwerveModule(3, Constants.Swerve.Mod3.constants)
         };
 
-    public Swerve() {
+    public void setKinesthetics(Kinesthetics k) {
+        kinesthetics = k;
         // PathPlanner setup
         AutoBuilder.configureHolonomic(
             this.kinesthetics::getPose, // a supplier for the robot pose
@@ -47,12 +48,7 @@ public class Swerve extends SubsystemBase {
             () -> this.kinesthetics.getAlliance() == DriverStation.Alliance.Red, // determines if autos should be flipped (i.e. if on Red Alliance)
             this // reference to this subsystem to set requirements
         );
-
         PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
-    }
-
-    public void setKinesthetics(Kinesthetics k) {
-        kinesthetics = k;
         
         Timer.delay(0.1);
         resetModulesToAbsolute();
