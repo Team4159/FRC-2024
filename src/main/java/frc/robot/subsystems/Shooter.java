@@ -8,6 +8,10 @@ import com.revrobotics.SparkAbsoluteEncoder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.Conversions;
@@ -17,27 +21,36 @@ import frc.robot.Constants.SpinState;
 public class Shooter extends SubsystemBase {  
     private CANSparkBase angleMotorController, shooterMLeftController, shooterMRightController, neckMotorController;
 
+    private final MechanismLigament2d mechanism;
+
     public Shooter() {
         angleMotorController = new CANSparkFlex(Constants.Shooter.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
         shooterMLeftController = new CANSparkFlex(Constants.Shooter.shooterMLeftID, CANSparkLowLevel.MotorType.kBrushless);
         shooterMRightController= new CANSparkFlex(Constants.Shooter.shooterMRightID,CANSparkLowLevel.MotorType.kBrushless);
         shooterMRightController.setInverted(true);
         neckMotorController = new CANSparkMax(Constants.Shooter.neckMotorID, CANSparkLowLevel.MotorType.kBrushless);
+        
+        var canvas = new Mechanism2d(400, 400);
+        mechanism = new MechanismLigament2d("Shooter", Units.inchesToMeters(20), Units.radiansToDegrees(getPitch()));
+        canvas.getRoot("A-Frame", Constants.Swerve.trackWidth / 2, Constants.Swerve.wheelBase / 2).append(mechanism);
+        Shuffleboard.getTab("Kinesthetics").add("Shooter", canvas);
     }
 
     /** @return radians */
     private double getPitch() {
-        return Units.rotationsToRadians(angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition() - Constants.Shooter.pitchOffset);
+        var o = Units.rotationsToRadians(angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition() - Constants.Shooter.pitchOffset);
+        mechanism.setAngle(Units.radiansToDegrees(o));
+        return o;
     }
 
     /** @param goalPitch radians */
     private void setGoalPitch(double goalPitch) {
-        goalPitch = MathUtil.clamp(goalPitch, Constants.Shooter.minimumPitch, Constants.Shooter.maximumPitch);
+        goalPitch = MathUtil.clamp(MathUtil.angleModulus(goalPitch), Constants.Shooter.minimumPitch, Constants.Shooter.maximumPitch) - Units.rotationsToRadians(Constants.Shooter.pitchOffset);
         angleMotorController.set(
-            Constants.Shooter.shooterPID.calculate(getPitch(), goalPitch)
+            Constants.Shooter.shooterPID.calculate(getPitch(), goalPitch + Units.rotationsToRadians(Constants.Shooter.pitchOffset))
             + Constants.Shooter.kF * Math.cos(getPitch())
-            + Constants.Shooter.pitchOffset
         );
+        SmartDashboard.putNumber("goalangle", Units.radiansToDegrees(goalPitch));
         //angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch) + Constants.Shooter.pitchOffset, CANSparkBase.ControlType.kSmartMotion);
     }
 
@@ -112,9 +125,12 @@ public class Shooter extends SubsystemBase {
         public boolean isFinished() {
             if (continuous) return false;
             var state = desiredState.get();
-            return MathUtil.isNear(state.pitch(), getPitch(), Constants.Shooter.pitchTolerance)
-                && MathUtil.isNear(state.lSpin(), getLSpin(), Constants.Shooter.spinTolerance)
-                && MathUtil.isNear(state.rSpin(), getRSpin(), Constants.Shooter.spinTolerance);
+            return
+                (state.pitch() == null || MathUtil.isNear(state.pitch(), getPitch(), Constants.Shooter.pitchTolerance)) &&
+                (!state.hasSpin() || (
+                    MathUtil.isNear(state.lSpin(), getLSpin(), Constants.Shooter.spinTolerance) &&
+                    MathUtil.isNear(state.rSpin(), getRSpin(), Constants.Shooter.spinTolerance)
+                ));
         }
     
         @Override

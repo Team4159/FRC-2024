@@ -36,17 +36,7 @@ public class IntakeAuto extends SequentialCommandGroup {
             sh.toPitch(Constants.Shooter.minimumPitch),
             sh.new ChangeNeck(SpinState.FW),
             i.new ChangeState(IntakeState.DOWN),
-            new WaitUntilCommand(k::shooterHasNote).withTimeout(2)
-        );
-        // if the beambreak works, reverse the neck until it reopens
-        if (k.shooterHasNote()) {
-            addCommands(
-                sh.new ChangeNeck(SpinState.BW),
-                new WaitUntilCommand(() -> !k.shooterHasNote()),
-                sh.new ChangeNeck(SpinState.ST)
-            );
-        }
-        addCommands(
+            new WaitUntilCommand(k::shooterHasNote).withTimeout(1.5),
             new ParallelCommandGroup( // ending commands
                 i.new ChangeState(IntakeState.STOW),
                 sh.new ChangeNeck(SpinState.ST)
@@ -55,8 +45,8 @@ public class IntakeAuto extends SequentialCommandGroup {
     }
 
     public static boolean canRun(Kinesthetics k) { // is there a note in view and does it seem close enough to grab
-        var notetrans = Vision.getNoteTranslation().toTranslation2d();
+        var notetrans = Vision.getNoteTranslation();
         if (notetrans == null) return false;
-        return notetrans.getNorm() < Constants.Intake.intakeRange*5;
+        return notetrans.toTranslation2d().getNorm() < Constants.Intake.intakeRange*5;
     }
 }

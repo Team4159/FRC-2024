@@ -35,19 +35,17 @@ public class Deflector extends SubsystemBase{
         @Override
         public void initialize(){
             setGoalPitch(Constants.Deflector.maximumPitch);
-            super.initialize();
+        }
+    }
+
+    public class Lower extends Command {
+        public Lower() {
+            addRequirements(Deflector.this);
         }
 
         @Override
-        public boolean isFinished() {
-            return false;
-            // return MathUtil.isNear(Constants.Deflector.maximumPitch, getPitch(), Constants.Deflector.pitchTolerance);
-        }
-
-        @Override
-        public void end(boolean interrupted){
+        public void initialize(){
             setGoalPitch(0);
-            super.end(interrupted);
         }
     }
 }

@@ -5,6 +5,8 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants;
 import frc.robot.subsystems.Kinesthetics;
@@ -43,6 +45,8 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                     Math.sqrt(transform.getZ()*transform.getZ() + relativex * relativex + relativey * relativey)
                 ) * 400/47 );
 
+                SmartDashboard.putNumber("pitch", Units.radiansToDegrees(desiredPitch));
+
                 return new Shooter.ShooterCommand(
                     desiredPitch,
                     Constants.Shooter.shooterFeedForward.calculate(desiredNoteVel)
@@ -75,6 +79,7 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
 
     public static boolean isInRange(Kinesthetics k) {
         Translation2d offset = getDifference(k).getTranslation().toTranslation2d();
+        SmartDashboard.putNumber("autoaim dist", offset.getY());
         return Math.abs(offset.getY()) < 5; // legal zone & limit of equations
     }
 }

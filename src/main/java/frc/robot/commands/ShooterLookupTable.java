@@ -43,9 +43,7 @@ public class ShooterLookupTable extends ParallelCommandGroup {
     }
 
     /** @return shooter pitch */
-    private static double bestPitch(Kinesthetics k) {
-        double dist = getDistance(k);
-
+    private static double bestPitch() {
         double closestMatch = 0;
         double secClosestMatch = 0;
 
@@ -54,7 +52,7 @@ public class ShooterLookupTable extends ParallelCommandGroup {
 
         // Locate closest and second closest match
         for (double key : shooterTable.keySet()) {
-            double accuracy = Math.abs(key - dist);
+            double accuracy = key;
             if(accuracy < closestAccuracy) {
                 secClosestMatch = closestMatch;
                 closestMatch = key;
