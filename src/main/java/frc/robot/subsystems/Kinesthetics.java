@@ -25,6 +25,7 @@ public class Kinesthetics extends SubsystemBase {
     private Pigeon2 gyro;
     // private DigitalInput feederBeamBreak;
     private DigitalInput shooterBeamBreak;
+    // private PowerDistribution pdh = new PowerDistribution(1, ModuleType.kRev);
 
     // Data Fields
     private DriverStation.Alliance alliance;
@@ -49,9 +50,18 @@ public class Kinesthetics extends SubsystemBase {
     
         ShuffleboardTab table = Shuffleboard.getTab("Kinesthetics");
 
-        field.getObject("Speaker").setPose(Constants.Environment.speakers.get(getAlliance()).toPose2d());
+        field.getObject("Speaker").setPose(new Pose2d(Constants.Environment.speakers.get(getAlliance()).toTranslation2d(), new Rotation2d()));
         table.addBoolean("Shooter Note?", this::shooterHasNote);
         table.add("Pose Estimation", field);
+        // table.addDoubleArray("Current", () -> {
+        //     double[] power = new double[20];
+        //     for (int i = 0; i < power.length; i++) try {
+        //         power[i] = pdh.getCurrent(i);
+        //     } catch (Exception e) {
+        //         power[i] = -1;
+        //     }
+        //     return power;
+        // });
     }
 
     @Override
@@ -100,10 +110,6 @@ public class Kinesthetics extends SubsystemBase {
 
     public void zeroHeading() {
         poseEstimator.resetPosition(getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d(getPose().getTranslation(), new Rotation2d()));
-    }
-
-    public void smartInvert() {
-        poseEstimator.resetPosition(getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d(getPose().getTranslation(), new Rotation2d().minus(getHeading())));
     }
 
     /** @return v_x meters / second (forward +), v_y meters / second (left +), ω radians / second (ccw +)*/

@@ -11,7 +11,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.Conversions;
@@ -21,7 +21,7 @@ import frc.robot.Constants.SpinState;
 public class Shooter extends SubsystemBase {  
     private CANSparkBase angleMotorController, shooterMLeftController, shooterMRightController, neckMotorController;
 
-    private final MechanismLigament2d mechanism;
+    private final MechanismLigament2d mechanism, mechanismGoal;
 
     public Shooter() {
         angleMotorController = new CANSparkFlex(Constants.Shooter.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
@@ -31,26 +31,31 @@ public class Shooter extends SubsystemBase {
         neckMotorController = new CANSparkMax(Constants.Shooter.neckMotorID, CANSparkLowLevel.MotorType.kBrushless);
         
         var canvas = new Mechanism2d(400, 400);
-        mechanism = new MechanismLigament2d("Shooter", Units.inchesToMeters(20), Units.radiansToDegrees(getPitch()));
-        canvas.getRoot("A-Frame", Constants.Swerve.trackWidth / 2, Constants.Swerve.wheelBase / 2).append(mechanism);
+        mechanism = new MechanismLigament2d("Shooter", 100, Units.radiansToDegrees(getPitch()), 10, new Color8Bit(255, 64, 64));
+        mechanismGoal = new MechanismLigament2d("Shooter Goal", 100, Units.radiansToDegrees(getPitch()), 5, new Color8Bit(10, 10, 60));
+        canvas.getRoot("A-Frame", 200, 200).append(mechanism);
+        canvas.getRoot("A-Frame Goal", 200, 200).append(mechanismGoal);
         Shuffleboard.getTab("Kinesthetics").add("Shooter", canvas);
+    }
+
+    @Override
+    public void periodic() {
+        mechanism.setAngle(Units.radiansToDegrees(getPitch()));
     }
 
     /** @return radians */
     private double getPitch() {
-        var o = Units.rotationsToRadians(angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition() - Constants.Shooter.pitchOffset);
-        mechanism.setAngle(Units.radiansToDegrees(o));
-        return o;
+        return Units.rotationsToRadians(angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition() - Constants.Shooter.pitchOffset);
     }
 
     /** @param goalPitch radians */
     private void setGoalPitch(double goalPitch) {
-        goalPitch = MathUtil.clamp(MathUtil.angleModulus(goalPitch), Constants.Shooter.minimumPitch, Constants.Shooter.maximumPitch) - Units.rotationsToRadians(Constants.Shooter.pitchOffset);
+        goalPitch = MathUtil.clamp(MathUtil.angleModulus(goalPitch), Constants.Shooter.minimumPitch, Constants.Shooter.maximumPitch);
+        mechanismGoal.setAngle(Units.radiansToDegrees(goalPitch));
         angleMotorController.set(
             Constants.Shooter.shooterPID.calculate(getPitch(), goalPitch + Units.rotationsToRadians(Constants.Shooter.pitchOffset))
             + Constants.Shooter.kF * Math.cos(getPitch())
         );
-        SmartDashboard.putNumber("goalangle", Units.radiansToDegrees(goalPitch));
         //angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch) + Constants.Shooter.pitchOffset, CANSparkBase.ControlType.kSmartMotion);
     }
 
@@ -74,7 +79,11 @@ public class Shooter extends SubsystemBase {
     }
 
     private void setNeck(SpinState ss) {
-        neckMotorController.set(ss.multiplier * Constants.Shooter.neckSpeed);
+        setNeck(ss, 1);
+    }
+
+    private void setNeck(SpinState ss, double multiplier) {
+        neckMotorController.set(ss.multiplier * multiplier * Constants.Shooter.neckSpeed);
     }
 
     public ChangeState toPitch(double pitch) {
@@ -86,7 +95,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public ChangeState stopShooter() {
-        return new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 0d), false);
+        return new ChangeState(() -> Constants.Shooter.idleCommand, false);
     }
 
     /**
@@ -136,9 +145,8 @@ public class Shooter extends SubsystemBase {
         @Override
         public void end(boolean interrupted) {
             if (interrupted && !continuous) {
-                setGoalPitch(Constants.Shooter.minimumPitch);
-                shooterMLeftController.stopMotor();
-                shooterMRightController.stopMotor();
+                setGoalPitch(Constants.Shooter.idleCommand.pitch());
+                setGoalSpin(Constants.Shooter.idleCommand.lSpin(), Constants.Shooter.idleCommand.rSpin());
             }
             super.end(interrupted);
         }
@@ -154,9 +162,15 @@ public class Shooter extends SubsystemBase {
 
         private boolean beamBreakMode; // should this command end when the beam break opens
         private SpinState desiredNeck;
+        private boolean desiredSlow;
 
         public ChangeNeck(SpinState ss) {
+            this(ss, false);
+        }
+
+        public ChangeNeck(SpinState ss, boolean slow) {
             desiredNeck = ss;
+            desiredSlow = slow;
             addRequirements(Shooter.this);
         }
 
@@ -169,7 +183,7 @@ public class Shooter extends SubsystemBase {
 
         @Override
         public void initialize() {
-            setNeck(desiredNeck);
+            setNeck(desiredNeck, desiredSlow ? 0.5 : 1);
         }
 
         @Override
@@ -179,7 +193,7 @@ public class Shooter extends SubsystemBase {
 
         @Override
         public void end(boolean interrupted) {
-            if (interrupted) setNeck(SpinState.ST);
+            if (interrupted || beamBreakMode) setNeck(SpinState.ST);
             super.end(interrupted);
         }
     }

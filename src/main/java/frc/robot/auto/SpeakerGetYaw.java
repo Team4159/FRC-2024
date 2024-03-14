@@ -2,9 +2,8 @@ package frc.robot.auto;
 
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.Kinesthetics;
@@ -17,7 +16,7 @@ public class SpeakerGetYaw extends Command {
 
     public SpeakerGetYaw(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
         double rootg = Math.sqrt(Constants.Environment.G);
-        Transform3d transform = getDifference(k);
+        var transform = getDifference(k);
 
         double roottwoh = Math.sqrt(2*transform.getZ()); // Z, up +
         boolean speakerIsOnRight = transform.getY() > 0;
@@ -39,12 +38,13 @@ public class SpeakerGetYaw extends Command {
         return OverrideYaw;
     }
 
-    private static Transform3d getDifference(Kinesthetics k) {
-        return new Pose3d(k.getPose()).minus(Constants.Environment.speakers.get(k.getAlliance()));
+    private static Translation3d getDifference(Kinesthetics k) {
+        var t2 = k.getPose().getTranslation();
+        return Constants.Environment.speakers.get(k.getAlliance()).minus(new Translation3d(t2.getX(), t2.getY(), 0));
     }
 
     public static boolean isInRange(Kinesthetics k) {
-        Translation2d offset = getDifference(k).getTranslation().toTranslation2d();
+        Translation2d offset = getDifference(k).toTranslation2d();
         return Math.abs(offset.getY()) < 5;
     }
 }
