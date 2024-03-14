@@ -11,7 +11,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -28,6 +30,9 @@ public class Kinesthetics extends SubsystemBase {
     private DriverStation.Alliance alliance;
     private SwerveDrivePoseEstimator poseEstimator;
 
+    // Shuffleboard
+    private final Field2d field = new Field2d();
+
     public Kinesthetics(Swerve s) {
         s_Swerve = s;
         s_Swerve.setKinesthetics(this);
@@ -41,11 +46,16 @@ public class Kinesthetics extends SubsystemBase {
 
         alliance = DriverStation.getAlliance().orElse(null);
         poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d());
+    
+        ShuffleboardTab table = Shuffleboard.getTab("Kinesthetics");
+
+        field.getObject("Speaker").setPose(Constants.Environment.speakers.get(getAlliance()).toPose2d());
+        table.addBoolean("Shooter Note?", this::shooterHasNote);
+        table.add("Pose Estimation", field);
     }
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("Shooter Note?", shooterHasNote());
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
         var visionPose = Vision.getBotPose();
         if (visionPose != null)
@@ -71,7 +81,9 @@ public class Kinesthetics extends SubsystemBase {
     }
 
     public Pose2d getPose() {
-        return poseEstimator.getEstimatedPosition();
+        var o = poseEstimator.getEstimatedPosition();
+        field.setRobotPose(o);
+        return o;
     }
 
     public void setPose(Pose2d pose) {

@@ -79,6 +79,7 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
 
     public static boolean isInRange(Kinesthetics k) {
         Translation2d offset = getDifference(k).getTranslation().toTranslation2d();
+        SmartDashboard.putNumber("autoaim dist", offset.getY());
         return Math.abs(offset.getY()) < 5; // legal zone & limit of equations
     }
 }

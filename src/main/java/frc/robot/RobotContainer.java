@@ -1,6 +1,8 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -22,13 +24,13 @@ public class RobotContainer {
     private static final Joystick secondary = new Joystick(1);
 
     /* Driver Buttons */
-    private static final JoystickButton zeroGyro = new JoystickButton(driver, 1);
+    private static final JoystickButton resetGyro = new JoystickButton(driver, 1);
 
-    private static final JoystickButton manualAmp = new JoystickButton(secondary, 7);
-    private static final JoystickButton manualShootPodium = new JoystickButton(secondary, 4);
-    private static final JoystickButton manualShootSubwoofer = new JoystickButton(secondary, 3);
+    private static final JoystickButton manualAmp = new JoystickButton(secondary, 3);
+    private static final JoystickButton manualShootPodium = new JoystickButton(secondary, 5);
+    private static final JoystickButton manualShootSubwoofer = new JoystickButton(secondary, 4);
     private static final JoystickButton manualIntake = new JoystickButton(secondary, 2);
-    private static final JoystickButton manualOuttake = new JoystickButton(secondary, 8);
+    private static final JoystickButton manualOuttake = new JoystickButton(secondary, 11);
     private static final JoystickButton manualFeed = new JoystickButton(secondary, 1); 
 
     private static final JoystickButton autoAmp = new JoystickButton(secondary, 12);
@@ -71,7 +73,7 @@ public class RobotContainer {
      */
     private void configureButtonBindings() {
         /* Driver Buttons */
-        zeroGyro.onTrue(new InstantCommand(kinesthetics::zeroHeading));
+        resetGyro.onTrue(new InstantCommand(kinesthetics::zeroHeading));
 
         // Automatic Command Groups
         autoSpk.and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
@@ -129,6 +131,14 @@ public class RobotContainer {
             ));
         manualOuttake
             .whileTrue(s_Intake.new ChangeState(IntakeState.SPIT));
+    }
+
+    public Command getTeleopInit() {
+        return new SequentialCommandGroup(
+            Commands.runOnce(() -> kinesthetics.setHeading(kinesthetics.getAlliance() == Alliance.Red ? 
+            Rotation2d.fromDegrees(180) : 
+            Rotation2d.fromDegrees(0) ))
+        );
     }
 
     public Command getAutonomousCommand() {

@@ -8,6 +8,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.Conversions;
 import frc.robot.Constants;
@@ -18,6 +19,8 @@ public class Vision extends SubsystemBase {
 
     private Kinesthetics kinesthetics;
     private final GenericEntry isSingleTarget;
+
+    private static final Field2d field = new Field2d(); 
 
     public Vision(Kinesthetics k) {
         this.kinesthetics = k;
@@ -33,6 +36,7 @@ public class Vision extends SubsystemBase {
             return kinesthetics.getPose().getTranslation().getDistance(v.getTranslation().toTranslation2d());
         });
         table.addBoolean("Note Seen", () -> limelightTable.getEntry("notetrans").exists());
+        table.add("Vision Field", field);
     }
 
     @Override
@@ -44,10 +48,12 @@ public class Vision extends SubsystemBase {
     public static Pose3d getBotPose() {
         if (!limelightTable.getEntry("botpose_wpiblue").exists()) return null;
         double[] ntdata = limelightTable.getEntry("botpose_wpiblue").getDoubleArray(new double[6]);
-        return new Pose3d(
+        var o = new Pose3d(
             new Translation3d(ntdata[0], ntdata[1], ntdata[2]),
             new Rotation3d(ntdata[3], ntdata[4], ntdata[5])
         );
+        field.setRobotPose(o.toPose2d());
+        return o;
     } // limelight translation is y 12.947", z 8.03", pitch 64 deg
 
     public static double getLimelightPing() {
