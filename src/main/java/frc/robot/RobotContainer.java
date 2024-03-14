@@ -26,7 +26,6 @@ import frc.robot.auto.*;
 import frc.robot.Constants.SpinState;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.Shooter.ShooterCommand;
 
 public class RobotContainer {
     /* Controllers */
@@ -78,10 +77,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("intakeStatic", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true));
         NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
-            s_Shooter.new ChangeState(() -> new ShooterCommand(
-                Constants.CommandConstants.speakerSubwooferPitch, 
-                Constants.CommandConstants.speakerSubwooferSpin), 
-                false),
+            s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, false),
             s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
             s_Shooter.stopShooter()
         ));

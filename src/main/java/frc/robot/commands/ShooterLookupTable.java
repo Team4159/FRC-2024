@@ -24,7 +24,7 @@ public class ShooterLookupTable extends ParallelCommandGroup {
     public ShooterLookupTable(Kinesthetics k, Shooter sh, Swerve sw, DoubleSupplier translationSup, DoubleSupplier strafeSup){
         super(
             sw.new ChangeYaw(translationSup, strafeSup, () -> getRequiredYaw(k).getRadians()),
-            sh.new ChangeState(() -> new ShooterCommand(bestPitch(k), 30d, 15d), true)
+            sh.new ChangeState(() -> new ShooterCommand(bestPitch(), 30d, 15d), true)
         );
     }
 
