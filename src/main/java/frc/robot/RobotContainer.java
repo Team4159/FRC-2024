@@ -77,6 +77,13 @@ public class RobotContainer {
             s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
             s_Shooter.stopShooter()
         ));
+        NamedCommands.registerCommand("speakerPodium", new SequentialCommandGroup(
+            s_Shooter.new ChangeNeck(SpinState.ST),
+            s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, 
+                false),
+            s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
+            s_Shooter.stopShooter()
+        ));
         NamedCommands.registerCommand("speakerLookupTable", new ParallelCommandGroup(
             new ShooterLookupTable(kinesthetics, s_Shooter, s_Swerve, null, null), 
             new SpeakerGetYaw(kinesthetics, s_Swerve, s_Shooter, null, null)
@@ -161,7 +168,7 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return new SequentialCommandGroup(
-            Commands.runOnce(() -> kinesthetics.setPose(Vision.getBotPose().toPose2d())),
+            //Commands.runOnce(() -> kinesthetics.setPose(Vision.getBotPose().toPose2d())),
             autoChooser.getSelected()
         ); // add auto here
     }

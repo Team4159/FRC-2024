@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.3089291736778261,
+      "y": 5.52811290895741
+    },
+    "rotation": 180.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "speakerSubwoofer"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Middle to 2 Static Intake "
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "speakerPodium"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

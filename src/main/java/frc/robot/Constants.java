@@ -160,8 +160,8 @@ public final class Constants {
 
         // used by PathPlanner during setup
         public static final HolonomicPathFollowerConfig autoPathFollowerConfig = new HolonomicPathFollowerConfig( // TODO set values
-            new PIDConstants(5, 0, 0), // translation PID constants
-            new PIDConstants(5, 0, 0), // rotation PID constants
+            new PIDConstants(1, 0, 0), // translation PID constants
+            new PIDConstants(1, 0, 0), // rotation PID constants
             Constants.Swerve.AutoConfig.kMaxSpeedMetersPerSecond, 
             0.48, // drive base radius in m
             new ReplanningConfig() // default path replanning config

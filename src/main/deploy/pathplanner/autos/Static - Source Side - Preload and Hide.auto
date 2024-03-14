@@ -2,8 +2,8 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7041386162544403,
-      "y": 4.420390379242297
+      "x": 0.7275269251393202,
+      "y": 4.361919607030098
     },
     "rotation": 118.9509952074668
   },
@@ -18,7 +18,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "speakerAutoAim"
+                  "name": "speakerSubwoofer"
                 }
               }
             ]
