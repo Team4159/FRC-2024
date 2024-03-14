@@ -2,9 +2,8 @@ package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -18,7 +17,7 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
         double rootg = Math.sqrt(Constants.Environment.G);
         addCommands(
             sh.new ChangeState(() -> {
-                Transform3d transform = getDifference(k);
+                var transform = getDifference(k);
 
                 double roottwoh = Math.sqrt(2*transform.getZ()); // Z, up +
                 boolean speakerIsOnRight = transform.getY() > 0;
@@ -28,10 +27,12 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                 double relativexv = (speakerIsOnRight ? -1 : 1) * k.getVelocity().get(1, 0);
                 double relativeyv = (speakerIsOnRight ? -1 : 1) * k.getVelocity().get(0, 0);
                 
+                SmartDashboard.putNumber("xv", relativexv);
+
                 double n = relativex * rootg / roottwoh - relativexv;
                 double m = relativey * rootg / roottwoh + relativeyv;
 
-                double desiredPitch = Math.atan((roottwoh * rootg) / n);
+                double desiredPitch = Math.atan2(roottwoh * rootg, n);
                 if (desiredPitch < 0) desiredPitch += Math.PI;
                 double desiredNoteVel = Math.sqrt(
                     2*Constants.Environment.G*transform.getZ()
@@ -45,15 +46,15 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                     Math.sqrt(transform.getZ()*transform.getZ() + relativex * relativex + relativey * relativey)
                 ) * 400/47 );
 
-                SmartDashboard.putNumber("pitch", Units.radiansToDegrees(desiredPitch));
-
+                SmartDashboard.putNumber("autopitch", Units.radiansToDegrees(desiredPitch));
+                
                 return new Shooter.ShooterCommand(
                     desiredPitch,
                     Constants.Shooter.shooterFeedForward.calculate(desiredNoteVel)
                 );
             }, false),
             sw.new ChangeYaw(translationSup, strafeSup, () -> {
-                Transform3d transform = getDifference(k);
+                var transform = getDifference(k);
 
                 double roottwoh = Math.sqrt(2*transform.getZ()); // Z, up +
                 boolean speakerIsOnRight = transform.getY() > 0;
@@ -66,20 +67,23 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                 double n = relativex * rootg / roottwoh - relativexv;
 
                 double desiredYaw = Math.atan(- ((rootg * relativey) / roottwoh + relativeyv) / n);
-                desiredYaw -= Math.PI / 2; // zero degrees is forwards, the equation assumes it's right
+                desiredYaw += Math.PI / 2; // zero degrees is forwards, the equation assumes it's right
                 if (!speakerIsOnRight) desiredYaw += Math.PI; // flip it around
+
+                SmartDashboard.putNumber("autoyaw", desiredYaw);
+
                 return desiredYaw;
             })
         );
     }
 
-    private static Transform3d getDifference(Kinesthetics k) {
-        return new Pose3d(k.getPose()).minus(Constants.Environment.speakers.get(k.getAlliance()));
+    private static Translation3d getDifference(Kinesthetics k) {
+        var t2 = k.getPose().getTranslation();
+        return Constants.Environment.speakers.get(k.getAlliance()).minus(new Translation3d(t2.getX(), t2.getY(), 0));
     }
 
     public static boolean isInRange(Kinesthetics k) {
-        Translation2d offset = getDifference(k).getTranslation().toTranslation2d();
-        SmartDashboard.putNumber("autoaim dist", offset.getY());
+        Translation2d offset = getDifference(k).toTranslation2d();
         return Math.abs(offset.getY()) < 5; // legal zone & limit of equations
     }
 }

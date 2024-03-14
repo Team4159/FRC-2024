@@ -29,7 +29,7 @@ public class Vision extends SubsystemBase {
 
         isSingleTarget = table
             .add("Single-Target", false)
-            .withWidget(BuiltInWidgets.kToggleSwitch).getEntry("boolean");
+            .withWidget(BuiltInWidgets.kToggleButton).getEntry("boolean");
         table.addDouble("LL Error", () -> {
             var v = Vision.getBotPose();
             if (v == null) return -1d;
@@ -48,9 +48,10 @@ public class Vision extends SubsystemBase {
     public static Pose3d getBotPose() {
         if (!limelightTable.getEntry("botpose_wpiblue").exists()) return null;
         double[] ntdata = limelightTable.getEntry("botpose_wpiblue").getDoubleArray(new double[6]);
+        if (ntdata[0] == ntdata[1] && ntdata[1] == ntdata[2] && ntdata[2] == 0) return null;
         var o = new Pose3d(
             new Translation3d(ntdata[0], ntdata[1], ntdata[2]),
-            new Rotation3d(ntdata[3], ntdata[4], ntdata[5])
+            new Rotation3d(0, 0, ntdata[5])
         );
         field.setRobotPose(o.toPose2d());
         return o;

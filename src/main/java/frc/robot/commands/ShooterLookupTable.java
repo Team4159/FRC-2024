@@ -5,9 +5,8 @@ import java.util.Map;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants;
@@ -28,18 +27,19 @@ public class ShooterLookupTable extends ParallelCommandGroup {
         );
     }
 
-    private static Transform3d getDifference(Kinesthetics k) {
-        return new Pose3d(k.getPose()).minus(Constants.Environment.speakers.get(k.getAlliance()));
+    private static Translation3d getDifference(Kinesthetics k) {
+        var t2 = k.getPose().getTranslation();
+        return Constants.Environment.speakers.get(k.getAlliance()).minus(new Translation3d(t2.getX(), t2.getY(), 0));
     }
 
     /** @return meters */
     private static double getDistance(Kinesthetics k){
-        return getDifference(k).getTranslation().getNorm();
+        return getDifference(k).getNorm();
     }
 
     /** @return required yaw in radians */
     private static Rotation2d getRequiredYaw(Kinesthetics k){
-        return getDifference(k).getTranslation().toTranslation2d().getAngle();
+        return getDifference(k).toTranslation2d().getAngle();
     }
 
     /** @return shooter pitch */

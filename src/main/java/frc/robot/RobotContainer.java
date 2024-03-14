@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.Intake.IntakeState;
@@ -30,12 +29,13 @@ public class RobotContainer {
     private static final JoystickButton manualShootPodium = new JoystickButton(secondary, 5);
     private static final JoystickButton manualShootSubwoofer = new JoystickButton(secondary, 4);
     private static final JoystickButton manualIntake = new JoystickButton(secondary, 2);
-    private static final JoystickButton manualOuttake = new JoystickButton(secondary, 11);
+    private static final JoystickButton manualRegurgitate = new JoystickButton(secondary, 11);
+    private static final JoystickButton manualOuttake = new JoystickButton(secondary, 10);
     private static final JoystickButton manualFeed = new JoystickButton(secondary, 1); 
 
-    private static final JoystickButton autoAmp = new JoystickButton(secondary, 12);
-    private static final JoystickButton autoSpk = new JoystickButton(secondary, 13);
-    private static final JoystickButton autoIntake = new JoystickButton(secondary, 14);
+    private static final JoystickButton autoAmp = new JoystickButton(driver, 4);
+    private static final JoystickButton autoSpk = new JoystickButton(driver, 3);
+    private static final JoystickButton autoIntake = new JoystickButton(driver, 14);
     
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
@@ -77,11 +77,10 @@ public class RobotContainer {
 
         // Automatic Command Groups
         autoSpk.and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
+            .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
             .whileTrue(new SequentialCommandGroup(
-                new PrintCommand("auto speaker"),
-                s_Shooter.new ChangeNeck(SpinState.ST),
                 new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()),
-                s_Shooter.new ChangeNeck(SpinState.FW)
+                s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW)
             )).onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
         autoAmp.and(kinesthetics::shooterHasNote).and(() -> AmpAuto.isInRange(kinesthetics))
             .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
@@ -129,15 +128,31 @@ public class RobotContainer {
                 s_Intake.new ChangeState(IntakeState.STOW),
                 s_Shooter.new ChangeNeck(SpinState.ST)
             ));
+        manualRegurgitate
+            .whileTrue(new ParallelCommandGroup(
+                s_Shooter.new ChangeNeck(SpinState.BW),
+                s_Intake.new ChangeState(IntakeState.SPIT)
+            ))
+            .onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
         manualOuttake
-            .whileTrue(s_Intake.new ChangeState(IntakeState.SPIT));
+            .whileTrue(new ParallelCommandGroup(
+                s_Shooter.new ChangeNeck(SpinState.BW),
+                s_Intake.new ChangeState(IntakeState.SPIT_DOWN)
+            ))
+            .onFalse(new ParallelCommandGroup(
+                s_Shooter.new ChangeNeck(SpinState.ST),
+                s_Intake.new ChangeState(IntakeState.STOW)
+            ));
     }
 
     public Command getTeleopInit() {
-        return new SequentialCommandGroup(
-            Commands.runOnce(() -> kinesthetics.setHeading(kinesthetics.getAlliance() == Alliance.Red ? 
-            Rotation2d.fromDegrees(180) : 
-            Rotation2d.fromDegrees(0) ))
+        return new ParallelCommandGroup(
+            s_Shooter.new ChangeState(() -> Constants.Shooter.idleCommand, false),
+            Commands.runOnce(() -> kinesthetics.setHeading(
+                kinesthetics.getAlliance() == Alliance.Red ? 
+                    Rotation2d.fromDegrees(180) : 
+                    Rotation2d.fromDegrees(0)
+            ))
         );
     }
 

@@ -6,8 +6,9 @@ import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.lib.math.RobotState;
 import frc.robot.Constants;
@@ -34,13 +35,14 @@ public class IntakeAuto extends SequentialCommandGroup {
         }
         addCommands(
             sh.toPitch(Constants.Shooter.minimumPitch),
-            sh.new ChangeNeck(SpinState.FW),
-            i.new ChangeState(IntakeState.DOWN),
-            new WaitUntilCommand(k::shooterHasNote).withTimeout(1.5),
-            new ParallelCommandGroup( // ending commands
-                i.new ChangeState(IntakeState.STOW),
-                sh.new ChangeNeck(SpinState.ST)
-            )
+            new ParallelDeadlineGroup(
+                new WaitUntilCommand(k::shooterHasNote),
+                sh.new ChangeNeck(SpinState.FW),
+                i.new ChangeState(IntakeState.DOWN)
+            ),
+            sh.new ChangeNeck(SpinState.BW, true),
+            new WaitCommand(0.02),
+            sh.new ChangeNeck(SpinState.ST)
         );
     }
 
