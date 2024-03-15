@@ -250,6 +250,9 @@ public final class Constants {
         public static final ShooterCommand ampShooterCommand = new ShooterCommand(
             Units.degreesToRadians(55), 160d);
         public static final double ampAutoDistanceToStartSpinning = 1; // meters
+
+        public static final ShooterCommand sourceInShooterCommand = new ShooterCommand(
+            Units.degreesToRadians(35), -150d);
     }
 
     public static final class Environment {
