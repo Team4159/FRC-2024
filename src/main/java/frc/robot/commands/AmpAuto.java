@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
@@ -18,9 +19,10 @@ public class AmpAuto extends ParallelCommandGroup {
     public AmpAuto(Kinesthetics k, Swerve sw, Shooter sh, Deflector d) {
         var desiredPose = Constants.Environment.amps.get(k.getAlliance());
         // offset the desired pose so the front of the robot touches the amp, not the center (which would be bad)
-        desiredPose.plus(new Transform2d(0, -Constants.Swerve.trackWidth/2 - Constants.CommandConstants.bumperWidth, new Rotation2d()));
+        desiredPose.plus(new Transform2d(-Constants.Swerve.trackWidth/2 - Constants.CommandConstants.bumperWidth, 0, new Rotation2d()));
         addCommands(
             new SwerveAuto(k, sw, new RobotState(desiredPose)),
+            new PrintCommand("swerve auto command odne"),
             new SequentialCommandGroup(
                 new ParallelCommandGroup(
                     sh.toPitch(Constants.CommandConstants.ampShooterCommand.pitch()),
