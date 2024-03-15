@@ -77,7 +77,7 @@ public final class Constants {
         public static final double angleKD = chosenModule.angleKD;
 
         /* Drive Motor PID Values */
-        public static final double driveKP = 0.07; //TODO: This must be tuned to specific robot
+        public static final double driveKP = 0.04; //TODO: This must be tuned to specific robot
         public static final double driveKI = 0.0;
         public static final double driveKD = 0.0001;
         public static final double driveKF = 0.0;
@@ -91,7 +91,7 @@ public final class Constants {
         /** Meters per Second */
         public static final double maxSpeed = 4.5; //TODO: This must be tuned to specific robot
         /** Radians per Second */
-        public static final double maxAngularVelocity = 3.0; //TODO: This must be tuned to specific robot
+        public static final double maxAngularVelocity = 3.0;
 
         public static final class AutoConfig { //TODO: must be tuned to specific robot
             public static final double kMaxSpeedMetersPerSecond = 3;
@@ -177,17 +177,18 @@ public final class Constants {
         public static final double pitchTolerance = Math.PI/32; // radians
         public static final double spinTolerance = Math.PI/16; // radians
 
-        public static final double intakeSpin = 0.6; // -1 to 1
-        public static final double feederSpin = 0.35; // -1 to 1
+        public static final double intakeSpin = 0.85; // -1 to 1
+        public static final double feederSpin = 0.45; // -1 to 1
 
         public static final double intakeRange = 0.2; // meters
         public static final double intakeAngleRange = Units.degreesToRadians(64);
 
         public static enum IntakeState {
             STOW(Units.rotationsToRadians(0.012), SpinState.ST), // starting pos & when moving
+            GARGLE(Units.rotationsToRadians(0.012), SpinState.FW), // just move the motors
             DOWN(Units.rotationsToRadians(0.465), SpinState.FW), // intaking
-            SPIT(Units.rotationsToRadians(0.012), SpinState.BW), // outtaking
-            SPIT_DOWN(Units.rotationsToRadians(0.465), SpinState.BW);
+            RETCH(Units.rotationsToRadians(0.012), SpinState.BW), // just move the motors
+            SPIT(Units.rotationsToRadians(0.465), SpinState.BW); // outtaking
 
             public final double pitch;
             public final SpinState spin;
@@ -218,7 +219,7 @@ public final class Constants {
         public static final double minimumPitch = Units.degreesToRadians(15);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
         public static final double neckSpeed = 0.25; // -1 to 1
-        public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 175d);
+        public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 150d);
         
         /** @param shooterFeedForward kS radians / second, kV radians / second per meter / second */
         public static final SimpleMotorFeedforward shooterFeedForward = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
@@ -231,7 +232,7 @@ public final class Constants {
     public static final class Deflector {
         public static final int motorID = 9;
 
-        public static final double maximumPitch = Units.rotationsToRadians(2.65);
+        public static final double maximumPitch = Units.rotationsToRadians(2.7);
     }
 
     public static final class CommandConstants {
@@ -247,7 +248,7 @@ public final class Constants {
 
         public static final double ampAutoDistanceMax = 3.0; // meters
         public static final ShooterCommand ampShooterCommand = new ShooterCommand(
-            Units.degreesToRadians(55), 175d);
+            Units.degreesToRadians(55), 160d);
         public static final double ampAutoDistanceToStartSpinning = 1; // meters
     }
 
@@ -259,8 +260,8 @@ public final class Constants {
         );
         /** @param amps Pose2d is in meters */
         public static final Map<Alliance, Pose2d> amps = Map.of(
-            Alliance.Red, new Pose2d(14.7008, 8.2042, Rotation2d.fromDegrees(0)),
-            Alliance.Blue, new Pose2d(1.842, 8.2042, Rotation2d.fromDegrees(0))
+            Alliance.Red, new Pose2d(8.2042, 14.7008, Rotation2d.fromDegrees(0)),
+            Alliance.Blue, new Pose2d(8.2042, 1.842, Rotation2d.fromDegrees(0))
         );
         /** @param G meters / second squared
          * Acceleration due to gravity

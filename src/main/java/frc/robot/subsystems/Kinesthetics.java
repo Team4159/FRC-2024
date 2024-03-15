@@ -73,6 +73,11 @@ public class Kinesthetics extends SubsystemBase {
         super.periodic();
     }
 
+    public void forceVision() {
+        var visionPose = Vision.getBotPose();
+        if (visionPose != null) setPose(visionPose.toPose2d());
+    }
+
     private Rotation2d getGyroYaw() {
         return Rotation2d.fromDegrees(gyro.getYaw().getValue());
     }
