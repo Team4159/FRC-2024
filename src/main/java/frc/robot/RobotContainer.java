@@ -76,7 +76,7 @@ public class RobotContainer {
         );
 
         // register Named Commands for PathPlanner, must be done before building autos
-        NamedCommands.registerCommand("intakeStatic", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true));
+        NamedCommands.registerCommand("intakeStatic", new IntakeStatic(kinesthetics, s_Shooter, s_Intake));
         NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
             s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, false),
