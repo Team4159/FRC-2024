@@ -13,6 +13,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -80,14 +81,18 @@ public class Swerve extends SubsystemBase {
         for(SwerveModule mod : mSwerveMods) mod.resetToAbsolute();
     }
 
-    // @Override
-    // public void periodic(){
-    //     for(SwerveModule mod : mSwerveMods){
-    //         SmartDashboard.putNumber("Mod " + mod.moduleNumber + " CANcoder", mod.getCANcoder().getDegrees());
-    //         SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
-    //         SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
-    //     }
-    // }
+    @Override
+    public void periodic(){
+        double[] out = new double[mSwerveMods.length * 2];
+        for(SwerveModule mod : mSwerveMods){
+            out[mod.moduleNumber * 2 - 2] = mod.getDriveCurrent();
+            out[mod.moduleNumber * 2 - 1] = mod.getAngleCurrent();
+            // SmartDashboard.putNumber("Mod " + mod.moduleNumber + " CANcoder", mod.getCANcoder().getDegrees());
+            // SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
+            // SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
+        }
+        SmartDashboard.putNumberArray("Swerve Current", out);
+    }
 
     public class ChangeYaw extends Command {
         private DoubleSupplier passthroughTranslation, passthroughStrafe, desiredYaw;
