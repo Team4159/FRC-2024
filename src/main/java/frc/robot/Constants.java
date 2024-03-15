@@ -244,7 +244,7 @@ public final class Constants {
     }
 
     public static final class Environment {
-        /** @param speakers Pose3d is in meters */
+        /** @param speakers in meters */
         public static final Map<Alliance, Translation3d> speakers = Map.of(
             Alliance.Red, new Translation3d(16.579, 5.548, 1.891),
             Alliance.Blue, new Translation3d(-0.0381, 5.548, 1.891)
