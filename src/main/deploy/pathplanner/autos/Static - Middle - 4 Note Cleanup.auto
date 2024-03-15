@@ -28,6 +28,30 @@
           "data": {
             "name": "speakerPodium"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2 to 1 Static Intake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "speakerPodium"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1 to 3 Static Intake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "speakerPodium"
+          }
         }
       ]
     }
