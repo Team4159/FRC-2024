@@ -24,7 +24,7 @@ public class RobotContainer {
 
     /* Driver Buttons */
     private static final JoystickButton resetGyro = new JoystickButton(driver, 1);
-    private static final JoystickButton forceVision = new JoystickButton(driver, 16);
+    private static final JoystickButton forceVision = new JoystickButton(driver, 10); // nottom left 
 
     private static final JoystickButton manualAmp = new JoystickButton(secondary, 3);
     private static final JoystickButton manualShootPodium = new JoystickButton(secondary, 5);
