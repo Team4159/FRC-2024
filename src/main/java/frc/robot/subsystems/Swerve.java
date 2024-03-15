@@ -85,11 +85,11 @@ public class Swerve extends SubsystemBase {
     public void periodic(){
         double[] out = new double[mSwerveMods.length * 2];
         for(SwerveModule mod : mSwerveMods){
-            out[mod.moduleNumber * 2 - 2] = mod.getDriveCurrent();
-            out[mod.moduleNumber * 2 - 1] = mod.getAngleCurrent();
-            // SmartDashboard.putNumber("Mod " + mod.moduleNumber + " CANcoder", mod.getCANcoder().getDegrees());
-            // SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
-            // SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
+            out[mod.moduleNumber * 2] = mod.getDriveCurrent();
+            out[mod.moduleNumber * 2 + 1] = mod.getAngleCurrent();
+            SmartDashboard.putNumber("Mod " + mod.moduleNumber + " CANcoder", mod.getCANcoder().getDegrees());
+            SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Angle", mod.getPosition().angle.getDegrees());
+            SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
         }
         SmartDashboard.putNumberArray("Swerve Current", out);
     }

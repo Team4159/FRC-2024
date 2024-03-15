@@ -11,6 +11,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -40,7 +41,9 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
-        mechanism.setAngle(Units.radiansToDegrees(getPitch()));
+        var d = Units.radiansToDegrees(getPitch());
+        mechanism.setAngle(d);
+        SmartDashboard.putNumber("d", d);
     }
 
     /** @return radians */

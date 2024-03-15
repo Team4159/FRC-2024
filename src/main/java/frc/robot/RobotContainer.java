@@ -128,10 +128,10 @@ public class RobotContainer {
             ));
         manualShootSourceIn
             .whileTrue(new SequentialCommandGroup(
-                s_Shooter.new ChangeNeck(SpinState.BW),
+                s_Shooter.new ChangeNeck(SpinState.BW, true),
                 s_Shooter.new ChangeState(() -> Constants.CommandConstants.sourceInShooterCommand, false),
                 new WaitUntilCommand(kinesthetics::shooterHasNote),
-                new WaitCommand(1),
+                new WaitCommand(0.05),
                 s_Shooter.new ChangeNeck(SpinState.ST)
             ));
         manualFeed
