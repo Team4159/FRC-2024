@@ -37,7 +37,7 @@ public class RobotContainer {
 
     private static final JoystickButton autoAmp = new JoystickButton(driver, 4);
     private static final JoystickButton autoSpk = new JoystickButton(driver, 3);
-    private static final JoystickButton autoIntake = new JoystickButton(driver, 14);
+    // private static final JoystickButton autoIntake = new JoystickButton(driver, 14);
     
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
@@ -85,19 +85,19 @@ public class RobotContainer {
                 new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()),
                 s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW)
             )).onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
-        autoAmp.and(kinesthetics::shooterHasNote)//.and(() -> AmpAuto.isInRange(kinesthetics))
+        autoAmp.and(kinesthetics::shooterHasNote).and(() -> AmpAuto.isInRange(kinesthetics))
             .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
             .whileTrue(new SequentialCommandGroup(
                 new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector),
                 s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW)
             )).onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
-        autoIntake.and(() -> !kinesthetics.shooterHasNote()) // && !kinesthetics.feederHasNote()
-            .and(() -> IntakeAuto.canRun(kinesthetics))
-            .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake))
-            .onFalse(new ParallelCommandGroup(
-                s_Shooter.new ChangeNeck(SpinState.ST),
-                s_Intake.new ChangeState(IntakeState.STOW)
-            ));
+        // autoIntake.and(() -> !kinesthetics.shooterHasNote()) // && !kinesthetics.feederHasNote()
+        //     .and(() -> IntakeAuto.canRun(kinesthetics))
+        //     .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake))
+        //     .onFalse(new ParallelCommandGroup(
+        //         s_Shooter.new ChangeNeck(SpinState.ST),
+        //         s_Intake.new ChangeState(IntakeState.STOW)
+        //     ));
 
         // Manual Command Groups
         manualAmp

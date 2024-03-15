@@ -6,6 +6,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.*;
@@ -209,9 +210,10 @@ public final class Constants {
         public static final double neckSpeed = 0.25; // -1 to 1
         public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 150d);
         
-        /** @param shooterFeedForward kS radians / second, kV radians / second per meter / second */
-        public static final SimpleMotorFeedforward shooterFeedForward = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
-
+        public static final ArmFeedforward shooterAngleFF = new ArmFeedforward(0, 1, 0, 0); // TODO tune
+        /** @param shooterSpinFF kS radians / second, kV radians / second per meter / second */
+        public static final SimpleMotorFeedforward shooterSpinFF = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
+        
         // TODO: This must be tuned to specific robot
         public static final PIDController shooterPID = new PIDController(0.7, 0, 0.03);
         public static final double kF = 0.0;
@@ -237,7 +239,7 @@ public final class Constants {
         public static final double ampAutoDistanceMax = 3.0; // meters
         public static final ShooterCommand ampShooterCommand = new ShooterCommand(
             Units.degreesToRadians(55), 160d);
-        public static final double ampAutoDistanceToStartSpinning = 1; // meters
+        public static final double ampAutoDistanceToStartSpinning = 0.5; // meters
     }
 
     public static final class Environment {

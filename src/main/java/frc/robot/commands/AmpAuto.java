@@ -4,7 +4,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
@@ -22,7 +21,6 @@ public class AmpAuto extends ParallelCommandGroup {
         desiredPose.plus(new Transform2d(-Constants.Swerve.trackWidth/2 - Constants.CommandConstants.bumperWidth, 0, new Rotation2d()));
         addCommands(
             new SwerveAuto(k, sw, new RobotState(desiredPose)),
-            new PrintCommand("swerve auto command odne"),
             new SequentialCommandGroup(
                 new ParallelCommandGroup(
                     sh.toPitch(Constants.CommandConstants.ampShooterCommand.pitch()),
@@ -45,9 +43,8 @@ public class AmpAuto extends ParallelCommandGroup {
     }
 
     public static boolean isInRange(Kinesthetics k) { // are we close enough
-        return 
-            Constants.Environment.amps.get(k.getAlliance()).getTranslation()
-            .getDistance(k.getPose().getTranslation())
+        return Constants.Environment.amps.get(k.getAlliance()).getTranslation()
+            .minus(k.getPose().getTranslation()).getNorm()
             < Constants.CommandConstants.ampAutoDistanceMax;
     }
 }

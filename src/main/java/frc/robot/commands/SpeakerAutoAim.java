@@ -50,7 +50,7 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                 
                 return new Shooter.ShooterCommand(
                     desiredPitch,
-                    Constants.Shooter.shooterFeedForward.calculate(desiredNoteVel)
+                    Constants.Shooter.shooterSpinFF.calculate(desiredNoteVel)
                 );
             }, false),
             sw.new ChangeYaw(translationSup, strafeSup, () -> {
