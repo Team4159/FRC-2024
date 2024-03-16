@@ -120,11 +120,17 @@ public class Shooter extends SubsystemBase {
 
     public class ChangeState extends Command {
         private boolean continuous = false;
+        private boolean instant = false;
         private Supplier<ShooterCommand> desiredState;
 
         public ChangeState(Supplier<ShooterCommand> shooterStateSupplier, boolean continuous) {
+            this(shooterStateSupplier, continuous, false);
+        }
+
+        public ChangeState(Supplier<ShooterCommand> shooterStateSupplier, boolean continuous, boolean instant) {
             desiredState = shooterStateSupplier;
             this.continuous = continuous;
+            this.instant = instant; // FIXME STUPID
             addRequirements(Shooter.this);
         }
         
@@ -137,17 +143,13 @@ public class Shooter extends SubsystemBase {
     
         @Override
         public boolean isFinished() {
+            if (instant) return true;
             if (continuous) return false;
             var state = desiredState.get();
-            boolean goodpitch = (state.pitch() == null || MathUtil.isNear(state.pitch(), getPitch(), Constants.Shooter.pitchTolerance));
-            boolean goodspin = (!state.hasSpin() || (
+            return (state.pitch() == null || MathUtil.isNear(state.pitch(), getPitch(), Constants.Shooter.pitchTolerance)) && (!state.hasSpin() || (
                     MathUtil.isNear(state.lSpin(), getLSpin(), Constants.Shooter.spinTolerance) &&
                     MathUtil.isNear(state.rSpin(), getRSpin(), Constants.Shooter.spinTolerance)
                 ));
-            System.out.println(goodpitch+" && "+goodspin);
-            return goodpitch
-                 &&
-                goodspin;
         }
     
         @Override

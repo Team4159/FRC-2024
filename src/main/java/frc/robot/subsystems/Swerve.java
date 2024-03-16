@@ -36,20 +36,20 @@ public class Swerve extends SubsystemBase {
     public void setKinesthetics(Kinesthetics k) {
         kinesthetics = k;
         // PathPlanner setup
-        AutoBuilder.configureHolonomic(
-            this.kinesthetics::getPose, // a supplier for the robot pose
-            this.kinesthetics::setPose, // a consumer for the robot pose, accepts Pose2d
-            () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(this.getModuleStates()), // a supplier for robot relative ChassisSpeeds
-            (ChassisSpeeds chassisSpeeds) -> { // the drive method, accepts robot relative ChassisSpeeds
-                SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(chassisSpeeds);
-                SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
-                for(SwerveModule mod : mSwerveMods) mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false);
-            }, 
-            Constants.Swerve.autoPathFollowerConfig, // config, includes PID values
-            () -> this.kinesthetics.getAlliance().equals(DriverStation.Alliance.Red), // determines if autos should be flipped (i.e. if on Red Alliance)
-            this // reference to this subsystem to set requirements
-        );
-        PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
+        // AutoBuilder.configureHolonomic(
+        //     this.kinesthetics::getPose, // a supplier for the robot pose
+        //     this.kinesthetics::setPose, // a consumer for the robot pose, accepts Pose2d
+        //     () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(this.getModuleStates()), // a supplier for robot relative ChassisSpeeds
+        //     (ChassisSpeeds chassisSpeeds) -> { // the drive method, accepts robot relative ChassisSpeeds
+        //         SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(chassisSpeeds);
+        //         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
+        //         for(SwerveModule mod : mSwerveMods) mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false);
+        //     }, 
+        //     Constants.AutoConfig.autoPathFollowerConfig, // config, includes PID values
+        //     () -> this.kinesthetics.getAlliance().equals(DriverStation.Alliance.Red), // determines if autos should be flipped (i.e. if on Red Alliance)
+        //     this // reference to this subsystem to set requirements
+        // );
+        // PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
         
         Timer.delay(0.1);
         resetModulesToAbsolute();

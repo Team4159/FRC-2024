@@ -57,7 +57,7 @@ public class RobotContainer {
     @SuppressWarnings("unused")
     private final Vision s_Vision = new Vision(kinesthetics);
 
-    private final SendableChooser<Command> autoChooser;
+    // private final SendableChooser<Command> autoChooser;
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
@@ -77,32 +77,32 @@ public class RobotContainer {
         configureButtonBindings();
 
         // configure SmartDashboard
-        autoChooser = AutoBuilder.buildAutoChooser(); // can accept a default auto by passing in its name as a string
-        SmartDashboard.putData("Auto Chooser", autoChooser);
+        // autoChooser = AutoBuilder.buildAutoChooser(); // can accept a default auto by passing in its name as a string
+        // SmartDashboard.putData("Auto Chooser", autoChooser);
 
         DriverStation.silenceJoystickConnectionWarning(true);
     }
 
     private void configureAutoCommands() {
         // register Named Commands for PathPlanner, must be done before building autos
-        NamedCommands.registerCommand("intakeStatic", new IntakeStatic(kinesthetics, s_Shooter, s_Intake));
-        NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
-            s_Shooter.new ChangeNeck(SpinState.ST),
-            s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, false),
-            s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
-            s_Shooter.stopShooter()
-        ));
-        NamedCommands.registerCommand("speakerPodium", new SequentialCommandGroup(
-            s_Shooter.new ChangeNeck(SpinState.ST),
-            s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, 
-                false),
-            s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
-            s_Shooter.stopShooter()
-        ));
-        NamedCommands.registerCommand("speakerLookupTable", new ShooterLookupTable(kinesthetics, s_Shooter, s_Swerve, () -> 0, () -> 0));
-        NamedCommands.registerCommand("ampAuto", new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector));
-        NamedCommands.registerCommand("speakerAutoAim", new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0));
-        NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake));
+        // NamedCommands.registerCommand("intakeStatic", new IntakeStatic(kinesthetics, s_Shooter, s_Intake));
+        // NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
+        //     s_Shooter.new ChangeNeck(SpinState.ST),
+        //     s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, false, true).alongWith(new WaitCommand(2)),
+        //     s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
+        //     s_Shooter.stopShooter()
+        // ));
+        // NamedCommands.registerCommand("speakerPodium", new SequentialCommandGroup(
+        //     s_Shooter.new ChangeNeck(SpinState.ST),
+        //     s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, 
+        //         false, true).alongWith(new WaitCommand(2)),
+        //     s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
+        //     s_Shooter.stopShooter()
+        // ));
+        // NamedCommands.registerCommand("speakerLookupTable", new ShooterLookupTable(kinesthetics, s_Shooter, s_Swerve, () -> 0, () -> 0));
+        // NamedCommands.registerCommand("ampAuto", new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector));
+        // NamedCommands.registerCommand("speakerAutoAim", new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0));
+        // NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake));
     }
 
     /**
@@ -213,6 +213,10 @@ public class RobotContainer {
     }  
 
     public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
+        return new SequentialCommandGroup(
+            s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, false, true).alongWith(new WaitCommand(2)),
+            s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
+            s_Shooter.stopShooter()
+        );
     }
 }

@@ -57,12 +57,12 @@ public final class Constants {
         public static final SensorDirectionValue cancoderInvert = chosenModule.cancoderInvert;
 
         /* Swerve Current Limiting */
-        public static final int angleCurrentLimit = 20; //25
+        public static final int angleCurrentLimit = 20;
         public static final int angleCurrentThreshold = 40;
         public static final double angleCurrentThresholdTime = 0.1;
         public static final boolean angleEnableCurrentLimit = true;
 
-        public static final int driveCurrentLimit = 25; //35
+        public static final int driveCurrentLimit = 25;
         public static final int driveCurrentThreshold = 40;
         public static final double driveCurrentThresholdTime = 0.1;
         public static final boolean driveEnableCurrentLimit = true;
@@ -78,7 +78,7 @@ public final class Constants {
         public static final double angleKD = chosenModule.angleKD;
 
         /* Drive Motor PID Values */
-        public static final double driveKP = 0.04; //TODO: This must be tuned to specific robot
+        public static final double driveKP = 0.04;
         public static final double driveKI = 0.0;
         public static final double driveKD = 0.0001;
         public static final double driveKF = 0.0;
@@ -90,7 +90,7 @@ public final class Constants {
 
         /* Swerve Profiling Values */
         /** Meters per Second */
-        public static final double maxSpeed = 4.5; //TODO: This must be tuned to specific robot
+        public static final double maxSpeed = 4.5;
         /** Radians per Second */
         public static final double maxAngularVelocity = 3.0;
 
@@ -100,14 +100,23 @@ public final class Constants {
             public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
             public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
         
-            public static final double kPXController = 1;
-            public static final double kPYController = 1;
+            public static final double kPXController = 10;
+            public static final double kPYController = 10;
             public static final double kPThetaController = 1;
         
             /* Constraint for the motion profilied robot angle controller */
             public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
                 new TrapezoidProfile.Constraints(
                     kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+
+            // used by PathPlanner during setup
+            public static final HolonomicPathFollowerConfig autoPathFollowerConfig = new HolonomicPathFollowerConfig( // TODO set values
+                new PIDConstants(10, 0, 0), // translation PID constants
+                new PIDConstants(10, 0, 0), // rotation PID constants
+                Constants.Swerve.AutoConfig.kMaxSpeedMetersPerSecond, 
+                0.48, // drive base radius in m
+                new ReplanningConfig() // default path replanning config
+            );
         }
 
         /* Neutral Modes */
@@ -158,15 +167,6 @@ public final class Constants {
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
-
-        // used by PathPlanner during setup
-        public static final HolonomicPathFollowerConfig autoPathFollowerConfig = new HolonomicPathFollowerConfig( // TODO set values
-            new PIDConstants(10, 0, 0), // translation PID constants
-            new PIDConstants(10, 0, 0), // rotation PID constants
-            Constants.Swerve.AutoConfig.kMaxSpeedMetersPerSecond, 
-            0.48, // drive base radius in m
-            new ReplanningConfig() // default path replanning config
-        );
     }
 
     public static final class Intake {
@@ -175,7 +175,7 @@ public final class Constants {
         public static final int feederMotorID = 3;
         // public static final int beamBreakID = 1; // PWM
 
-        public static final double pitchTolerance = Math.PI/32; // radians
+        public static final double pitchTolerance = Math.PI/64; // radians
         public static final double spinTolerance = Math.PI/16; // radians
 
         public static final double intakeSpin = 0.7; // -1 to 1
@@ -187,9 +187,9 @@ public final class Constants {
         public static enum IntakeState {
             STOW(Units.degreesToRadians(10.4), SpinState.ST), // starting pos & when moving
             GARGLE(Units.degreesToRadians(10.4), SpinState.FW), // just move the motors
-            DOWN(Units.degreesToRadians(175), SpinState.FW), // intaking
+            DOWN(Units.rotationsToRadians(0.49), SpinState.FW), // intaking
             RETCH(Units.degreesToRadians(10.4), SpinState.BW), // just move the motors
-            SPIT(Units.degreesToRadians(175), SpinState.BW); // outtaking
+            SPIT(Units.rotationsToRadians(0.49), SpinState.BW); // outtaking
 
             public final double pitch;
             public final SpinState spin;
@@ -246,7 +246,7 @@ public final class Constants {
         public static final ShooterCommand speakerPodiumShooterCommand = new ShooterCommand(
             0.7, 500d, 275d);
         public static final ShooterCommand speakerSubwooferShooterCommand = new ShooterCommand(
-            1.1d, 450d, 250d);
+            1.1, 450d, 250d);
 
         public static final double ampAutoDistanceMax = 3.0; // meters
         public static final ShooterCommand ampShooterCommand = new ShooterCommand(
