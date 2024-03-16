@@ -69,7 +69,7 @@ public final class Constants {
 
         /* These values are used by the drive falcon to ramp in open loop and closed loop driving.
          * We found a small open loop ramp (0.25) helps with tread wear, tipping, etc */
-        public static final double openLoopRamp = 0.25;
+        public static final double openLoopRamp = 0.5;
         public static final double closedLoopRamp = 0.0;
 
         /* Angle Motor PID Values */
@@ -80,13 +80,13 @@ public final class Constants {
         /* Drive Motor PID Values */
         public static final double driveKP = 0.04; //TODO: This must be tuned to specific robot
         public static final double driveKI = 0.0;
-        public static final double driveKD = 0.0001;
+        public static final double driveKD = 0.0;
         public static final double driveKF = 0.0;
 
         /* Drive Motor Characterization Values From SYSID */
-        public static final double driveKS = 0.32/12;
-        public static final double driveKV = 1.51/12;
-        public static final double driveKA = 0.27/12;
+        public static final double driveKS = 0.32;
+        public static final double driveKV = 1.51;
+        public static final double driveKA = 0.27;
 
         /* Swerve Profiling Values */
         /** Meters per Second */
