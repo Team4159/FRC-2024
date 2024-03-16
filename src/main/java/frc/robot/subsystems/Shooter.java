@@ -11,7 +11,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -41,9 +40,12 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
-        var d = Units.radiansToDegrees(getPitch());
-        mechanism.setAngle(d);
-        SmartDashboard.putNumber("d", d);
+        mechanism.setAngle(Units.radiansToDegrees(getPitch()));
+        angleMotorController.set(
+            // Constants.Shooter.shooterAngleFF.calculate()
+            Constants.Shooter.shooterPID.calculate(getPitch(), desiredPitch)
+            + Constants.Shooter.kF * Math.cos(getPitch())
+        );
     }
 
     /** @return radians */
@@ -51,15 +53,13 @@ public class Shooter extends SubsystemBase {
         return Units.rotationsToRadians(angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition() - Constants.Shooter.pitchOffset);
     }
 
+    private double desiredPitch = Constants.Shooter.minimumPitch;
+
     /** @param goalPitch radians */
     private void setGoalPitch(double goalPitch) {
         goalPitch = MathUtil.clamp(MathUtil.angleModulus(goalPitch), Constants.Shooter.minimumPitch, Constants.Shooter.maximumPitch);
         mechanismGoal.setAngle(Units.radiansToDegrees(goalPitch));
-        angleMotorController.set(
-            // Constants.Shooter.shooterAngleFF.calculate()
-            Constants.Shooter.shooterPID.calculate(getPitch(), goalPitch + Units.rotationsToRadians(Constants.Shooter.pitchOffset))
-            + Constants.Shooter.kF * Math.cos(getPitch())
-        );
+        desiredPitch = goalPitch;
         //angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch) + Constants.Shooter.pitchOffset, CANSparkBase.ControlType.kSmartMotion);
     }
 

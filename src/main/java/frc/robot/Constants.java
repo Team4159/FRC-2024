@@ -19,7 +19,7 @@ import frc.lib.util.SwerveModuleConstants;
 import frc.robot.subsystems.Shooter.ShooterCommand;
 
 public final class Constants {
-    public static final double stickDeadband = 0.1;
+    public static final double stickDeadband = 0.15;
 
     public static final class Swerve {
         public static final String canBus = "Drivetrain";
@@ -60,7 +60,7 @@ public final class Constants {
         public static final boolean angleEnableCurrentLimit = true;
 
         public static final int driveCurrentLimit = 25; //35
-        public static final int driveCurrentThreshold = 60;
+        public static final int driveCurrentThreshold = 40;
         public static final double driveCurrentThresholdTime = 0.1;
         public static final boolean driveEnableCurrentLimit = true;
 
@@ -166,18 +166,18 @@ public final class Constants {
         public static final double pitchTolerance = Math.PI/32; // radians
         public static final double spinTolerance = Math.PI/16; // radians
 
-        public static final double intakeSpin = 0.85; // -1 to 1
+        public static final double intakeSpin = 0.7; // -1 to 1
         public static final double feederSpin = 0.45; // -1 to 1
 
         public static final double intakeRange = 0.2; // meters
         public static final double intakeAngleRange = Units.degreesToRadians(64);
 
         public static enum IntakeState {
-            STOW(Units.rotationsToRadians(0.012), SpinState.ST), // starting pos & when moving
-            GARGLE(Units.rotationsToRadians(0.012), SpinState.FW), // just move the motors
-            DOWN(Units.rotationsToRadians(0.465), SpinState.FW), // intaking
-            RETCH(Units.rotationsToRadians(0.012), SpinState.BW), // just move the motors
-            SPIT(Units.rotationsToRadians(0.465), SpinState.BW); // outtaking
+            STOW(Units.degreesToRadians(10.4), SpinState.ST), // starting pos & when moving
+            GARGLE(Units.degreesToRadians(10.4), SpinState.FW), // just move the motors
+            DOWN(Units.degreesToRadians(175), SpinState.FW), // intaking
+            RETCH(Units.degreesToRadians(10.4), SpinState.BW), // just move the motors
+            SPIT(Units.degreesToRadians(175), SpinState.BW); // outtaking
 
             public final double pitch;
             public final SpinState spin;
@@ -215,7 +215,7 @@ public final class Constants {
         public static final SimpleMotorFeedforward shooterSpinFF = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
         
         // TODO: This must be tuned to specific robot
-        public static final PIDController shooterPID = new PIDController(0.7, 0, 0.06);
+        public static final PIDController shooterPID = new PIDController(0.7, 0, 0.05);
         public static final double kF = 0.0;
     }
 
@@ -238,7 +238,7 @@ public final class Constants {
 
         public static final double ampAutoDistanceMax = 3.0; // meters
         public static final ShooterCommand ampShooterCommand = new ShooterCommand(
-            Units.degreesToRadians(55), 160d);
+            Units.degreesToRadians(55), 130d);
         public static final double ampAutoDistanceToStartSpinning = 0.5; // meters
 
         public static final ShooterCommand sourceInShooterCommand = new ShooterCommand(

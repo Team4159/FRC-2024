@@ -181,7 +181,7 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return new SequentialCommandGroup(
-            Commands.runOnce(() -> kinesthetics.setPose(Vision.getBotPose().toPose2d()))
+            // Commands.runOnce(() -> kinesthetics.setPose(Vision.getBotPose().toPose2d()))
         ); // add auto here
     }
 }
