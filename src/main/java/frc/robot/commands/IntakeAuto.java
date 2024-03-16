@@ -36,7 +36,7 @@ public class IntakeAuto extends SequentialCommandGroup {
         addCommands(
             sh.toPitch(Constants.Shooter.minimumPitch),
             new ParallelDeadlineGroup(
-                new WaitUntilCommand(k::shooterHasNote),
+                new WaitUntilCommand(k::shooterHasNote).raceWith(new WaitCommand(3)),
                 sh.new ChangeNeck(SpinState.FW),
                 i.new ChangeState(IntakeState.DOWN)
             ),

@@ -35,7 +35,7 @@ public class RobotContainer {
 
     /* Driver Buttons */
     private static final JoystickButton resetGyro = new JoystickButton(driver, 1);
-    private static final JoystickButton forceVision = new JoystickButton(driver, 16);
+    private static final JoystickButton forceVision = new JoystickButton(driver, 10); // nottom left 
 
     private static final JoystickButton manualAmp = new JoystickButton(secondary, 3);
     private static final JoystickButton manualShootPodium = new JoystickButton(secondary, 5);
@@ -49,7 +49,7 @@ public class RobotContainer {
 
     private static final JoystickButton autoAmp = new JoystickButton(driver, 4);
     private static final JoystickButton autoSpk = new JoystickButton(driver, 3);
-    private static final JoystickButton autoIntake = new JoystickButton(driver, 14);
+    // private static final JoystickButton autoIntake = new JoystickButton(driver, 14);
     
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
@@ -126,19 +126,19 @@ public class RobotContainer {
                 new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()),
                 s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW)
             )).onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
-        autoAmp.and(kinesthetics::shooterHasNote)//.and(() -> AmpAuto.isInRange(kinesthetics))
+        autoAmp.and(kinesthetics::shooterHasNote).and(() -> AmpAuto.isInRange(kinesthetics))
             .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
             .whileTrue(new SequentialCommandGroup(
                 new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector),
                 s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW)
             )).onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
-        autoIntake.and(() -> !kinesthetics.shooterHasNote()) // && !kinesthetics.feederHasNote()
-            .and(() -> IntakeAuto.canRun(kinesthetics))
-            .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake))
-            .onFalse(new ParallelCommandGroup(
-                s_Shooter.new ChangeNeck(SpinState.ST),
-                s_Intake.new ChangeState(IntakeState.STOW)
-            ));
+        // autoIntake.and(() -> !kinesthetics.shooterHasNote()) // && !kinesthetics.feederHasNote()
+        //     .and(() -> IntakeAuto.canRun(kinesthetics))
+        //     .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake))
+        //     .onFalse(new ParallelCommandGroup(
+        //         s_Shooter.new ChangeNeck(SpinState.ST),
+        //         s_Intake.new ChangeState(IntakeState.STOW)
+        //     ));
 
         // Manual Command Groups
         manualAmp
@@ -166,10 +166,10 @@ public class RobotContainer {
             ));
         manualShootSourceIn
             .whileTrue(new SequentialCommandGroup(
-                s_Shooter.new ChangeNeck(SpinState.BW),
+                s_Shooter.new ChangeNeck(SpinState.BW, true),
                 s_Shooter.new ChangeState(() -> Constants.CommandConstants.sourceInShooterCommand, false),
                 new WaitUntilCommand(kinesthetics::shooterHasNote),
-                new WaitCommand(1),
+                new WaitCommand(0.05),
                 s_Shooter.new ChangeNeck(SpinState.ST)
             ));
         manualFeed
@@ -181,7 +181,7 @@ public class RobotContainer {
             ))
             .onFalse(new ParallelCommandGroup(
                 s_Shooter.new ChangeNeck(SpinState.ST),
-                s_Intake.new ChangeState(IntakeState.STOW)
+                s_Intake.new ChangeState(IntakeState.STOW) 
             ));
         manualIntakeDown
             .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true))
@@ -218,9 +218,6 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return new SequentialCommandGroup(
-            //Commands.runOnce(() -> kinesthetics.setPose(Vision.getBotPose().toPose2d())),
-            autoChooser.getSelected()
-        ); // add auto here
+        return autoChooser.getSelected();
     }
 }

@@ -9,6 +9,7 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.*;
@@ -21,7 +22,7 @@ import frc.lib.util.SwerveModuleConstants;
 import frc.robot.subsystems.Shooter.ShooterCommand;
 
 public final class Constants {
-    public static final double stickDeadband = 0.1;
+    public static final double stickDeadband = 0.15;
 
     public static final class Swerve {
         public static final String canBus = "Drivetrain";
@@ -56,13 +57,13 @@ public final class Constants {
         public static final SensorDirectionValue cancoderInvert = chosenModule.cancoderInvert;
 
         /* Swerve Current Limiting */
-        public static final int angleCurrentLimit = 25;
+        public static final int angleCurrentLimit = 20; //25
         public static final int angleCurrentThreshold = 40;
         public static final double angleCurrentThresholdTime = 0.1;
         public static final boolean angleEnableCurrentLimit = true;
 
-        public static final int driveCurrentLimit = 35;
-        public static final int driveCurrentThreshold = 60;
+        public static final int driveCurrentLimit = 25; //35
+        public static final int driveCurrentThreshold = 40;
         public static final double driveCurrentThresholdTime = 0.1;
         public static final boolean driveEnableCurrentLimit = true;
 
@@ -119,7 +120,7 @@ public final class Constants {
             public static final int driveMotorID = 1;
             public static final int angleMotorID = 2;
             public static final int canCoderID = 1;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-54);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-55.5);
 
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -130,7 +131,7 @@ public final class Constants {
             public static final int driveMotorID = 3;
             public static final int angleMotorID = 4;
             public static final int canCoderID = 2;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-69); 
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-69.5); 
 
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -141,7 +142,7 @@ public final class Constants {
             public static final int driveMotorID = 5;
             public static final int angleMotorID = 6;
             public static final int canCoderID = 3;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-16);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-17.3);
 
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -152,7 +153,7 @@ public final class Constants {
             public static final int driveMotorID = 7;
             public static final int angleMotorID = 8;
             public static final int canCoderID = 4;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(55); 
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(55.5); 
 
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -177,18 +178,18 @@ public final class Constants {
         public static final double pitchTolerance = Math.PI/32; // radians
         public static final double spinTolerance = Math.PI/16; // radians
 
-        public static final double intakeSpin = 0.85; // -1 to 1
+        public static final double intakeSpin = 0.7; // -1 to 1
         public static final double feederSpin = 0.45; // -1 to 1
 
         public static final double intakeRange = 0.2; // meters
         public static final double intakeAngleRange = Units.degreesToRadians(64);
 
         public static enum IntakeState {
-            STOW(Units.rotationsToRadians(0.012), SpinState.ST), // starting pos & when moving
-            GARGLE(Units.rotationsToRadians(0.012), SpinState.FW), // just move the motors
-            DOWN(Units.rotationsToRadians(0.465), SpinState.FW), // intaking
-            RETCH(Units.rotationsToRadians(0.012), SpinState.BW), // just move the motors
-            SPIT(Units.rotationsToRadians(0.465), SpinState.BW); // outtaking
+            STOW(Units.degreesToRadians(10.4), SpinState.ST), // starting pos & when moving
+            GARGLE(Units.degreesToRadians(10.4), SpinState.FW), // just move the motors
+            DOWN(Units.degreesToRadians(175), SpinState.FW), // intaking
+            RETCH(Units.degreesToRadians(10.4), SpinState.BW), // just move the motors
+            SPIT(Units.degreesToRadians(175), SpinState.BW); // outtaking
 
             public final double pitch;
             public final SpinState spin;
@@ -221,11 +222,12 @@ public final class Constants {
         public static final double neckSpeed = 0.25; // -1 to 1
         public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 150d);
         
-        /** @param shooterFeedForward kS radians / second, kV radians / second per meter / second */
-        public static final SimpleMotorFeedforward shooterFeedForward = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
-
+        public static final ArmFeedforward shooterAngleFF = new ArmFeedforward(0, 1, 0, 0); // TODO tune
+        /** @param shooterSpinFF kS radians / second, kV radians / second per meter / second */
+        public static final SimpleMotorFeedforward shooterSpinFF = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
+        
         // TODO: This must be tuned to specific robot
-        public static final PIDController shooterPID = new PIDController(0.7, 0, 0.03);
+        public static final PIDController shooterPID = new PIDController(0.7, 0, 0.05);
         public static final double kF = 0.0;
     }
 
@@ -248,15 +250,15 @@ public final class Constants {
 
         public static final double ampAutoDistanceMax = 3.0; // meters
         public static final ShooterCommand ampShooterCommand = new ShooterCommand(
-            Units.degreesToRadians(55), 160d);
-        public static final double ampAutoDistanceToStartSpinning = 1; // meters
+            Units.degreesToRadians(55), 130d);
+        public static final double ampAutoDistanceToStartSpinning = 0.5; // meters
 
         public static final ShooterCommand sourceInShooterCommand = new ShooterCommand(
-            Units.degreesToRadians(35), -150d);
+            Units.degreesToRadians(75), -90d);
     }
 
     public static final class Environment {
-        /** @param speakers Pose3d is in meters */
+        /** @param speakers in meters */
         public static final Map<Alliance, Translation3d> speakers = Map.of(
             Alliance.Red, new Translation3d(16.579, 5.548, 1.891),
             Alliance.Blue, new Translation3d(-0.0381, 5.548, 1.891)

@@ -41,6 +41,11 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic() {
         mechanism.setAngle(Units.radiansToDegrees(getPitch()));
+        angleMotorController.set(
+            // Constants.Shooter.shooterAngleFF.calculate()
+            Constants.Shooter.shooterPID.calculate(getPitch(), desiredPitch)
+            + Constants.Shooter.kF * Math.cos(getPitch())
+        );
     }
 
     /** @return radians */
@@ -48,14 +53,13 @@ public class Shooter extends SubsystemBase {
         return Units.rotationsToRadians(angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition() - Constants.Shooter.pitchOffset);
     }
 
+    private double desiredPitch = Constants.Shooter.minimumPitch;
+
     /** @param goalPitch radians */
     private void setGoalPitch(double goalPitch) {
         goalPitch = MathUtil.clamp(MathUtil.angleModulus(goalPitch), Constants.Shooter.minimumPitch, Constants.Shooter.maximumPitch);
         mechanismGoal.setAngle(Units.radiansToDegrees(goalPitch));
-        angleMotorController.set(
-            Constants.Shooter.shooterPID.calculate(getPitch(), goalPitch + Units.rotationsToRadians(Constants.Shooter.pitchOffset))
-            + Constants.Shooter.kF * Math.cos(getPitch())
-        );
+        desiredPitch = goalPitch;
         //angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch) + Constants.Shooter.pitchOffset, CANSparkBase.ControlType.kSmartMotion);
     }
 
