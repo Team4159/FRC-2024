@@ -237,6 +237,12 @@ public final class Constants {
         public static final double maximumPitch = Units.rotationsToRadians(2.5);
     }
 
+    public static final class Climber {
+        public static final int motorID = 10;
+
+        public static final double motorInput = 0.5;
+    }
+
     public static final class CommandConstants {
         public static final double bumperWidth = Units.inchesToMeters(2.75);
 

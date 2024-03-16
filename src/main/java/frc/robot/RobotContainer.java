@@ -34,6 +34,7 @@ public class RobotContainer {
     private static final JoystickButton forceVision = new JoystickButton(driver, 10); // bottom left 
 
     private static final JoystickButton manualAmp = new JoystickButton(secondary, 3);
+    private static final JoystickButton climb = new JoystickButton(secondary, 12);
     private static final JoystickButton manualShootPodium = new JoystickButton(secondary, 5);
     private static final JoystickButton manualShootSubwoofer = new JoystickButton(secondary, 4);
     private static final JoystickButton manualShootSourceIn = new JoystickButton(secondary, 6);
@@ -52,6 +53,7 @@ public class RobotContainer {
     private final Shooter s_Shooter = new Shooter();
     private final Intake s_Intake = new Intake();
     private final Deflector s_Deflector = new Deflector();
+    private final Climber s_Climber = new Climber();
 
     private final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve);
     @SuppressWarnings("unused")
@@ -201,6 +203,7 @@ public class RobotContainer {
                 s_Shooter.new ChangeNeck(SpinState.ST),
                 s_Intake.new ChangeState(IntakeState.STOW)
             ));
+        climb.whileTrue(new InstantCommand(() -> s_Climber.setMotor(Constants.Climber.motorInput)));
     }
 
     public Command getTeleopInit() {
