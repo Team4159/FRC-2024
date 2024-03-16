@@ -24,9 +24,7 @@ public class Kinesthetics extends SubsystemBase {
 
     // Sensor Information
     private Pigeon2 gyro;
-    // private DigitalInput feederBeamBreak;
     private DigitalInput shooterBeamBreak;
-    // private PowerDistribution pdh = new PowerDistribution(1, ModuleType.kRev);
 
     // Data Fields
     private DriverStation.Alliance alliance;
@@ -53,15 +51,6 @@ public class Kinesthetics extends SubsystemBase {
 
         table.addBoolean("Shooter Note?", this::shooterHasNote);
         table.add("Pose Estimation", field);
-        // table.addDoubleArray("Current", () -> {
-        //     double[] power = new double[20];
-        //     for (int i = 0; i < power.length; i++) try {
-        //         power[i] = pdh.getCurrent(i);
-        //     } catch (Exception e) {
-        //         power[i] = -1;
-        //     }
-        //     return power;
-        // });
     }
 
     @Override
@@ -87,10 +76,6 @@ public class Kinesthetics extends SubsystemBase {
     public DriverStation.Alliance getAlliance() {
         return alliance;
     }
-
-    // public boolean feederHasNote() {
-    //     return feederBeamBreak.get();
-    // }
 
     public boolean shooterHasNote() {
         return !shooterBeamBreak.get();

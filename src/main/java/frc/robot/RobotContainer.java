@@ -87,7 +87,6 @@ public class RobotContainer {
 
     private void configureAutoCommands() {
         // register Named Commands for PathPlanner, must be done before building autos
-        NamedCommands.registerCommand("intakeStatic", new IntakeStatic(kinesthetics, s_Shooter, s_Intake));
         NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
             s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, false),
@@ -96,8 +95,7 @@ public class RobotContainer {
         ));
         NamedCommands.registerCommand("speakerPodium", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
-            s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, 
-                false),
+            s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, false),
             s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
             s_Shooter.stopShooter()
         ));
