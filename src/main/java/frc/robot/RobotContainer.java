@@ -143,7 +143,7 @@ public class RobotContainer {
             ))
             .onFalse(new ParallelCommandGroup(
                 s_Shooter.new ChangeNeck(SpinState.ST),
-                s_Intake.new ChangeState(IntakeState.STOW)
+                s_Intake.new ChangeState(IntakeState.STOW) 
             ));
         manualIntakeDown
             .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true))
