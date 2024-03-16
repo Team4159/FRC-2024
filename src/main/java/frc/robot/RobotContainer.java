@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -86,12 +87,12 @@ public class RobotContainer {
     private void configureAutoCommands() {
         // register Named Commands for PathPlanner, must be done before building autos
         // NamedCommands.registerCommand("intakeStatic", new IntakeStatic(kinesthetics, s_Shooter, s_Intake));
-        // NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
-        //     s_Shooter.new ChangeNeck(SpinState.ST),
-        //     s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, false, true).alongWith(new WaitCommand(2)),
-        //     s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
-        //     s_Shooter.stopShooter()
-        // ));
+        NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
+            s_Shooter.new ChangeNeck(SpinState.ST),
+            s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, false, true).alongWith(new WaitCommand(2)),
+            s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
+            s_Shooter.stopShooter()
+        ));
         // NamedCommands.registerCommand("speakerPodium", new SequentialCommandGroup(
         //     s_Shooter.new ChangeNeck(SpinState.ST),
         //     s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, 
@@ -214,9 +215,10 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return new SequentialCommandGroup(
-            s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, false, true).alongWith(new WaitCommand(2)),
-            s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
-            s_Shooter.stopShooter()
+            // s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, false, true).alongWith(new WaitCommand(2)),
+            // s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
+            // s_Shooter.stopShooter()
+            new PathPlannerAuto("SAC Amp Side - Subwoofer, Wait, Taxi")
         );
     }
 }

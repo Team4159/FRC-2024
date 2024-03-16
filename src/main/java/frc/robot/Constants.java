@@ -95,7 +95,7 @@ public final class Constants {
         public static final double maxAngularVelocity = 3.0;
 
         public static final class AutoConfig { //TODO: must be tuned to specific robot
-            public static final double kMaxSpeedMetersPerSecond = 3;
+            public static final double kMaxSpeedMetersPerSecond = 4.5;
             public static final double kMaxAccelerationMetersPerSecondSquared = 3;
             public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
             public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
