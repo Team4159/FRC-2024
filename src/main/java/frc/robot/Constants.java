@@ -161,8 +161,8 @@ public final class Constants {
 
         // used by PathPlanner during setup
         public static final HolonomicPathFollowerConfig autoPathFollowerConfig = new HolonomicPathFollowerConfig( // TODO set values
-            new PIDConstants(1, 0, 0), // translation PID constants
-            new PIDConstants(1, 0, 0), // rotation PID constants
+            new PIDConstants(10, 0, 0), // translation PID constants
+            new PIDConstants(10, 0, 0), // rotation PID constants
             Constants.Swerve.AutoConfig.kMaxSpeedMetersPerSecond, 
             0.48, // drive base radius in m
             new ReplanningConfig() // default path replanning config
@@ -214,7 +214,7 @@ public final class Constants {
         public static final int beamBreakID = 0; // PWM
 
         public static final double pitchTolerance = Math.PI/128;
-        public static final double spinTolerance = Math.PI/256;
+        public static final double spinTolerance = Math.PI/64;
 
         public static final double pitchOffset = Units.degreesToRotations(-3);
         public static final double minimumPitch = Units.degreesToRadians(15);

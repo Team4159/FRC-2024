@@ -51,7 +51,6 @@ public class Kinesthetics extends SubsystemBase {
     
         ShuffleboardTab table = Shuffleboard.getTab("Kinesthetics");
 
-        field.getObject("Speaker").setPose(new Pose2d(Constants.Environment.speakers.get(getAlliance()).toTranslation2d(), new Rotation2d()));
         table.addBoolean("Shooter Note?", this::shooterHasNote);
         table.add("Pose Estimation", field);
         // table.addDoubleArray("Current", () -> {

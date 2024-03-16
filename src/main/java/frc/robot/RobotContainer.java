@@ -1,8 +1,5 @@
 package frc.robot;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
@@ -23,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.Intake.IntakeState;
-import frc.robot.auto.*;
 import frc.robot.Constants.SpinState;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -35,7 +31,7 @@ public class RobotContainer {
 
     /* Driver Buttons */
     private static final JoystickButton resetGyro = new JoystickButton(driver, 1);
-    private static final JoystickButton forceVision = new JoystickButton(driver, 10); // nottom left 
+    private static final JoystickButton forceVision = new JoystickButton(driver, 10); // bottom left 
 
     private static final JoystickButton manualAmp = new JoystickButton(secondary, 3);
     private static final JoystickButton manualShootPodium = new JoystickButton(secondary, 5);
@@ -58,13 +54,10 @@ public class RobotContainer {
     private final Deflector s_Deflector = new Deflector();
 
     private final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve);
-
-    public static final Map<Double, Double> shooterTable = new HashMap<>();
-
-    private final SendableChooser<Command> autoChooser;
-    
     @SuppressWarnings("unused")
     private final Vision s_Vision = new Vision(kinesthetics);
+
+    private final SendableChooser<Command> autoChooser;
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
@@ -78,6 +71,19 @@ public class RobotContainer {
             )
         );
 
+        configureAutoCommands();
+
+        // Configure the button bindings
+        configureButtonBindings();
+
+        // configure SmartDashboard
+        autoChooser = AutoBuilder.buildAutoChooser(); // can accept a default auto by passing in its name as a string
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+
+        DriverStation.silenceJoystickConnectionWarning(true);
+    }
+
+    private void configureAutoCommands() {
         // register Named Commands for PathPlanner, must be done before building autos
         NamedCommands.registerCommand("intakeStatic", new IntakeStatic(kinesthetics, s_Shooter, s_Intake));
         NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
@@ -98,14 +104,6 @@ public class RobotContainer {
         NamedCommands.registerCommand("speakerAutoAim", new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0));
         NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake));
 
-        // Configure the button bindings
-        configureButtonBindings();
-
-        // configure SmartDashboard
-        autoChooser = AutoBuilder.buildAutoChooser(); // can accept a default auto by passing in its name as a string
-        SmartDashboard.putData("Auto Chooser", autoChooser);
-
-        DriverStation.silenceJoystickConnectionWarning(true);
     }
 
     /**

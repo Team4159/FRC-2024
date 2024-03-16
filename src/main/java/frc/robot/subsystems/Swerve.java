@@ -46,7 +46,7 @@ public class Swerve extends SubsystemBase {
                 for(SwerveModule mod : mSwerveMods) mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false);
             }, 
             Constants.Swerve.autoPathFollowerConfig, // config, includes PID values
-            () -> this.kinesthetics.getAlliance() == DriverStation.Alliance.Red, // determines if autos should be flipped (i.e. if on Red Alliance)
+            () -> this.kinesthetics.getAlliance().equals(DriverStation.Alliance.Red), // determines if autos should be flipped (i.e. if on Red Alliance)
             this // reference to this subsystem to set requirements
         );
         PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
@@ -104,14 +104,14 @@ public class Swerve extends SubsystemBase {
 
     // override the path rotation if robot is currently shooting into speaker
     public Optional<Rotation2d> getRotationTargetOverride(){
-        if (CommandScheduler.getInstance().isScheduled(SpeakerGetYaw.instance)) {
+        if (SpeakerGetYaw.instance != null && CommandScheduler.getInstance().isScheduled(SpeakerGetYaw.instance)) {
             // return an optional containing the speaker's rotation override (field relative rotation)
             return Optional.of(new Rotation2d(SpeakerGetYaw.instance.getDesiredYaw()));
         } else {
             // return an empty optional when path rotation should not be overriden
             return Optional.empty();
         }
-    }
+    } 
 
     @Override
     public void periodic(){
