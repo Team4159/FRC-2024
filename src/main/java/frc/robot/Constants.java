@@ -240,7 +240,12 @@ public final class Constants {
     public static final class Climber {
         public static final int motorID = 10;
 
-        public static final double motorInput = 0.5;
+        public static final double heightTolerance = Units.inchesToMeters(1);
+
+        public static final double hookHeight = Units.inchesToMeters(5);
+        public static final double maximumHeight = Units.inchesToMeters(10);
+
+        public static final double sprocketCircumference = Units.inchesToMeters(2 * Math.PI);
     }
 
     public static final class CommandConstants {

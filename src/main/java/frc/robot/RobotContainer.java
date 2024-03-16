@@ -203,7 +203,7 @@ public class RobotContainer {
                 s_Shooter.new ChangeNeck(SpinState.ST),
                 s_Intake.new ChangeState(IntakeState.STOW)
             ));
-        climb.whileTrue(new InstantCommand(() -> s_Climber.setMotor(Constants.Climber.motorInput)));
+        climb.whileTrue(s_Climber.new Raise());
     }
 
     public Command getTeleopInit() {
