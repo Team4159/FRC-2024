@@ -8,7 +8,6 @@ import com.revrobotics.SparkAbsoluteEncoder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -22,11 +21,6 @@ public class Intake extends SubsystemBase {
         intakeMotorController = new CANSparkFlex(Constants.Intake.intakeMotorID, CANSparkLowLevel.MotorType.kBrushless);
         intakeMotorController.setInverted(true);
         feederMotorController = new CANSparkMax(Constants.Intake.feederMotorID, CANSparkLowLevel.MotorType.kBrushless);
-    }
-    
-    @Override
-    public void periodic() {
-        SmartDashboard.putNumber("dd", Units.radiansToDegrees(getPitch()));
     }
 
     /** @return radians */

@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.function.Supplier;
+
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel;
@@ -11,7 +13,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -43,7 +44,6 @@ public class Shooter extends SubsystemBase {
     public void periodic() {
         mechanism.setAngle(Units.radiansToDegrees(getPitch()));
         angleMotorController.set(
-            // Constants.Shooter.shooterAngleFF.calculate()
             Constants.Shooter.shooterPID.calculate(getPitch(), desiredPitch)
             + Constants.Shooter.kF * Math.cos(getPitch())
         );
@@ -120,9 +120,9 @@ public class Shooter extends SubsystemBase {
 
     public class ChangeState extends Command {
         private boolean continuous = false;
-        private ShooterStateSupplier desiredState;
+        private Supplier<ShooterCommand> desiredState;
 
-        public ChangeState(ShooterStateSupplier shooterStateSupplier, boolean continuous) {
+        public ChangeState(Supplier<ShooterCommand> shooterStateSupplier, boolean continuous) {
             desiredState = shooterStateSupplier;
             this.continuous = continuous;
             addRequirements(Shooter.this);
@@ -139,12 +139,15 @@ public class Shooter extends SubsystemBase {
         public boolean isFinished() {
             if (continuous) return false;
             var state = desiredState.get();
-            return
-                (state.pitch() == null || MathUtil.isNear(state.pitch(), getPitch(), Constants.Shooter.pitchTolerance)) &&
-                (!state.hasSpin() || (
+            boolean goodpitch = (state.pitch() == null || MathUtil.isNear(state.pitch(), getPitch(), Constants.Shooter.pitchTolerance));
+            boolean goodspin = (!state.hasSpin() || (
                     MathUtil.isNear(state.lSpin(), getLSpin(), Constants.Shooter.spinTolerance) &&
                     MathUtil.isNear(state.rSpin(), getRSpin(), Constants.Shooter.spinTolerance)
                 ));
+            System.out.println(goodpitch+" && "+goodspin);
+            return goodpitch
+                 &&
+                goodspin;
         }
     
         @Override
@@ -154,11 +157,6 @@ public class Shooter extends SubsystemBase {
                 setGoalSpin(Constants.Shooter.idleCommand.lSpin(), Constants.Shooter.idleCommand.rSpin());
             }
             super.end(interrupted);
-        }
-
-        @FunctionalInterface
-        public interface ShooterStateSupplier{
-            public ShooterCommand get();
         }
     }
 

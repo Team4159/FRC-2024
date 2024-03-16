@@ -103,7 +103,6 @@ public class RobotContainer {
         NamedCommands.registerCommand("ampAuto", new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector));
         NamedCommands.registerCommand("speakerAutoAim", new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0));
         NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake));
-
     }
 
     /**
@@ -205,15 +204,13 @@ public class RobotContainer {
     }
 
     public Command getTeleopInit() {
-        return new ParallelCommandGroup(
-            s_Shooter.new ChangeState(() -> Constants.Shooter.idleCommand, false),
-            Commands.runOnce(() -> kinesthetics.setHeading(
-                kinesthetics.getAlliance() == Alliance.Red ? 
-                    Rotation2d.fromDegrees(180) : 
-                    Rotation2d.fromDegrees(0)
-            ))
-        );
-    }
+        var g = new ParallelCommandGroup(s_Shooter.new ChangeState(() -> Constants.Shooter.idleCommand, false));
+        if (kinesthetics.getAlliance() == Alliance.Red)
+            g.addCommands(Commands.runOnce(() -> kinesthetics.setHeading(
+                kinesthetics.getHeading().minus(Rotation2d.fromDegrees(180))
+            )));
+        return g;
+    }  
 
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();

@@ -71,6 +71,7 @@ public class Kinesthetics extends SubsystemBase {
         if (visionPose != null)
             poseEstimator.addVisionMeasurement(visionPose.toPose2d(), Vision.getLimelightPing());
         super.periodic();
+        field.setRobotPose(getPose());
     }
 
     public void forceVision() {
@@ -96,9 +97,7 @@ public class Kinesthetics extends SubsystemBase {
     }
 
     public Pose2d getPose() {
-        var o = poseEstimator.getEstimatedPosition();
-        field.setRobotPose(o);
-        return o;
+        return poseEstimator.getEstimatedPosition();
     }
 
     public void setPose(Pose2d pose) {

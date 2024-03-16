@@ -234,7 +234,7 @@ public final class Constants {
     public static final class Deflector {
         public static final int motorID = 9;
 
-        public static final double maximumPitch = Units.rotationsToRadians(2.7);
+        public static final double maximumPitch = Units.rotationsToRadians(2.5);
     }
 
     public static final class CommandConstants {

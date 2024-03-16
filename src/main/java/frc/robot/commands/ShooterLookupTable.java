@@ -32,11 +32,6 @@ public class ShooterLookupTable extends ParallelCommandGroup {
         return Constants.Environment.speakers.get(k.getAlliance()).minus(new Translation3d(t2.getX(), t2.getY(), 0));
     }
 
-    /** @return meters */
-    private static double getDistance(Kinesthetics k){
-        return getDifference(k).getNorm();
-    }
-
     /** @return required yaw in radians */
     private static Rotation2d getRequiredYaw(Kinesthetics k){
         return getDifference(k).toTranslation2d().getAngle();
