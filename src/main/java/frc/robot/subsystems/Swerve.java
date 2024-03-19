@@ -13,15 +13,14 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.SwerveModule;
-import frc.robot.auto.SpeakerGetYaw;
+import frc.robot.commands.SpeakerAutoAim;
 
 public class Swerve extends SubsystemBase {
     private Kinesthetics kinesthetics;
@@ -49,7 +48,11 @@ public class Swerve extends SubsystemBase {
             () -> this.kinesthetics.getAlliance().equals(DriverStation.Alliance.Red), // determines if autos should be flipped (i.e. if on Red Alliance)
             this // reference to this subsystem to set requirements
         );
-        PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
+        PPHolonomicDriveController.setRotationTargetOverride(() -> {
+            var cmd = this.getCurrentCommand();
+            if (cmd == null || !(cmd instanceof SpeakerAutoAim a) || a.latestYaw == null) return Optional.empty();
+            return Optional.of(Rotation2d.fromRadians(a.latestYaw));
+        });
         
         Timer.delay(0.1);
         resetModulesToAbsolute();
@@ -101,17 +104,6 @@ public class Swerve extends SubsystemBase {
     private void resetModulesToAbsolute(){
         for(SwerveModule mod : mSwerveMods) mod.resetToAbsolute();
     }
-
-    // override the path rotation if robot is currently shooting into speaker
-    public Optional<Rotation2d> getRotationTargetOverride(){
-        if (SpeakerGetYaw.instance != null && CommandScheduler.getInstance().isScheduled(SpeakerGetYaw.instance)) {
-            // return an optional containing the speaker's rotation override (field relative rotation)
-            return Optional.of(new Rotation2d(SpeakerGetYaw.instance.getDesiredYaw()));
-        } else {
-            // return an empty optional when path rotation should not be overriden
-            return Optional.empty();
-        }
-    } 
 
     @Override
     public void periodic(){

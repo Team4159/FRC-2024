@@ -11,13 +11,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.Intake.IntakeState;
 import frc.robot.Constants.SpinState;
@@ -46,7 +40,7 @@ public class RobotContainer {
 
     private static final JoystickButton autoAmp = new JoystickButton(driver, 4);
     private static final JoystickButton autoSpk = new JoystickButton(driver, 3);
-    // private static final JoystickButton autoIntake = new JoystickButton(driver, 14);
+    private static final JoystickButton autoIntake = new JoystickButton(driver, 14);
     
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
@@ -78,15 +72,14 @@ public class RobotContainer {
         // Configure the button bindings
         configureButtonBindings();
 
-        // configure SmartDashboard
-        autoChooser = AutoBuilder.buildAutoChooser(); // can accept a default auto by passing in its name as a string
-        SmartDashboard.putData("Auto Chooser", autoChooser);
+        autoChooser = AutoBuilder.buildAutoChooser();
+        SmartDashboard.putData("Autonomous Routine", autoChooser);
 
         DriverStation.silenceJoystickConnectionWarning(true);
     }
 
+    // register PathPlanner Commands, must be done before building autos
     private void configureAutoCommands() {
-        // register Named Commands for PathPlanner, must be done before building autos
         NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
             s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, false),
@@ -129,13 +122,12 @@ public class RobotContainer {
                 new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector),
                 s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW)
             )).onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
-        // autoIntake.and(() -> !kinesthetics.shooterHasNote()) // && !kinesthetics.feederHasNote()
-        //     .and(() -> IntakeAuto.canRun(kinesthetics))
-        //     .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake))
-        //     .onFalse(new ParallelCommandGroup(
-        //         s_Shooter.new ChangeNeck(SpinState.ST),
-        //         s_Intake.new ChangeState(IntakeState.STOW)
-        //     ));
+        autoIntake.and(() -> !kinesthetics.shooterHasNote()).and(() -> IntakeAuto.canRun(kinesthetics))
+            .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake))
+            .onFalse(new ParallelCommandGroup(
+                s_Shooter.new ChangeNeck(SpinState.ST),
+                s_Intake.new ChangeState(IntakeState.STOW)
+            ));
 
         // Manual Command Groups
         manualAmp
@@ -211,7 +203,7 @@ public class RobotContainer {
                 kinesthetics.getHeading().minus(Rotation2d.fromDegrees(180))
             )));
         return g;
-    }  
+    }
 
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();

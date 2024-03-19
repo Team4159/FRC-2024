@@ -4,9 +4,7 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants;
 import frc.robot.subsystems.Kinesthetics;
@@ -14,6 +12,8 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 
 public class SpeakerAutoAim extends ParallelCommandGroup {
+    public Double latestYaw;
+
     public SpeakerAutoAim(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
         double rootg = Math.sqrt(Constants.Environment.G);
         addCommands(
@@ -31,8 +31,6 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                 double relativexv = (speakerIsOnRight ? 1 : -1) * k.getVelocity().get(1, 0); // towards+ away-
                 double relativeyv = (speakerIsOnRight ? -1 : 1) * k.getVelocity().get(0, 0); 
                 
-                SmartDashboard.putNumber("xv", relativexv);
-
                 double n = relativex * rootg / roottwoh - relativexv; // airtine
                 double m = relativey * rootg / roottwoh + relativeyv;
 
@@ -48,8 +46,6 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                     ) *
                     Math.sqrt(transform.getZ()*transform.getZ() + relativex * relativex + relativey * relativey)
                 ) * 400/47 );
-
-                SmartDashboard.putNumber("autopitch", Units.radiansToDegrees(desiredPitch));
                 
                 return new Shooter.ShooterCommand(
                     desiredPitch,
@@ -76,8 +72,7 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                 desiredYaw -= Math.PI / 2; // zero degrees is forwards, the equation assumes it's right
                 if (!speakerIsOnRight) desiredYaw += Math.PI; // flip it around
 
-                SmartDashboard.putNumber("autoyaw", desiredYaw);
-
+                latestYaw = desiredYaw;
                 return desiredYaw;
             })
         );
