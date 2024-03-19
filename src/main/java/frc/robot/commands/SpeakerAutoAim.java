@@ -4,7 +4,9 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants;
 import frc.robot.subsystems.Kinesthetics;
@@ -31,8 +33,15 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                 double relativexv = (speakerIsOnRight ? 1 : -1) * k.getVelocity().get(1, 0); // towards+ away-
                 double relativeyv = (speakerIsOnRight ? -1 : 1) * k.getVelocity().get(0, 0); 
                 
+                SmartDashboard.putNumber("Speaker dx", relativex);
+                SmartDashboard.putNumber("Speaker dy", relativey);
+                SmartDashboard.putNumber("Speaker dx/dt", relativexv);
+                SmartDashboard.putNumber("Speaker dy/dt", relativeyv);
+
                 double n = relativex * rootg / roottwoh - relativexv; // airtine
                 double m = relativey * rootg / roottwoh + relativeyv;
+
+                SmartDashboard.putNumber("Speaker airtime", n);
 
                 double desiredPitch = Math.atan2(roottwoh * rootg, n);
                 double desiredNoteVel = Math.sqrt(
@@ -71,6 +80,8 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                 double desiredYaw = -Math.atan(- ((rootg * relativey) / roottwoh + relativeyv) / n); // CCW+
                 desiredYaw -= Math.PI / 2; // zero degrees is forwards, the equation assumes it's right
                 if (!speakerIsOnRight) desiredYaw += Math.PI; // flip it around
+
+                SmartDashboard.putNumber("Speaker absolute theta", Units.radiansToDegrees(desiredYaw)); // CCW+, 0 = North
 
                 latestYaw = desiredYaw;
                 return desiredYaw;
