@@ -19,6 +19,7 @@ import frc.robot.subsystems.Kinesthetics;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.LED.LEDState;
 
 public class IntakeAuto extends SequentialCommandGroup {
     public IntakeAuto(Kinesthetics k, Swerve sw, Shooter sh, Intake i) {
@@ -30,10 +31,14 @@ public class IntakeAuto extends SequentialCommandGroup {
             Translation2d notetrans = Vision.getNoteTranslation().toTranslation2d();
             if (notetrans.getNorm() > Constants.Intake.intakeRange || Math.abs(MathUtil.inputModulus(notetrans.getAngle().getRadians(), -Math.PI/2, Math.PI)) > Constants.Intake.intakeAngleRange) {
                 Rotation2d noteAngle = k.getHeading().plus(notetrans.getAngle());
-                addCommands(new SwerveAuto(k, sw, new RobotState(new Translation2d(notetrans.getNorm()-Constants.Swerve.trackWidth/2, noteAngle), noteAngle, new Vector<N3>(Nat.N3()))));
+                addCommands(
+                    k.led.new ChangeState(LEDState.PURPLE),
+                    new SwerveAuto(k, sw, new RobotState(new Translation2d(notetrans.getNorm()-Constants.Swerve.trackWidth/2, noteAngle), noteAngle, new Vector<N3>(Nat.N3())))
+                );
             }
         }
         addCommands(
+            k.led.new ChangeState(LEDState.YELLOW),
             sh.toPitch(Constants.Shooter.minimumPitch),
             new ParallelDeadlineGroup(
                 new WaitUntilCommand(k::shooterHasNote),

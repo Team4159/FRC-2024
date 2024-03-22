@@ -29,13 +29,15 @@ public class Kinesthetics extends SubsystemBase {
     // Data Fields
     private DriverStation.Alliance alliance;
     private SwerveDrivePoseEstimator poseEstimator;
+    public final LED led;
 
     // Shuffleboard
     private final Field2d field = new Field2d();
 
-    public Kinesthetics(Swerve s) {
+    public Kinesthetics(Swerve s, LED l) {
         s_Swerve = s;
         s_Swerve.setKinesthetics(this);
+        led = l;
 
         gyro = new Pigeon2(Constants.Swerve.pigeonID, Constants.Swerve.canBus);
         gyro.getConfigurator().apply(new Pigeon2Configuration());

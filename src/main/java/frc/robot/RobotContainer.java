@@ -49,7 +49,10 @@ public class RobotContainer {
     private final Deflector s_Deflector = new Deflector();
     // private final Climber s_Climber = new Climber();
 
-    private final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve);
+    private final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve,
+        new LED(3, 300, true)
+    );
+
     @SuppressWarnings("unused")
     private final Vision s_Vision = new Vision(kinesthetics);
 
@@ -74,8 +77,6 @@ public class RobotContainer {
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Autonomous Routine", autoChooser);
-
-        DriverStation.silenceJoystickConnectionWarning(true);
     }
 
     // register PathPlanner Commands, must be done before building autos
@@ -95,7 +96,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("speakerLookupTable", new ShooterLookupTable(kinesthetics, s_Shooter, s_Swerve, () -> 0, () -> 0));
         NamedCommands.registerCommand("ampAuto", new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector));
         NamedCommands.registerCommand("speakerAutoAim", new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0));
-        NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake));
+        NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, false));
     }
 
     /**
@@ -105,6 +106,8 @@ public class RobotContainer {
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
+        DriverStation.silenceJoystickConnectionWarning(true);
+
         /* Driver Buttons */
         resetGyro.onTrue(new InstantCommand(kinesthetics::zeroHeading));
         forceVision.onTrue(new InstantCommand(kinesthetics::forceVision));        

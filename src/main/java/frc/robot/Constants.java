@@ -268,6 +268,11 @@ public final class Constants {
             Units.degreesToRadians(75), -90d);
     }
 
+    public static final class LED {
+        public static final double intensityMultiplier = 0.7;
+        public static final double blinkDelay = 0.5;
+    }
+
     public static final class Environment {
         /** @param speakers in meters */
         public static final Map<Alliance, Translation3d> speakers = Map.of(
