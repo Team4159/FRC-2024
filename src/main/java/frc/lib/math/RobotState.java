@@ -2,8 +2,6 @@ package frc.lib.math;
 
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -11,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N3;
 
+/** Represents a 2D pose state containing translational, rotational and velocity elements. */
 public class RobotState extends Pose2d {
     private final Vector<N3> m_velocity;
 
@@ -22,6 +21,7 @@ public class RobotState extends Pose2d {
         return new RobotState(pose.getTranslation(), pose.getRotation(), vec);
     }
 
+    /** Creates a RobotState with no velocity component */
     public RobotState(Pose2d pose) {
         this(pose.getTranslation(), pose.getRotation(), new Vector<N3>(Nat.N3()));
     }
@@ -32,21 +32,20 @@ public class RobotState extends Pose2d {
     }
 
     /** @return meters / second (right +) */
-    public double getVelocityX() {
+    public double getvx() {
         return m_velocity.get(0, 0);
     }
 
     /** @return meters / second (forward +) */
-    public double getVelocityY() {
+    public double getvy() {
         return m_velocity.get(1, 0);
     }
 
     /** @return radians / second (ccw +) */
-    public double getVelocityω() {
+    public double getvω() {
         return m_velocity.get(2, 0);
     }
 
-    @JsonProperty
     public Vector<N3> getVelocity() {
         return m_velocity;
     }
