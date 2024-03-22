@@ -33,7 +33,7 @@ public class Climber extends SubsystemBase{
         }
 
         @Override
-        public void initialize(){
+        public void initialize() {
             setGoalPitch(Constants.Climber.maximumHeight);
         }
 

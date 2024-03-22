@@ -40,7 +40,7 @@ public class RobotContainer {
 
     private static final JoystickButton autoAmp = new JoystickButton(driver, 4);
     private static final JoystickButton autoSpk = new JoystickButton(driver, 3);
-    private static final JoystickButton autoIntake = new JoystickButton(driver, 14);
+    private static final JoystickButton autoIntake = new JoystickButton(driver, 5);
     
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
