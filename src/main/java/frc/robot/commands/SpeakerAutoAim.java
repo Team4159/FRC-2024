@@ -31,8 +31,8 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
 
                 double relativex  = Math.abs(transform.getX()); // left+ right+
                 double relativey  = (speakerIsOnRight ? -1 : 1) * transform.getY(); // forward backward
-                double relativexv = (speakerIsOnRight ? 1 : -1) * state.getVelocityX(); // speaker relative towards+ away-
-                double relativeyv = (speakerIsOnRight ? -1 : 1) * state.getVelocityY(); // speaker relative left- right+
+                double relativexv = (speakerIsOnRight ? 1 : -1) * state.getvx(); // speaker relative towards+ away-
+                double relativeyv = (speakerIsOnRight ? -1 : 1) * state.getvy(); // speaker relative left- right+
                 
                 SmartDashboard.putNumber("Speaker dx", relativex);
                 SmartDashboard.putNumber("Speaker dy", relativey);
@@ -74,8 +74,8 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
 
                 double relativex  = Math.abs(transform.getX()); // left+ right+
                 double relativey  = (speakerIsOnRight ? -1 : 1) * transform.getY(); // forward backward
-                double relativexv = (speakerIsOnRight ? 1 : -1) * state.getVelocityX(); // speaker relative towards+ away-
-                double relativeyv = (speakerIsOnRight ? -1 : 1) * state.getVelocityY(); // speaker relative left- right+
+                double relativexv = (speakerIsOnRight ? 1 : -1) * state.getvx(); // speaker relative towards+ away-
+                double relativeyv = (speakerIsOnRight ? -1 : 1) * state.getvy(); // speaker relative left- right+
                 
                 double n = relativex * rootg / roottwoh - relativexv;
 
