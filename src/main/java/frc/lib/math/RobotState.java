@@ -12,7 +12,15 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N3;
 
 public class RobotState extends Pose2d {
-    private Vector<N3> m_velocity;
+    private final Vector<N3> m_velocity;
+
+    public static RobotState fromVelocity(Pose2d pose, double vx, double vy, double vω) {
+        var vec = new Vector<N3>(Nat.N3());
+        vec.set(0, 0, vx);
+        vec.set(1, 0, vy);
+        vec.set(2, 0, vω);
+        return new RobotState(pose.getTranslation(), pose.getRotation(), vec);
+    }
 
     public RobotState(Pose2d pose) {
         this(pose.getTranslation(), pose.getRotation(), new Vector<N3>(Nat.N3()));
@@ -23,15 +31,18 @@ public class RobotState extends Pose2d {
         this.m_velocity = velocity;
     }
 
+    /** @return meters / second (right +) */
     public double getVelocityX() {
         return m_velocity.get(0, 0);
     }
 
+    /** @return meters / second (forward +) */
     public double getVelocityY() {
         return m_velocity.get(1, 0);
     }
 
-    public double getVelocityOmega() {
+    /** @return radians / second (ccw +) */
+    public double getVelocityω() {
         return m_velocity.get(2, 0);
     }
 
