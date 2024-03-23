@@ -85,8 +85,8 @@ public final class Constants {
 
         /* Drive Motor Characterization Values From SYSID */
         public static final double driveKS = 0.32; // 0.32/12
-        public static final double driveKV = 1.51/12;
-        public static final double driveKA = 0.27/12;
+        public static final double driveKV = 1.51; // 1.51/12
+        public static final double driveKA = 0.27; // 0.27/12
 
         /* Swerve Profiling Values */
         /** Meters per Second */
@@ -95,8 +95,8 @@ public final class Constants {
         public static final double maxAngularVelocity = 3.0;
 
         public static final class AutoConfig { //TODO: must be tuned to specific robot
-            public static final double kMaxSpeedMetersPerSecond = 4.5;
-            public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+            public static final double kMaxSpeedMetersPerSecond = 5;
+            public static final double kMaxAccelerationMetersPerSecondSquared = 4;
             public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
             public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
         
@@ -213,8 +213,8 @@ public final class Constants {
         public static final int neckMotorID = 7;
         public static final int beamBreakID = 0; // PWM
 
-        public static final double pitchTolerance = Math.PI/128;
-        public static final double spinTolerance = Math.PI/64;
+        public static final double pitchTolerance = Math.PI/64;
+        public static final double spinTolerance = Math.PI/8;
 
         public static final double pitchOffset = Units.degreesToRotations(-3);
         public static final double minimumPitch = Units.degreesToRadians(15);
@@ -255,9 +255,9 @@ public final class Constants {
         public static final double speakerShooterAngleMin = Units.rotationsToRadians(0.0);
 
         public static final ShooterCommand speakerPodiumShooterCommand = new ShooterCommand(
-            0.7, 500d, 275d);
+            0.7, 450d, 225d);
         public static final ShooterCommand speakerSubwooferShooterCommand = new ShooterCommand(
-            1.1, 450d, 250d);
+            1.1, 400d, 200d);
 
         public static final double ampAutoDistanceMax = 3.0; // meters
         public static final ShooterCommand ampShooterCommand = new ShooterCommand(

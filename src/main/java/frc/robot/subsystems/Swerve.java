@@ -42,7 +42,7 @@ public class Swerve extends SubsystemBase {
             (ChassisSpeeds chassisSpeeds) -> { // the drive method, accepts robot relative ChassisSpeeds
                 SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(chassisSpeeds);
                 SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
-                for(SwerveModule mod : mSwerveMods) mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false);
+                for(SwerveModule mod : mSwerveMods) mod.setDesiredState(swerveModuleStates[mod.moduleNumber], true);
             }, 
             Constants.Swerve.AutoConfig.autoPathFollowerConfig, // config, includes PID values
             () -> this.kinesthetics.getAlliance().equals(DriverStation.Alliance.Red), // determines if autos should be flipped (i.e. if on Red Alliance)

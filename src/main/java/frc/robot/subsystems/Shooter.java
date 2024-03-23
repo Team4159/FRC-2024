@@ -146,10 +146,15 @@ public class Shooter extends SubsystemBase {
             if (instant) return true;
             if (continuous) return false;
             var state = desiredState.get();
+            System.out.println("Left Desired: " + state.lSpin() + " Left Actual: " + getLSpin());
+            System.out.println("Right Desired: " + state.rSpin() + " Right Actual: " + getRSpin());
+            System.out.println("Pitch isNear: " + MathUtil.isNear(state.pitch(), getPitch(), Constants.Shooter.pitchTolerance));
+            System.out.println("Left Spin isNear: " + MathUtil.isNear(state.lSpin(), getLSpin(), Constants.Shooter.spinTolerance));
+            System.out.println("Right Spin isNear: " + MathUtil.isNear(state.rSpin(), getRSpin(), Constants.Shooter.spinTolerance));
             return (state.pitch() == null || MathUtil.isNear(state.pitch(), getPitch(), Constants.Shooter.pitchTolerance))
                 && (!state.hasSpin() || (
                     MathUtil.isNear(state.lSpin(), getLSpin(), Constants.Shooter.spinTolerance) &&
-                    MathUtil.isNear(state.rSpin(), getRSpin(), Constants.Shooter.spinTolerance)
+                    MathUtil.isNear(state.rSpin(), getRSpin(), Constants.Shooter.spinTolerance + Math.PI*2) // the right side needs to be more tolerant because it has a chain instead of a belt
                 ));
         }
     
@@ -200,6 +205,32 @@ public class Shooter extends SubsystemBase {
         @Override
         public void end(boolean interrupted) {
             if (interrupted || beamBreakMode) setNeck(SpinState.ST);
+            super.end(interrupted);
+        }
+    }
+
+    public class ChangeStaticState extends Command {
+        private Supplier<ShooterCommand> desiredState;
+
+        public ChangeStaticState(Supplier<ShooterCommand> shooterStateSupplier) {
+            desiredState = shooterStateSupplier;
+            addRequirements(Shooter.this);
+        }
+        
+        @Override
+        public void initialize() {
+            var state = desiredState.get();
+            if (state.pitch() != null) setGoalPitch(state.pitch());
+            if (state.hasSpin()) setGoalSpin(state.lSpin(), state.rSpin());
+        }
+    
+        @Override
+        public boolean isFinished() {
+            return true;
+        }
+    
+        @Override
+        public void end(boolean interrupted) {
             super.end(interrupted);
         }
     }

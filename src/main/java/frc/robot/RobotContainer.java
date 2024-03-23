@@ -82,10 +82,9 @@ public class RobotContainer {
         NamedCommands.registerCommand("intakeStatic", new IntakeStatic(kinesthetics, s_Shooter, s_Intake));
         NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
-            s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, 
-                false, true).alongWith(new WaitCommand(1)),
+            s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, false, false),//.alongWith(new WaitCommand(1)),
             s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
-            s_Shooter.stopShooter()
+            s_Shooter.new ChangeState(() -> Constants.Shooter.idleCommand, false, false)
         ));
         NamedCommands.registerCommand("speakerPodium", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
@@ -211,8 +210,11 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return new SequentialCommandGroup(
-            autoChooser.getSelected()
-        );
+        if (autoChooser.getSelected() != null) {
+            return autoChooser.getSelected();
+        } else {
+            System.out.println("Autonomous command is null");
+            return new SequentialCommandGroup();
+        }
     }
 }
