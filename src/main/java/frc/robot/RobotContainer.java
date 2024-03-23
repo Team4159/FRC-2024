@@ -106,7 +106,7 @@ public class RobotContainer {
         DriverStation.silenceJoystickConnectionWarning(true);
 
         /* Driver Buttons */
-        resetGyro.onTrue(new InstantCommand(kinesthetics::zeroHeading)); // FIXME this messes up absolute yaw
+        resetGyro.onTrue(new InstantCommand(s_Swerve::setAngleOffset));
         forceVision.onTrue(new InstantCommand(kinesthetics::forceVision));
 
         // Automatic Command Groups

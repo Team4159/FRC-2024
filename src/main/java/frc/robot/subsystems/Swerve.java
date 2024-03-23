@@ -25,12 +25,14 @@ import frc.robot.commands.SpeakerAutoAim;
 public class Swerve extends SubsystemBase {
     private Kinesthetics kinesthetics;
 
-        private SwerveModule[] mSwerveMods = new SwerveModule[] {
-            new SwerveModule(0, Constants.Swerve.Mod0.constants),
-            new SwerveModule(1, Constants.Swerve.Mod1.constants),
-            new SwerveModule(2, Constants.Swerve.Mod2.constants),
-            new SwerveModule(3, Constants.Swerve.Mod3.constants)
-        };
+    private final SwerveModule[] mSwerveMods = new SwerveModule[] {
+        new SwerveModule(0, Constants.Swerve.Mod0.constants),
+        new SwerveModule(1, Constants.Swerve.Mod1.constants),
+        new SwerveModule(2, Constants.Swerve.Mod2.constants),
+        new SwerveModule(3, Constants.Swerve.Mod3.constants)
+    };
+
+    private Rotation2d driverAngleOffset = new Rotation2d(0);
 
     public void setKinesthetics(Kinesthetics k) {
         kinesthetics = k;
@@ -55,7 +57,7 @@ public class Swerve extends SubsystemBase {
         });
         
         Timer.delay(0.1);
-        resetModulesToAbsolute();
+        for (SwerveModule mod : mSwerveMods) mod.resetToAbsolute();
     }
 
     /** @param rotation radians / second */
@@ -66,7 +68,7 @@ public class Swerve extends SubsystemBase {
                                     translation.getX(), 
                                     translation.getY(), 
                                     rotation, 
-                                    kinesthetics.getHeading()
+                                    kinesthetics.getHeading().plus(driverAngleOffset)
                                 )
                                 : new ChassisSpeeds(
                                     translation.getX(), 
@@ -101,8 +103,8 @@ public class Swerve extends SubsystemBase {
         return positions;
     }
 
-    private void resetModulesToAbsolute(){
-        for(SwerveModule mod : mSwerveMods) mod.resetToAbsolute();
+    public void setAngleOffset() {
+        driverAngleOffset = Rotation2d.fromRadians(-kinesthetics.getHeading().getRadians());
     }
 
     @Override
@@ -134,7 +136,15 @@ public class Swerve extends SubsystemBase {
         public void execute() {
             drive(
                 new Translation2d(passthroughTranslation.getAsDouble(), passthroughStrafe.getAsDouble()).times(Constants.Swerve.maxSpeed),
-                desiredYaw.getAsDouble(), true, false
+                Constants.CommandConstants.swerveYawPID.calculate(kinesthetics.getHeading().getRadians(), desiredYaw.getAsDouble()), true, false
+            );
+        }
+
+        @Override
+        public void end(boolean interrupted) {
+            drive(
+                new Translation2d(passthroughTranslation.getAsDouble(), passthroughStrafe.getAsDouble()).times(Constants.Swerve.maxSpeed),
+                0, true, false
             );
         }
 

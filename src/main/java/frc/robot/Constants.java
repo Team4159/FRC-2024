@@ -173,7 +173,6 @@ public final class Constants {
         public static final int angleMotorID = 1;
         public static final int intakeMotorID = 2;
         public static final int feederMotorID = 3;
-        // public static final int beamBreakID = 1; // PWM
 
         public static final double pitchTolerance = Math.PI/32; // radians
         public static final double spinTolerance = Math.PI/16; // radians
@@ -216,7 +215,7 @@ public final class Constants {
         public static final double pitchTolerance = Math.PI/128;
         public static final double spinTolerance = Math.PI/64;
 
-        public static final double pitchOffset = Units.degreesToRotations(-3);
+        public static double pitchOffset = Units.degreesToRotations(-3);
         public static final double minimumPitch = Units.degreesToRadians(15);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
         public static final double neckSpeed = 0.25; // -1 to 1
@@ -251,8 +250,7 @@ public final class Constants {
     public static final class CommandConstants {
         public static final double bumperWidth = Units.inchesToMeters(2.75);
 
-        public static final double speakerShooterAngleMax = Units.rotationsToRadians(0.2);
-        public static final double speakerShooterAngleMin = Units.rotationsToRadians(0.0);
+        public static final PIDController swerveYawPID = new PIDController(0.01, 0, 0.0001);
 
         public static final ShooterCommand speakerPodiumShooterCommand = new ShooterCommand(
             0.7, 500d, 275d);

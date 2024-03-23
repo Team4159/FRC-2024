@@ -94,10 +94,6 @@ public class Kinesthetics extends SubsystemBase {
         poseEstimator.resetPosition(getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d(getPose().getTranslation(), heading));
     }
 
-    public void zeroHeading() {
-        poseEstimator.resetPosition(getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d(getPose().getTranslation(), new Rotation2d()));
-    }
-
     public RobotState getRobotState() {
         var speeds = Constants.Swerve.swerveKinematics.toChassisSpeeds(s_Swerve.getModuleStates());
         speeds = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getHeading());
