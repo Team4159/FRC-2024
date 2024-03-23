@@ -11,13 +11,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.Intake.IntakeState;
 import frc.robot.auto.IntakeStatic;
@@ -42,17 +36,19 @@ public class RobotContainer {
     private static final JoystickButton manualIntakeDown = new JoystickButton(secondary, 2);
     private static final JoystickButton manualOuttakeUp = new JoystickButton(secondary, 11);
     private static final JoystickButton manualOuttakeDown = new JoystickButton(secondary, 10);
-    private static final JoystickButton manualFeed = new JoystickButton(secondary, 1); 
+    private static final JoystickButton manualFeed = new JoystickButton(secondary, 1);
+    // private static final JoystickButton climb = new JoystickButton(secondary, 12); 
 
     private static final JoystickButton autoAmp = new JoystickButton(driver, 4);
     private static final JoystickButton autoSpk = new JoystickButton(driver, 3);
-    // private static final JoystickButton autoIntake = new JoystickButton(driver, 14);
+    private static final JoystickButton autoIntake = new JoystickButton(driver, 5);
     
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
     private final Shooter s_Shooter = new Shooter();
     private final Intake s_Intake = new Intake();
     private final Deflector s_Deflector = new Deflector();
+    // private final Climber s_Climber = new Climber();
 
     private final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve);
     @SuppressWarnings("unused")
@@ -77,16 +73,12 @@ public class RobotContainer {
         // Configure the button bindings
         configureButtonBindings();
 
-        // configure SmartDashboard
-        autoChooser = AutoBuilder.buildAutoChooser(); // can accept a default auto by passing in its name as a string
-        SmartDashboard.putData("Auto Chooser", autoChooser);
-
-        DriverStation.silenceJoystickConnectionWarning(true);
+        autoChooser = AutoBuilder.buildAutoChooser();
+        SmartDashboard.putData("Autonomous Routine", autoChooser);
     }
 
+    // register PathPlanner Commands, must be done before building autos
     private void configureAutoCommands() {
-        // register Named Commands for PathPlanner, must be done before building autos
-        NamedCommands.registerCommand("intakeStatic", new IntakeStatic(kinesthetics, s_Shooter, s_Intake));
         NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
             s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, 
@@ -114,9 +106,11 @@ public class RobotContainer {
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
+        DriverStation.silenceJoystickConnectionWarning(true);
+
         /* Driver Buttons */
-        resetGyro.onTrue(new InstantCommand(kinesthetics::zeroHeading));
-        forceVision.onTrue(new InstantCommand(kinesthetics::forceVision));        
+        resetGyro.onTrue(new InstantCommand(kinesthetics::zeroHeading)); // FIXME this messes up absolute yaw
+        forceVision.onTrue(new InstantCommand(kinesthetics::forceVision));
 
         // Automatic Command Groups
         autoSpk.and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
@@ -125,19 +119,19 @@ public class RobotContainer {
                 new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()),
                 s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW)
             )).onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
-        autoAmp.and(kinesthetics::shooterHasNote).and(() -> AmpAuto.isInRange(kinesthetics))
+        autoAmp.and(kinesthetics::shooterHasNote)//.and(() -> AmpAuto.isInRange(kinesthetics)) FIXME BROKEN LMAO
             .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
             .whileTrue(new SequentialCommandGroup(
+                new PrintCommand("bei"),
                 new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector),
                 s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW)
             )).onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
-        // autoIntake.and(() -> !kinesthetics.shooterHasNote()) // && !kinesthetics.feederHasNote()
-        //     .and(() -> IntakeAuto.canRun(kinesthetics))
-        //     .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake))
-        //     .onFalse(new ParallelCommandGroup(
-        //         s_Shooter.new ChangeNeck(SpinState.ST),
-        //         s_Intake.new ChangeState(IntakeState.STOW)
-        //     ));
+        autoIntake.and(() -> !kinesthetics.shooterHasNote()).and(() -> IntakeAuto.canRun(kinesthetics))
+            .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake))
+            .onFalse(new ParallelCommandGroup(
+                s_Shooter.new ChangeNeck(SpinState.ST),
+                s_Intake.new ChangeState(IntakeState.STOW)
+            ));
 
         // Manual Command Groups
         manualAmp
@@ -203,6 +197,7 @@ public class RobotContainer {
                 s_Shooter.new ChangeNeck(SpinState.ST),
                 s_Intake.new ChangeState(IntakeState.STOW)
             ));
+        // climb.whileTrue(s_Climber.new Raise());
     }
 
     public Command getTeleopInit() {
@@ -212,7 +207,7 @@ public class RobotContainer {
                 kinesthetics.getHeading().minus(Rotation2d.fromDegrees(180))
             )));
         return g;
-    }  
+    }
 
     public Command getAutonomousCommand() {
         return new SequentialCommandGroup(

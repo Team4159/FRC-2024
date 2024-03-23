@@ -14,11 +14,14 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 
 public class SpeakerAutoAim extends ParallelCommandGroup {
+    public Double latestYaw;
+
     public SpeakerAutoAim(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
         double rootg = Math.sqrt(Constants.Environment.G);
         addCommands(
             sh.new ChangeState(() -> {
                 var transform = getDifference(k);
+                var state = k.getRobotState();
 
                 double roottwoh = Math.sqrt(2*transform.getZ()); // Z, up +
                 boolean speakerIsOnRight = transform.getX() > 0;
@@ -28,13 +31,18 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
 
                 double relativex  = Math.abs(transform.getX()); // left+ right+
                 double relativey  = (speakerIsOnRight ? -1 : 1) * transform.getY(); // forward backward
-                double relativexv = (speakerIsOnRight ? 1 : -1) * k.getVelocity().get(1, 0); // towards+ away-
-                double relativeyv = (speakerIsOnRight ? -1 : 1) * k.getVelocity().get(0, 0); 
+                double relativexv = (speakerIsOnRight ? 1 : -1) * state.getvx(); // speaker relative towards+ away-
+                double relativeyv = (speakerIsOnRight ? -1 : 1) * state.getvy(); // speaker relative left- right+
                 
-                SmartDashboard.putNumber("xv", relativexv);
+                SmartDashboard.putNumber("Speaker x", relativex);
+                SmartDashboard.putNumber("Speaker y", relativey);
+                SmartDashboard.putNumber("Speaker x'", relativexv);
+                SmartDashboard.putNumber("Speaker y'", relativeyv);
 
                 double n = relativex * rootg / roottwoh - relativexv; // airtine
                 double m = relativey * rootg / roottwoh + relativeyv;
+
+                SmartDashboard.putNumber("Speaker airtime", n);
 
                 double desiredPitch = Math.atan2(roottwoh * rootg, n);
                 double desiredNoteVel = Math.sqrt(
@@ -48,8 +56,6 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                     ) *
                     Math.sqrt(transform.getZ()*transform.getZ() + relativex * relativex + relativey * relativey)
                 ) * 400/47 );
-
-                SmartDashboard.putNumber("autopitch", Units.radiansToDegrees(desiredPitch));
                 
                 return new Shooter.ShooterCommand(
                     desiredPitch,
@@ -58,6 +64,7 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
             }, false),
             sw.new ChangeYaw(translationSup, strafeSup, () -> {
                 var transform = getDifference(k);
+                var state = k.getRobotState();
 
                 double roottwoh = Math.sqrt(2*transform.getZ()); // Z, up +
                 boolean speakerIsOnRight = transform.getX() > 0;
@@ -67,8 +74,8 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
 
                 double relativex  = Math.abs(transform.getX()); // left+ right+
                 double relativey  = (speakerIsOnRight ? -1 : 1) * transform.getY(); // forward backward
-                double relativexv = (speakerIsOnRight ? 1 : -1) * k.getVelocity().get(1, 0); // towards+ away-
-                double relativeyv = (speakerIsOnRight ? -1 : 1) * k.getVelocity().get(0, 0); 
+                double relativexv = (speakerIsOnRight ? 1 : -1) * state.getvx(); // speaker relative towards+ away-
+                double relativeyv = (speakerIsOnRight ? -1 : 1) * state.getvy(); // speaker relative left- right+
                 
                 double n = relativex * rootg / roottwoh - relativexv;
 
@@ -76,8 +83,9 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                 desiredYaw -= Math.PI / 2; // zero degrees is forwards, the equation assumes it's right
                 if (!speakerIsOnRight) desiredYaw += Math.PI; // flip it around
 
-                SmartDashboard.putNumber("autoyaw", desiredYaw);
+                SmartDashboard.putNumber("Speaker absolute theta", Units.radiansToDegrees(desiredYaw)); // CCW+, 0 = North
 
+                latestYaw = desiredYaw;
                 return desiredYaw;
             })
         );
@@ -86,7 +94,7 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
     /** @return x right+, y forward+, z up+ */
     private static Translation3d getDifference(Kinesthetics k) {
         var t2 = k.getPose().getTranslation();
-        return Constants.Environment.speakers.get(k.getAlliance()).minus(new Translation3d(-t2.getY(), t2.getX(), 0));
+        return Constants.Environment.speakers.get(k.getAlliance()).minus(new Translation3d(t2.getX(), t2.getY(), 0));
     }
 
     public static boolean isInRange(Kinesthetics k) {

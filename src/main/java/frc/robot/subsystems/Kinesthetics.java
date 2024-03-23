@@ -3,19 +3,17 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 
-import edu.wpi.first.math.Nat;
-import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.lib.math.RobotState;
 import frc.robot.Constants;
 
 public class Kinesthetics extends SubsystemBase {
@@ -24,9 +22,7 @@ public class Kinesthetics extends SubsystemBase {
 
     // Sensor Information
     private Pigeon2 gyro;
-    // private DigitalInput feederBeamBreak;
     private DigitalInput shooterBeamBreak;
-    // private PowerDistribution pdh = new PowerDistribution(1, ModuleType.kRev);
 
     // Data Fields
     private DriverStation.Alliance alliance;
@@ -39,11 +35,10 @@ public class Kinesthetics extends SubsystemBase {
         s_Swerve = s;
         s_Swerve.setKinesthetics(this);
 
-        gyro = new Pigeon2(Constants.Swerve.pigeonID, Constants.Swerve.canBus);
+        gyro = new Pigeon2(Constants.Swerve.pigeonID);
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.setYaw(0);
 
-        // feederBeamBreak = new DigitalInput(Constants.Intake.beamBreakID);
         shooterBeamBreak = new DigitalInput(Constants.Shooter.beamBreakID);
 
         alliance = DriverStation.getAlliance().orElse(null);
@@ -53,15 +48,6 @@ public class Kinesthetics extends SubsystemBase {
 
         table.addBoolean("Shooter Note?", this::shooterHasNote);
         table.add("Pose Estimation", field);
-        // table.addDoubleArray("Current", () -> {
-        //     double[] power = new double[20];
-        //     for (int i = 0; i < power.length; i++) try {
-        //         power[i] = pdh.getCurrent(i);
-        //     } catch (Exception e) {
-        //         power[i] = -1;
-        //     }
-        //     return power;
-        // });
     }
 
     @Override
@@ -88,10 +74,6 @@ public class Kinesthetics extends SubsystemBase {
         return alliance;
     }
 
-    // public boolean feederHasNote() {
-    //     return feederBeamBreak.get();
-    // }
-
     public boolean shooterHasNote() {
         return !shooterBeamBreak.get();
     }
@@ -116,14 +98,13 @@ public class Kinesthetics extends SubsystemBase {
         poseEstimator.resetPosition(getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d(getPose().getTranslation(), new Rotation2d()));
     }
 
-    /** @return Field Relative v_x meters / second (forward +), v_y meters / second (right +), ω radians / second (ccw +)*/
-    public Vector<N3> getVelocity() {
+    public RobotState getRobotState() {
         var speeds = Constants.Swerve.swerveKinematics.toChassisSpeeds(s_Swerve.getModuleStates());
         speeds = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getHeading());
-        var vec = new Vector<N3>(Nat.N3());
-        vec.set(0, 0, speeds.vxMetersPerSecond);
-        vec.set(1, 0, -speeds.vyMetersPerSecond);
-        vec.set(2, 0, speeds.omegaRadiansPerSecond);
-        return vec;
+        return RobotState.fromVelocity(getPose(),
+            -speeds.vyMetersPerSecond,
+            speeds.vxMetersPerSecond,
+            speeds.omegaRadiansPerSecond
+        );
     }
 }

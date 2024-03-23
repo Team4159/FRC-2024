@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkFlex;
-import com.revrobotics.CANSparkLowLevel;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkAbsoluteEncoder;
 
@@ -26,11 +26,11 @@ public class Shooter extends SubsystemBase {
     private final MechanismLigament2d mechanism, mechanismGoal;
 
     public Shooter() {
-        angleMotorController = new CANSparkFlex(Constants.Shooter.angleMotorID, CANSparkLowLevel.MotorType.kBrushless);
-        shooterMLeftController = new CANSparkFlex(Constants.Shooter.shooterMLeftID, CANSparkLowLevel.MotorType.kBrushless);
-        shooterMRightController= new CANSparkFlex(Constants.Shooter.shooterMRightID,CANSparkLowLevel.MotorType.kBrushless);
+        angleMotorController = new CANSparkFlex(Constants.Shooter.angleMotorID, MotorType.kBrushless);
+        shooterMLeftController = new CANSparkFlex(Constants.Shooter.shooterMLeftID, MotorType.kBrushless);
+        shooterMRightController= new CANSparkFlex(Constants.Shooter.shooterMRightID,MotorType.kBrushless);
         shooterMRightController.setInverted(true);
-        neckMotorController = new CANSparkMax(Constants.Shooter.neckMotorID, CANSparkLowLevel.MotorType.kBrushless);
+        neckMotorController = new CANSparkMax(Constants.Shooter.neckMotorID, MotorType.kBrushless);
         
         var canvas = new Mechanism2d(400, 400);
         mechanism = new MechanismLigament2d("Shooter", 100, Units.radiansToDegrees(getPitch()), 10, new Color8Bit(255, 64, 64));
@@ -146,7 +146,8 @@ public class Shooter extends SubsystemBase {
             if (instant) return true;
             if (continuous) return false;
             var state = desiredState.get();
-            return (state.pitch() == null || MathUtil.isNear(state.pitch(), getPitch(), Constants.Shooter.pitchTolerance)) && (!state.hasSpin() || (
+            return (state.pitch() == null || MathUtil.isNear(state.pitch(), getPitch(), Constants.Shooter.pitchTolerance))
+                && (!state.hasSpin() || (
                     MathUtil.isNear(state.lSpin(), getLSpin(), Constants.Shooter.spinTolerance) &&
                     MathUtil.isNear(state.rSpin(), getRSpin(), Constants.Shooter.spinTolerance)
                 ));
