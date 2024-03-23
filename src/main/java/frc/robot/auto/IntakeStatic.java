@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.auto;
 
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -11,6 +11,7 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Kinesthetics;
 import frc.robot.subsystems.Shooter;
 
+// this exists because IntakeAuto might require Swerve, which could mess up ParallelCommandGroups during auto paths
 public class IntakeStatic extends SequentialCommandGroup {
     public IntakeStatic(Kinesthetics k, Shooter sh, Intake i) {
         addCommands(

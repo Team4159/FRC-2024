@@ -84,7 +84,7 @@ public final class Constants {
         public static final double driveKF = 0.0;
 
         /* Drive Motor Characterization Values From SYSID */
-        public static final double driveKS = 0.32/12;
+        public static final double driveKS = 0.32; // 0.32/12
         public static final double driveKV = 1.51/12;
         public static final double driveKA = 0.27/12;
 
@@ -95,7 +95,7 @@ public final class Constants {
         public static final double maxAngularVelocity = 3.0;
 
         public static final class AutoConfig { //TODO: must be tuned to specific robot
-            public static final double kMaxSpeedMetersPerSecond = 3;
+            public static final double kMaxSpeedMetersPerSecond = 4.5;
             public static final double kMaxAccelerationMetersPerSecondSquared = 3;
             public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
             public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
@@ -111,10 +111,10 @@ public final class Constants {
 
             // used by PathPlanner during setup
             public static final HolonomicPathFollowerConfig autoPathFollowerConfig = new HolonomicPathFollowerConfig( // TODO set values
-                new PIDConstants(10, 0, 0), // translation PID constants
-                new PIDConstants(10, 0, 0), // rotation PID constants
+                new PIDConstants(15, 0, 0), // translation PID constants
+                new PIDConstants(15, 0, 0), // rotation PID constants
                 Constants.Swerve.AutoConfig.kMaxSpeedMetersPerSecond, 
-                0.48, // drive base radius in m
+                wheelBase, // drive base radius in m
                 new ReplanningConfig() // default path replanning config
             );
         }

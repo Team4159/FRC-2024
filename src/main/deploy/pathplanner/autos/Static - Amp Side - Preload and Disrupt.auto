@@ -3,9 +3,9 @@
   "startingPose": {
     "position": {
       "x": 0.6924444618120005,
-      "y": 4.373613761472538
+      "y": 6.689056341075646
     },
-    "rotation": 121.53948190016658
+    "rotation": -121.11533231474182
   },
   "command": {
     "type": "sequential",
@@ -20,7 +20,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Source Side to 7 Static Intake"
+            "pathName": "Amp Side to Disrupt"
           }
         }
       ]

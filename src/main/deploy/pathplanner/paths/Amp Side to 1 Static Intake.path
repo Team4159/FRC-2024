@@ -12,20 +12,20 @@
         "y": 7.367317298737161
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Amp Side"
     },
     {
       "anchor": {
-        "x": 3.651065535749305,
-        "y": 6.911245275482004
+        "x": 2.7856981070087494,
+        "y": 6.993104356579084
       },
       "prevControl": {
-        "x": 2.651065535749305,
-        "y": 6.911245275482004
+        "x": 1.7856981070087494,
+        "y": 6.993104356579084
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "1"
     }
   ],
   "rotationTargets": [
