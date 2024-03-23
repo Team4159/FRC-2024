@@ -48,11 +48,11 @@ public class Swerve extends SubsystemBase {
             () -> this.kinesthetics.getAlliance().equals(DriverStation.Alliance.Red), // determines if autos should be flipped (i.e. if on Red Alliance)
             this // reference to this subsystem to set requirements
         );
-        PPHolonomicDriveController.setRotationTargetOverride(() -> {
-            var cmd = this.getCurrentCommand();
-            if (cmd == null || !(cmd instanceof SpeakerAutoAim a) || a.latestYaw == null) return Optional.empty();
-            return Optional.of(Rotation2d.fromRadians(a.latestYaw));
-        });
+        // PPHolonomicDriveController.setRotationTargetOverride(() -> {
+        //     var cmd = this.getCurrentCommand();
+        //     if (cmd == null || !(cmd instanceof SpeakerAutoAim a) || a.latestYaw == null) return Optional.empty();
+        //     return Optional.of(Rotation2d.fromRadians(a.latestYaw));
+        // });
         
         Timer.delay(0.1);
         resetModulesToAbsolute();
