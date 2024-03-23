@@ -3,9 +3,9 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Intake.IntakeState;
 import frc.robot.Constants.SpinState;
 import frc.robot.commands.*;
@@ -24,19 +25,21 @@ public class RobotContainer {
     private static final Joystick secondary = new Joystick(1);
 
     /* Driver Buttons */
-    private static final JoystickButton resetGyro = new JoystickButton(driver, 1);
-    private static final JoystickButton forceVision = new JoystickButton(driver, 10); // bottom left 
+    private static final JoystickButton resetGyro = new JoystickButton(driver, 14);
+    private static final JoystickButton forceVision = new JoystickButton(driver, 15);
 
     private static final JoystickButton manualAmp = new JoystickButton(secondary, 3);
     private static final JoystickButton manualShootPodium = new JoystickButton(secondary, 5);
     private static final JoystickButton manualShootSubwoofer = new JoystickButton(secondary, 4);
     private static final JoystickButton manualShootSourceIn = new JoystickButton(secondary, 6);
-    private static final JoystickButton manualIntakeUp = new JoystickButton(secondary, 9);
+    private static final JoystickButton manualIntakeUp = new JoystickButton(secondary, 7);
     private static final JoystickButton manualIntakeDown = new JoystickButton(secondary, 2);
     private static final JoystickButton manualOuttakeUp = new JoystickButton(secondary, 11);
     private static final JoystickButton manualOuttakeDown = new JoystickButton(secondary, 10);
-    private static final JoystickButton manualFeed = new JoystickButton(secondary, 1);
-    // private static final JoystickButton climb = new JoystickButton(secondary, 12); 
+    // private static final JoystickButton manualClimberUp = new JoystickButton(secondary, 8);
+    // private static final JoystickButton manualClimberDown = new JoystickButton(secondary, 9);
+    private static final Trigger manualFeed = new JoystickButton(driver, 1)
+                                          .or(new JoystickButton(secondary, 1));
 
     private static final JoystickButton autoAmp = new JoystickButton(driver, 4);
     private static final JoystickButton autoSpk = new JoystickButton(driver, 3);
@@ -119,7 +122,6 @@ public class RobotContainer {
         autoAmp.and(kinesthetics::shooterHasNote)//.and(() -> AmpAuto.isInRange(kinesthetics)) FIXME BROKEN LMAO
             .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
             .whileTrue(new SequentialCommandGroup(
-                new PrintCommand("bei"),
                 new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector),
                 s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW)
             )).onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
@@ -194,19 +196,18 @@ public class RobotContainer {
                 s_Shooter.new ChangeNeck(SpinState.ST),
                 s_Intake.new ChangeState(IntakeState.STOW)
             ));
-        // climb.whileTrue(s_Climber.new Raise());
+        // manualClimberUp
+        //     .whileTrue(s_Climber.new ChangeState(SpinState.FW));
+        // manualClimberDown
+        //     .whileTrue(s_Climber.new ChangeState(SpinState.BW));
     }
 
     public Command getTeleopInit() {
-        var g = new ParallelCommandGroup(s_Shooter.new ChangeState(() -> Constants.Shooter.idleCommand, false));
-        if (kinesthetics.getAlliance() == Alliance.Red)
-            g.addCommands(Commands.runOnce(() -> kinesthetics.setHeading(
-                kinesthetics.getHeading().minus(Rotation2d.fromDegrees(180))
-            )));
-        return g;
+        return s_Shooter.new ChangeState(() -> Constants.Shooter.idleCommand, false);
     }
 
     public Command getAutonomousCommand() {
-        return autoChooser.getSelected();
+        return new InstantCommand(() -> kinesthetics.setPose(new Pose2d(1.31, 5.53, Rotation2d.fromDegrees(180))));
+        // return autoChooser.getSelected();
     }
 }

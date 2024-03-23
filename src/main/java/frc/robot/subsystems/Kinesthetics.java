@@ -56,7 +56,6 @@ public class Kinesthetics extends SubsystemBase {
         var visionPose = Vision.getBotPose();
         if (visionPose != null)
             poseEstimator.addVisionMeasurement(visionPose.toPose2d(), Vision.getLimelightPing());
-        super.periodic();
         field.setRobotPose(getPose());
     }
 
@@ -86,11 +85,11 @@ public class Kinesthetics extends SubsystemBase {
         poseEstimator.resetPosition(getGyroYaw(), s_Swerve.getModulePositions(), pose);
     }
 
-    public Rotation2d getHeading(){
+    public Rotation2d getHeading() {
         return getPose().getRotation();
     }
 
-    public void setHeading(Rotation2d heading){
+    public void setHeading(Rotation2d heading) {
         poseEstimator.resetPosition(getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d(getPose().getTranslation(), heading));
     }
 

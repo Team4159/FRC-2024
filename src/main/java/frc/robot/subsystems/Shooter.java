@@ -32,7 +32,7 @@ public class Shooter extends SubsystemBase {
         shooterMRightController.setInverted(true);
         neckMotorController = new CANSparkMax(Constants.Shooter.neckMotorID, MotorType.kBrushless);
         
-        Constants.Shooter.pitchOffset = angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition() - Units.radiansToRotations(Constants.Shooter.minimumPitch);
+        Constants.Shooter.pitchOffset = angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition() - Units.radiansToRotations(Constants.Shooter.minimumPitch) - 0.00041;
 
         var canvas = new Mechanism2d(400, 400);
         mechanism = new MechanismLigament2d("Shooter", 100, Units.radiansToDegrees(getPitch()), 10, new Color8Bit(255, 64, 64));
@@ -144,7 +144,7 @@ public class Shooter extends SubsystemBase {
             return (state.pitch() == null || MathUtil.isNear(state.pitch(), getPitch(), Constants.Shooter.pitchTolerance))
                 && (!state.hasSpin() || (
                     MathUtil.isNear(state.lSpin(), getLSpin(), Constants.Shooter.spinTolerance) &&
-                    MathUtil.isNear(state.rSpin(), getRSpin(), Constants.Shooter.spinTolerance)
+                    MathUtil.isNear(state.rSpin(), getRSpin(), Constants.Shooter.spinTolerance + Math.PI / 2) // god chain is so bad
                 ));
         }
     

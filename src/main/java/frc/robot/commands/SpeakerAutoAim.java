@@ -23,7 +23,7 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                 var transform = getDifference(k);
                 var state = k.getRobotState();
 
-                double roottwoh = Math.sqrt(2*transform.getZ()); // Z, up +
+                double roottwoh = Math.sqrt(2*transform.getZ()) - 0.5; // Z, up +
                 boolean speakerIsOnRight = transform.getX() > 0;
                 if (speakerIsOnRight != (k.getAlliance() == Alliance.Red)) {
                     System.out.println("UH OH!!!!");
@@ -58,7 +58,7 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                 ) * 400/47 );
                 
                 return new Shooter.ShooterCommand(
-                    desiredPitch,
+                    desiredPitch, // FIXME the pitch is too high
                     Constants.Shooter.shooterSpinFF.calculate(desiredNoteVel)
                 );
             }, false),
@@ -80,8 +80,8 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                 double n = relativex * rootg / roottwoh - relativexv;
 
                 double desiredYaw = -Math.atan(- ((rootg * relativey) / roottwoh + relativeyv) / n); // CCW+
-                desiredYaw -= Math.PI / 2; // zero degrees is forwards, the equation assumes it's right
-                if (!speakerIsOnRight) desiredYaw += Math.PI; // flip it around
+                desiredYaw += Math.PI / 2; // zero degrees is forwards, the equation assumes it's right
+                if (!speakerIsOnRight) desiredYaw *= -1; // flip it around
 
                 SmartDashboard.putNumber("Speaker absolute theta", Units.radiansToDegrees(desiredYaw)); // CCW+, 0 = North
 

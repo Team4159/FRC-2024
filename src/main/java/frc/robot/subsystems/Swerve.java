@@ -46,7 +46,7 @@ public class Swerve extends SubsystemBase {
                 SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
                 for(SwerveModule mod : mSwerveMods) mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false);
             }, 
-            Constants.Swerve.autoPathFollowerConfig, // config, includes PID values
+            Constants.Swerve.AutoConfig.pathFollower, // config, includes PID values
             () -> this.kinesthetics.getAlliance().equals(DriverStation.Alliance.Red), // determines if autos should be flipped (i.e. if on Red Alliance)
             this // reference to this subsystem to set requirements
         );
@@ -91,13 +91,13 @@ public class Swerve extends SubsystemBase {
         setModuleStates(Constants.Swerve.swerveKinematics.toSwerveModuleStates(new ChassisSpeeds(0, 0, 0)));
     }
 
-    public SwerveModuleState[] getModuleStates(){
+    public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
         for(SwerveModule mod : mSwerveMods) states[mod.moduleNumber] = mod.getState();
         return states;
     }
 
-    public SwerveModulePosition[] getModulePositions(){
+    public SwerveModulePosition[] getModulePositions() {
         SwerveModulePosition[] positions = new SwerveModulePosition[4];
         for(SwerveModule mod : mSwerveMods) positions[mod.moduleNumber] = mod.getPosition();
         return positions;

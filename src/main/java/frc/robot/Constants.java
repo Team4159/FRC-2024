@@ -43,7 +43,7 @@ public final class Constants {
             new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
             new Translation2d(-wheelBase / 2.0, trackWidth / 2.0),
             new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0));
-        public static final double yawTolerance = Math.PI/32; // Radians
+        public static final double yawTolerance = Math.PI/16; // Radians
 
         /* Module Gear Ratios */
         public static final double driveGearRatio = chosenModule.driveGearRatio;
@@ -108,6 +108,15 @@ public final class Constants {
             public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
                 new TrapezoidProfile.Constraints(
                     kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+
+            // used by PathPlanner during setup
+            public static final HolonomicPathFollowerConfig pathFollower = new HolonomicPathFollowerConfig( // TODO set values
+                new PIDConstants(10, 0, 0), // translation PID constants
+                new PIDConstants(10, 0, 0), // rotation PID constants
+                Constants.Swerve.AutoConfig.kMaxSpeedMetersPerSecond, 
+                0.48, // drive base radius in m
+                new ReplanningConfig() // default path replanning config
+            );
         }
 
         /* Neutral Modes */
@@ -158,15 +167,6 @@ public final class Constants {
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
-
-        // used by PathPlanner during setup
-        public static final HolonomicPathFollowerConfig autoPathFollowerConfig = new HolonomicPathFollowerConfig( // TODO set values
-            new PIDConstants(10, 0, 0), // translation PID constants
-            new PIDConstants(10, 0, 0), // rotation PID constants
-            Constants.Swerve.AutoConfig.kMaxSpeedMetersPerSecond, 
-            0.48, // drive base radius in m
-            new ReplanningConfig() // default path replanning config
-        );
     }
 
     public static final class Intake {
@@ -212,11 +212,11 @@ public final class Constants {
         public static final int neckMotorID = 7;
         public static final int beamBreakID = 0; // PWM
 
-        public static final double pitchTolerance = Math.PI/128;
-        public static final double spinTolerance = Math.PI/64;
+        public static final double pitchTolerance = Math.PI/64;
+        public static final double spinTolerance = Math.PI/8;
 
         public static double pitchOffset = Units.degreesToRotations(-3);
-        public static final double minimumPitch = Units.degreesToRadians(15);
+        public static final double minimumPitch = Units.degreesToRadians(14);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
         public static final double neckSpeed = 0.25; // -1 to 1
         public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 150d);
@@ -238,19 +238,17 @@ public final class Constants {
 
     public static final class Climber {
         public static final int motorID = 10;
+        public static final double climbSpeed = 0.7;
 
-        public static final double heightTolerance = Units.inchesToMeters(1);
-
-        public static final double hookHeight = Units.inchesToMeters(5);
-        public static final double maximumHeight = Units.inchesToMeters(10);
-
-        public static final double sprocketCircumference = Units.inchesToMeters(2 * Math.PI);
+        // public static final double heightTolerance = Units.inchesToMeters(1);
+        // public static final double maximumHeight = Units.inchesToMeters(15);
+        // public static final double sprocketCircumference = Units.inchesToMeters(2 * Math.PI);
     }
 
     public static final class CommandConstants {
         public static final double bumperWidth = Units.inchesToMeters(2.75);
 
-        public static final PIDController swerveYawPID = new PIDController(0.01, 0, 0.0001);
+        public static final PIDController swerveYawPID = new PIDController(0.1, 0, 0.001);
 
         public static final ShooterCommand speakerPodiumShooterCommand = new ShooterCommand(
             0.7, 500d, 275d);
