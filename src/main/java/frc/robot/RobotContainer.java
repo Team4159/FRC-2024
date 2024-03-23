@@ -74,8 +74,6 @@ public class RobotContainer {
 
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("Autonomous Routine", autoChooser);
-
-        DriverStation.silenceJoystickConnectionWarning(true);
     }
 
     // register PathPlanner Commands, must be done before building autos
@@ -105,9 +103,11 @@ public class RobotContainer {
      * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
      */
     private void configureButtonBindings() {
+        DriverStation.silenceJoystickConnectionWarning(true);
+
         /* Driver Buttons */
-        resetGyro.onTrue(new InstantCommand(kinesthetics::zeroHeading));
-        forceVision.onTrue(new InstantCommand(kinesthetics::forceVision));        
+        resetGyro.onTrue(new InstantCommand(kinesthetics::zeroHeading)); // FIXME this messes up absolute yaw
+        forceVision.onTrue(new InstantCommand(kinesthetics::forceVision));
 
         // Automatic Command Groups
         autoSpk.and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
@@ -116,9 +116,10 @@ public class RobotContainer {
                 new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()),
                 s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW)
             )).onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
-        autoAmp.and(kinesthetics::shooterHasNote).and(() -> AmpAuto.isInRange(kinesthetics))
+        autoAmp.and(kinesthetics::shooterHasNote)//.and(() -> AmpAuto.isInRange(kinesthetics)) FIXME BROKEN LMAO
             .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
             .whileTrue(new SequentialCommandGroup(
+                new PrintCommand("bei"),
                 new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector),
                 s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW)
             )).onFalse(s_Shooter.new ChangeNeck(SpinState.ST));

@@ -34,10 +34,10 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                 double relativexv = (speakerIsOnRight ? 1 : -1) * state.getvx(); // speaker relative towards+ away-
                 double relativeyv = (speakerIsOnRight ? -1 : 1) * state.getvy(); // speaker relative left- right+
                 
-                SmartDashboard.putNumber("Speaker dx", relativex);
-                SmartDashboard.putNumber("Speaker dy", relativey);
-                SmartDashboard.putNumber("Speaker dx/dt", relativexv);
-                SmartDashboard.putNumber("Speaker dy/dt", relativeyv);
+                SmartDashboard.putNumber("Speaker x", relativex);
+                SmartDashboard.putNumber("Speaker y", relativey);
+                SmartDashboard.putNumber("Speaker x'", relativexv);
+                SmartDashboard.putNumber("Speaker y'", relativeyv);
 
                 double n = relativex * rootg / roottwoh - relativexv; // airtine
                 double m = relativey * rootg / roottwoh + relativeyv;
@@ -94,7 +94,7 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
     /** @return x right+, y forward+, z up+ */
     private static Translation3d getDifference(Kinesthetics k) {
         var t2 = k.getPose().getTranslation();
-        return Constants.Environment.speakers.get(k.getAlliance()).minus(new Translation3d(-t2.getY(), t2.getX(), 0));
+        return Constants.Environment.speakers.get(k.getAlliance()).minus(new Translation3d(t2.getX(), t2.getY(), 0));
     }
 
     public static boolean isInRange(Kinesthetics k) {

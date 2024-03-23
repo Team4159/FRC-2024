@@ -62,9 +62,9 @@ public final class Constants {
         public static final double angleCurrentThresholdTime = 0.1;
         public static final boolean angleEnableCurrentLimit = true;
 
-        public static final int driveCurrentLimit = 25; //35
-        public static final int driveCurrentThreshold = 50;
-        public static final double driveCurrentThresholdTime = 0.1;
+        public static final int driveCurrentLimit = 35; //35
+        public static final int driveCurrentThreshold = 60;
+        public static final double driveCurrentThresholdTime = 0.05;
         public static final boolean driveEnableCurrentLimit = true;
 
         /* These values are used by the drive falcon to ramp in open loop and closed loop driving.
