@@ -90,16 +90,12 @@ public class Kinesthetics extends SubsystemBase {
     }
 
     public void setPose(Pose2d pose) {
-        gyro.setYaw(pose.getRotation().getDegrees());
         poseEstimator.resetPosition(getGyroYaw(), s_Swerve.getModulePositions(), pose);
     }
 
+    /** @return the gyro yaw (for some reason the code kills itself without this) */
     public Rotation2d getHeading() {
-        return getPose().getRotation();
-    }
-
-    public void setHeading(Rotation2d heading) {
-        poseEstimator.resetPosition(getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d(getPose().getTranslation(), heading));
+        return getGyroYaw();
     }
 
     public RobotState getRobotState() {
