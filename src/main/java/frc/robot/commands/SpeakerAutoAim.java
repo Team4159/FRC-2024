@@ -5,7 +5,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants;
@@ -25,9 +25,6 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
 
                 double roottwoh = Math.sqrt(2*transform.getZ()); // Z, up +
                 boolean speakerIsOnRight = transform.getX() > 0;
-                if (speakerIsOnRight != (k.getAlliance() == Alliance.Red)) {
-                    System.out.println("UH OH!!!!");
-                }
 
                 double relativex  = Math.abs(transform.getX()); // left+ right+
                 double relativey  = (speakerIsOnRight ? -1 : 1) * transform.getY(); // forward backward
@@ -58,7 +55,7 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                 ) * 400/47 );
                 
                 return new Shooter.ShooterCommand(
-                    desiredPitch,
+                    desiredPitch, // FIXME the pitch is too high
                     Constants.Shooter.shooterSpinFF.calculate(desiredNoteVel)
                 );
             }, false),
@@ -68,9 +65,6 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
 
                 double roottwoh = Math.sqrt(2*transform.getZ()); // Z, up +
                 boolean speakerIsOnRight = transform.getX() > 0;
-                if (speakerIsOnRight != (k.getAlliance() == Alliance.Red)) {
-                    System.out.println("UH OH!!!!");
-                }
 
                 double relativex  = Math.abs(transform.getX()); // left+ right+
                 double relativey  = (speakerIsOnRight ? -1 : 1) * transform.getY(); // forward backward
@@ -79,8 +73,7 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                 
                 double n = relativex * rootg / roottwoh - relativexv;
 
-                double desiredYaw = -Math.atan(- ((rootg * relativey) / roottwoh + relativeyv) / n); // CCW+
-                desiredYaw -= Math.PI / 2; // zero degrees is forwards, the equation assumes it's right
+                double desiredYaw = -Math.atan(- ((rootg * relativey) / roottwoh + relativeyv) / n); // CCW+, facing speaker = 0
                 if (!speakerIsOnRight) desiredYaw += Math.PI; // flip it around
 
                 SmartDashboard.putNumber("Speaker absolute theta", Units.radiansToDegrees(desiredYaw)); // CCW+, 0 = North
@@ -93,8 +86,10 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
 
     /** @return x right+, y forward+, z up+ */
     private static Translation3d getDifference(Kinesthetics k) {
+        var all = DriverStation.getAlliance();
+        if (all.isEmpty()) return null;
         var t2 = k.getPose().getTranslation();
-        return Constants.Environment.speakers.get(k.getAlliance()).minus(new Translation3d(t2.getX(), t2.getY(), 0));
+        return Constants.Environment.speakers.get(all.get()).minus(new Translation3d(t2.getX(), t2.getY(), 0));
     }
 
     public static boolean isInRange(Kinesthetics k) {

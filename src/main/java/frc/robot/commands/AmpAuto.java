@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -16,7 +17,9 @@ import frc.lib.math.RobotState;
 
 public class AmpAuto extends ParallelCommandGroup {
     public AmpAuto(Kinesthetics k, Swerve sw, Shooter sh, Deflector d) {
-        var desiredPose = Constants.Environment.amps.get(k.getAlliance());
+        var all = DriverStation.getAlliance();
+        if (all.isEmpty()) return;
+        var desiredPose = Constants.Environment.amps.get(all.get());
         // offset the desired pose so the front of the robot touches the amp, not the center (which would be bad)
         desiredPose.plus(new Transform2d(-Constants.Swerve.trackWidth/2 - Constants.CommandConstants.bumperWidth, 0, new Rotation2d()));
         addCommands(
@@ -43,7 +46,9 @@ public class AmpAuto extends ParallelCommandGroup {
     }
 
     public static boolean isInRange(Kinesthetics k) { // are we close enough
-        return Constants.Environment.amps.get(k.getAlliance()).getTranslation()
+        var all = DriverStation.getAlliance();
+        if (all.isEmpty()) return false;
+        return Constants.Environment.amps.get(all.get()).getTranslation()
             .minus(k.getPose().getTranslation()).getNorm()
             < Constants.CommandConstants.ampAutoDistanceMax;
     }

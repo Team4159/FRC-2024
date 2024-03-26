@@ -25,12 +25,14 @@ import frc.robot.commands.SpeakerAutoAim;
 public class Swerve extends SubsystemBase {
     private Kinesthetics kinesthetics;
 
-        private SwerveModule[] mSwerveMods = new SwerveModule[] {
-            new SwerveModule(0, Constants.Swerve.Mod0.constants),
-            new SwerveModule(1, Constants.Swerve.Mod1.constants),
-            new SwerveModule(2, Constants.Swerve.Mod2.constants),
-            new SwerveModule(3, Constants.Swerve.Mod3.constants)
-        };
+    private final SwerveModule[] mSwerveMods = new SwerveModule[] {
+        new SwerveModule(0, Constants.Swerve.Mod0.constants),
+        new SwerveModule(1, Constants.Swerve.Mod1.constants),
+        new SwerveModule(2, Constants.Swerve.Mod2.constants),
+        new SwerveModule(3, Constants.Swerve.Mod3.constants)
+    };
+
+    private Rotation2d driverAngleOffset = new Rotation2d(0);
 
     public void setKinesthetics(Kinesthetics k) {
         kinesthetics = k;
@@ -45,8 +47,8 @@ public class Swerve extends SubsystemBase {
                 SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
                 for(SwerveModule mod : mSwerveMods) mod.setDesiredState(swerveModuleStates[mod.moduleNumber], true);
             }, 
-            Constants.Swerve.AutoConfig.autoPathFollowerConfig, // config, includes PID values
-            () -> this.kinesthetics.getAlliance().equals(DriverStation.Alliance.Red), // determines if autos should be flipped (i.e. if on Red Alliance)
+            Constants.Swerve.AutoConfig.pathFollower, // config, includes PID values
+            () -> DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue).equals(DriverStation.Alliance.Red), // determines if autos should be flipped (i.e. if on Red Alliance)
             this // reference to this subsystem to set requirements
         );
         // PPHolonomicDriveController.setRotationTargetOverride(() -> {
@@ -56,7 +58,7 @@ public class Swerve extends SubsystemBase {
         // });
         
         Timer.delay(0.1);
-        resetModulesToAbsolute();
+        for (SwerveModule mod : mSwerveMods) mod.resetToAbsolute();
     }
 
     /** @param rotation radians / second */
@@ -67,7 +69,7 @@ public class Swerve extends SubsystemBase {
                                     translation.getX(), 
                                     translation.getY(), 
                                     rotation, 
-                                    kinesthetics.getHeading()
+                                    kinesthetics.getHeading().plus(driverAngleOffset)
                                 )
                                 : new ChassisSpeeds(
                                     translation.getX(), 
@@ -90,20 +92,20 @@ public class Swerve extends SubsystemBase {
         setModuleStates(Constants.Swerve.swerveKinematics.toSwerveModuleStates(new ChassisSpeeds(0, 0, 0)));
     }
 
-    public SwerveModuleState[] getModuleStates(){
+    public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
         for(SwerveModule mod : mSwerveMods) states[mod.moduleNumber] = mod.getState();
         return states;
     }
 
-    public SwerveModulePosition[] getModulePositions(){
+    public SwerveModulePosition[] getModulePositions() {
         SwerveModulePosition[] positions = new SwerveModulePosition[4];
         for(SwerveModule mod : mSwerveMods) positions[mod.moduleNumber] = mod.getPosition();
         return positions;
     }
 
-    private void resetModulesToAbsolute(){
-        for(SwerveModule mod : mSwerveMods) mod.resetToAbsolute();
+    public void setAngleOffset() {
+        driverAngleOffset = Rotation2d.fromRadians(-kinesthetics.getHeading().getRadians());
     }
 
     @Override
@@ -135,7 +137,15 @@ public class Swerve extends SubsystemBase {
         public void execute() {
             drive(
                 new Translation2d(passthroughTranslation.getAsDouble(), passthroughStrafe.getAsDouble()).times(Constants.Swerve.maxSpeed),
-                desiredYaw.getAsDouble(), true, false
+                Constants.CommandConstants.swerveYawPID.calculate(kinesthetics.getHeading().getRadians(), desiredYaw.getAsDouble()), true, false
+            );
+        }
+
+        @Override
+        public void end(boolean interrupted) {
+            drive(
+                new Translation2d(passthroughTranslation.getAsDouble(), passthroughStrafe.getAsDouble()).times(Constants.Swerve.maxSpeed),
+                0, true, false
             );
         }
 

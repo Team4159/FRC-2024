@@ -4,47 +4,53 @@ import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.math.Conversions;
 import frc.robot.Constants;
+import frc.robot.Constants.SpinState;
 
-public class Climber extends SubsystemBase{
+public class Climber extends SubsystemBase {
     private CANSparkBase motorController;
     
     public Climber(){
         motorController = new CANSparkFlex(Constants.Climber.motorID, MotorType.kBrushless);
     }
 
-    /** @return radians */
-    private double getHeight() {
-        return Conversions.rotationsToMeters(motorController.getEncoder().getPosition(), Constants.Climber.sprocketCircumference);
-    }
+    // /** @return radians */
+    // private double getHeight() {
+    //     return Conversions.rotationsToMeters(motorController.getEncoder().getPosition(), Constants.Climber.sprocketCircumference);
+    // }
     
-    /** @param goalPitch radians */
-    private void setGoalPitch(double goalPitch) {
-        motorController.getPIDController().setReference(Conversions.metersToRotations(goalPitch, Constants.Climber.sprocketCircumference), CANSparkBase.ControlType.kPosition);
+    // /** @param goalPitch radians */
+    // private void setGoalPitch(double goalPitch) {
+    //     motorController.getPIDController().setReference(Conversions.metersToRotations(goalPitch, Constants.Climber.sprocketCircumference), CANSparkBase.ControlType.kPosition);
+    // }
+
+    private void set(SpinState ss) {
+        motorController.set(ss.multiplier * Constants.Climber.climbSpeed);
     }
 
-    public class Raise extends Command {
-        public Raise() {
+    public class ChangeState extends Command {
+        private SpinState desiredState;
+
+        public ChangeState(SpinState ss) {
+            desiredState = ss;
             addRequirements(Climber.this);
         }
 
         @Override
         public void initialize() {
-            setGoalPitch(Constants.Climber.maximumHeight);
+            set(desiredState);
         }
 
         @Override
         public boolean isFinished() {
-            return MathUtil.isNear(Constants.Climber.maximumHeight, getHeight(), Constants.Climber.heightTolerance);
+            return true;
         }
 
         @Override
         public void end(boolean interrupted) {
-            setGoalPitch(Constants.Climber.hookHeight);
+            if (interrupted) set(SpinState.ST);
             super.end(interrupted);
         }
     }

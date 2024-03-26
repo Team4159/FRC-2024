@@ -32,9 +32,9 @@ public class Vision extends SubsystemBase {
             .add("Single-Target", false)
             .withWidget(BuiltInWidgets.kToggleButton).getEntry("boolean");
         table.addDouble("LL Error", () -> {
-            var v = Vision.getBotPose();
+            var v = Vision.getLimelightData();
             if (v == null) return -1d;
-            return kinesthetics.getPose().getTranslation().getDistance(v.getTranslation().toTranslation2d());
+            return kinesthetics.getPose().getTranslation().getDistance(v.pose().getTranslation().toTranslation2d());
         });
         table.addBoolean("Note Seen", () -> limelightTable.getEntry("notetrans").exists());
         table.add("Vision Field", field);
@@ -46,7 +46,7 @@ public class Vision extends SubsystemBase {
         if (getLimelightPipe() != desiredPipeline) setLimelightPipe(desiredPipeline);
     }
 
-    public static Pose3d getBotPose() {
+    public static VisionData getLimelightData() {
         if (!limelightTable.getEntry("botpose_wpiblue").exists()) return null;
         double[] ntdata = limelightTable.getEntry("botpose_wpiblue").getDoubleArray(new double[6]);
         if (ntdata[0] == ntdata[1] && ntdata[1] == ntdata[2] && ntdata[2] == 0) return null;
@@ -54,13 +54,20 @@ public class Vision extends SubsystemBase {
             new Translation3d(ntdata[0], ntdata[1], ntdata[2]),
             new Rotation3d(0, 0, Units.degreesToRadians(ntdata[5]))
         );
+        double area = limelightTable.getEntry("ta").getDouble(0.25);
         field.setRobotPose(o.toPose2d());
-        return o;
+        return new VisionData(
+            o,
+            1 - area * 0.4,
+            Units.millisecondsToSeconds(
+                limelightTable.getEntry("cl").getDouble(0) +
+                limelightTable.getEntry("tl").getDouble(0)
+            )
+        );
     } // limelight translation is y 12.947", z 8.03", pitch 64 deg
 
-    public static double getLimelightPing() {
-        return limelightTable.getEntry("cl").getDouble(-1);
-    }
+    /** @param ping seconds since image taken (+) */
+    public static record VisionData(Pose3d pose, double confidence, double ping) {};
 
     public static void setLimelightPipe(int pipeline) {
         limelightTable.getEntry("pipeline").setNumber(pipeline);
