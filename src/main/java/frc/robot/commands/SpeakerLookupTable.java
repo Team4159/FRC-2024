@@ -33,7 +33,7 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
         );
     }
 
-    /*public static void addMapValue(Shooter s, Kinesthetics k){
+    public static void addMapValue(Shooter s, Kinesthetics k){
         shooterTable.put(getDifference(k).getNorm(), s.getPitch());
     }
 
@@ -44,7 +44,7 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
         Double[] pitchesArray = pitches.toArray(new Double[0]);
         SmartDashboard.putNumberArray("lookup table distances", distancesArray);
         SmartDashboard.putNumberArray("lookup table pitches", pitchesArray);
-    }*/
+    }
 
     /** @return x right+, y forward+, z up+ */
     private static Translation3d getDifference(Kinesthetics k) {

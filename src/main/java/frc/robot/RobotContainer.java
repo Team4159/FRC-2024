@@ -31,8 +31,8 @@ public class RobotContainer {
     private static final JoystickButton forceVision = new JoystickButton(driver, 15);
 
     private static final JoystickButton manualAmp = new JoystickButton(secondary, 3);
-    private static final JoystickButton manualShootPodium = new JoystickButton(secondary, 5);
-    private static final JoystickButton manualShootSubwoofer = new JoystickButton(secondary, 4);
+    private static final JoystickButton lookupTableShoot = new JoystickButton(secondary, 5);
+    private static final JoystickButton manualShoot = new JoystickButton(secondary, 4);
     private static final JoystickButton manualShootSourceIn = new JoystickButton(secondary, 6);
     private static final JoystickButton manualIntakeUp = new JoystickButton(secondary, 7);
     private static final JoystickButton manualIntakeDown = new JoystickButton(secondary, 2);
@@ -146,16 +146,16 @@ public class RobotContainer {
                 s_Shooter.stopShooter(),
                 s_Deflector.new Lower()
             ));
-        manualShootPodium
+        lookupTableShoot
             .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
-            .whileTrue(s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, true))
+            .whileTrue(new SpeakerLookupTable(kinesthetics, s_Shooter, s_Swerve, () -> 0, () -> 0))
             .onFalse(new SequentialCommandGroup(
                 s_Shooter.new ChangeNeck(SpinState.ST),
                 s_Shooter.stopShooter()
             ));
-        manualShootSubwoofer
+        manualShoot
             .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
-            .whileTrue(s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true))
+            .whileTrue(s_Shooter.new ChangeState(() -> new ShooterCommand(secondary.getThrottle(), 450d, 350d), true))
             .onFalse(new SequentialCommandGroup(
                 s_Shooter.new ChangeNeck(SpinState.ST),
                 s_Shooter.stopShooter()
@@ -200,10 +200,10 @@ public class RobotContainer {
                 s_Shooter.new ChangeNeck(SpinState.ST),
                 s_Intake.new ChangeState(IntakeState.STOW)
             ));
-        // addMapValue
-        //     .onTrue(new InstantCommand(() -> SpeakerLookupTable.addMapValue(s_Shooter, kinesthetics)));
-        // printMapValue
-        //     .onTrue(new InstantCommand(() -> SpeakerLookupTable.printMap()));
+        addMapValue
+             .onTrue(new InstantCommand(() -> SpeakerLookupTable.addMapValue(s_Shooter, kinesthetics)));
+        printMapValue
+             .onTrue(new InstantCommand(() -> SpeakerLookupTable.printMap()));
         // manualClimberUp
         //     .whileTrue(s_Climber.new ChangeState(SpinState.FW));
         // manualClimberDown
