@@ -1,10 +1,8 @@
 package frc.robot.subsystems;
 
-import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -20,7 +18,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.SwerveModule;
-import frc.robot.commands.SpeakerAutoAim;
 
 public class Swerve extends SubsystemBase {
     private Kinesthetics kinesthetics;
@@ -47,7 +44,7 @@ public class Swerve extends SubsystemBase {
                 SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
                 for(SwerveModule mod : mSwerveMods) mod.setDesiredState(swerveModuleStates[mod.moduleNumber], true);
             }, 
-            Constants.Swerve.AutoConfig.pathFollower, // config, includes PID values
+            Constants.Swerve.AutoConfig.autoPathFollowerConfig, // config, includes PID values
             () -> DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue).equals(DriverStation.Alliance.Red), // determines if autos should be flipped (i.e. if on Red Alliance)
             this // reference to this subsystem to set requirements
         );
