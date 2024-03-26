@@ -174,7 +174,7 @@ public final class Constants {
         public static final int intakeMotorID = 2;
         public static final int feederMotorID = 3;
 
-        public static final double pitchTolerance = Math.PI/32; // radians
+        public static final double pitchTolerance = Math.PI/64; // radians
         public static final double spinTolerance = Math.PI/16; // radians
 
         public static final double intakeSpin = 0.7; // -1 to 1
@@ -186,7 +186,7 @@ public final class Constants {
         public static enum IntakeState {
             STOW(Units.degreesToRadians(10.4), SpinState.ST), // starting pos & when moving
             GARGLE(Units.degreesToRadians(10.4), SpinState.FW), // just move the motors
-            DOWN(Units.degreesToRadians(175), SpinState.FW), // intaking
+            DOWN(Units.degreesToRadians(220), SpinState.FW), // intaking
             RETCH(Units.degreesToRadians(10.4), SpinState.BW), // just move the motors
             SPIT(Units.degreesToRadians(175), SpinState.BW); // outtaking
 
@@ -218,7 +218,7 @@ public final class Constants {
         public static double pitchOffset = Units.degreesToRotations(-3);
         public static final double minimumPitch = Units.degreesToRadians(14);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
-        public static final double neckSpeed = 0.25; // -1 to 1
+        public static final double neckSpeed = 0.35; // -1 to 1
         public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 150d);
         
         public static final ArmFeedforward shooterAngleFF = new ArmFeedforward(0, 1, 0, 0); // TODO tune

@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
@@ -8,6 +9,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants;
 import frc.robot.subsystems.Kinesthetics;
@@ -17,15 +19,32 @@ import frc.robot.subsystems.Swerve;
 
 public class SpeakerLookupTable extends ParallelCommandGroup {
     private static final Map<Double, Double> shooterTable = new HashMap<>() {{
-        put(Units.inchesToMeters(51), 1.0);
+        put(1.29, 1.1);
+        put(2.0, 1.0);
+        put(3.0, 0.9);
+        put(4.0, 0.8);
+        put(5.0, 0.7);
     }}; // distance: pitch
 
     public SpeakerLookupTable(Kinesthetics k, Shooter sh, Swerve sw, DoubleSupplier translationSup, DoubleSupplier strafeSup){
         super(
-            sw.new ChangeYaw(translationSup, strafeSup, () -> getDifference(k).toTranslation2d().getAngle().getRadians()),
+            //sw.new ChangeYaw(translationSup, strafeSup, () -> getDifference(k).toTranslation2d().getAngle().getRadians()),
             sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 450d, 350d), true)
         );
     }
+
+    /*public static void addMapValue(Shooter s, Kinesthetics k){
+        shooterTable.put(getDifference(k).getNorm(), s.getPitch());
+    }
+
+    public static void printMap(){
+        Collection<Double> distances = shooterTable.keySet();
+        Collection<Double> pitches = shooterTable.values();
+        Double[] distancesArray = distances.toArray(new Double[0]);
+        Double[] pitchesArray = pitches.toArray(new Double[0]);
+        SmartDashboard.putNumberArray("lookup table distances", distancesArray);
+        SmartDashboard.putNumberArray("lookup table pitches", pitchesArray);
+    }*/
 
     /** @return x right+, y forward+, z up+ */
     private static Translation3d getDifference(Kinesthetics k) {
@@ -45,7 +64,7 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
 
         // Locate closest and second closest match
         for (double key : shooterTable.keySet()) {
-            double accuracy = Math.abs( key - distance );
+            double accuracy = Math.abs(key - distance);
             if(accuracy < closestAccuracy) {
                 secClosestMatch = closestMatch;
                 closestMatch = key;
@@ -60,7 +79,7 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
         return MathUtil.interpolate(
             shooterTable.get(closestMatch),
             shooterTable.get(secClosestMatch),
-            secClosestAccuracy / (secClosestAccuracy + closestAccuracy)
+            closestAccuracy / (secClosestAccuracy + closestAccuracy)
         );
     }
 }
