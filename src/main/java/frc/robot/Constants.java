@@ -95,7 +95,7 @@ public final class Constants {
         public static final double maxAngularVelocity = 3.0;
 
         public static final class AutoConfig { //TODO: must be tuned to specific robot
-            public static final double kMaxSpeedMetersPerSecond = 5;
+            public static final double kMaxSpeedMetersPerSecond = 4.5;
             public static final double kMaxAccelerationMetersPerSecondSquared = 4;
             public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
             public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
@@ -111,10 +111,10 @@ public final class Constants {
 
             // used by PathPlanner during setup
             public static final HolonomicPathFollowerConfig autoPathFollowerConfig = new HolonomicPathFollowerConfig( // TODO set values
-                new PIDConstants(15, 0, 0), // translation PID constants
-                new PIDConstants(15, 0, 0), // rotation PID constants
+                new PIDConstants(3, 0, 0), // translation PID constants
+                new PIDConstants(3, 0, 0), // rotation PID constants
                 Constants.Swerve.AutoConfig.kMaxSpeedMetersPerSecond, 
-                wheelBase, // drive base radius in m
+                wheelBase / Math.sqrt(2), // drive base radius in m
                 new ReplanningConfig() // default path replanning config
             );
         }

@@ -3,6 +3,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -15,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.Intake.IntakeState;
 import frc.robot.auto.IntakeStatic;
+import frc.lib.math.RobotState;
 import frc.robot.Constants.SpinState;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -209,7 +211,13 @@ public class RobotContainer {
         return g;
     }
 
+    public Command justDriveBackPls = new SwerveAuto(kinesthetics, s_Swerve, new RobotState(new Pose2d(2.46, 5.57, new Rotation2d(180))));
+
     public Command getAutonomousCommand() {
+        // return new SequentialCommandGroup(
+        //     new InstantCommand(() -> kinesthetics.setPose(new Pose2d(1.38, 5.57, new Rotation2d(180)))),
+        //     justDriveBackPls
+        // );
         if (autoChooser.getSelected() != null) {
             return autoChooser.getSelected();
         } else {
