@@ -54,11 +54,11 @@ public class Vision extends SubsystemBase {
             new Translation3d(ntdata[0], ntdata[1], ntdata[2]),
             new Rotation3d(0, 0, Units.degreesToRadians(ntdata[5]))
         );
-        double area = limelightTable.getEntry("ta").getDouble(0.5);
+        double area = limelightTable.getEntry("ta").getDouble(0.25);
         field.setRobotPose(o.toPose2d());
         return new VisionData(
             o,
-            1 - area / 2,
+            1 - area * 0.4,
             Units.millisecondsToSeconds(
                 limelightTable.getEntry("cl").getDouble(0) +
                 limelightTable.getEntry("tl").getDouble(0)

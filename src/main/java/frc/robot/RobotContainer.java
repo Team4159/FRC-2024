@@ -207,7 +207,12 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return new InstantCommand(() -> kinesthetics.setPose(new Pose2d(1.31, 5.53, Rotation2d.fromDegrees(180))));
+        return new InstantCommand(() -> kinesthetics.setPose(
+            DriverStation.getAlliance().map((a) -> a == DriverStation.Alliance.Red ?
+                new Pose2d(15.2, 5.53, Rotation2d.fromDegrees(0)) :
+                new Pose2d(1.31, 5.53, Rotation2d.fromDegrees(180))
+            ).orElse(new Pose2d())
+        ));
         // return autoChooser.getSelected();
     }
 }

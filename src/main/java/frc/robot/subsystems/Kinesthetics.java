@@ -28,7 +28,7 @@ public class Kinesthetics extends SubsystemBase {
     // Sensor Information
     private Pigeon2 gyro;
     private DigitalInput shooterBeamBreak;
-    private Debouncer shooterBeamBreakDebouncer = new Debouncer(0.02);
+    private Debouncer shooterBeamBreakDebouncer = new Debouncer(0.05, Debouncer.DebounceType.kRising);
 
     // Data Fields
     private SwerveDrivePoseEstimator poseEstimator;
@@ -44,7 +44,7 @@ public class Kinesthetics extends SubsystemBase {
         gyro = new Pigeon2(Constants.Swerve.pigeonID);
         gyro.getConfigurator().apply(new Pigeon2Configuration());
         gyro.setYaw(0);
-
+        
         shooterBeamBreak = new DigitalInput(Constants.Shooter.beamBreakID);
 
         poseEstimator = new SwerveDrivePoseEstimator(
@@ -65,7 +65,7 @@ public class Kinesthetics extends SubsystemBase {
             poseEstimator.addVisionMeasurement(
                 visionPose.pose().toPose2d(),
                 Timer.getFPGATimestamp()-visionPose.ping(),
-                VecBuilder.fill(visionPose.confidence(), visionPose.confidence(), 1)
+                VecBuilder.fill(visionPose.confidence(), visionPose.confidence(), 2)
             );
         swerveStates.set(s_Swerve.getModuleStates());
         field.setRobotPose(getPose());

@@ -186,9 +186,9 @@ public final class Constants {
         public static enum IntakeState {
             STOW(Units.degreesToRadians(10.4), SpinState.ST), // starting pos & when moving
             GARGLE(Units.degreesToRadians(10.4), SpinState.FW), // just move the motors
-            DOWN(Units.degreesToRadians(175), SpinState.FW), // intaking
+            DOWN(Units.degreesToRadians(220), SpinState.FW), // intaking
             RETCH(Units.degreesToRadians(10.4), SpinState.BW), // just move the motors
-            SPIT(Units.degreesToRadians(175), SpinState.BW); // outtaking
+            SPIT(Units.degreesToRadians(220), SpinState.BW); // outtaking
 
             public final double pitch;
             public final SpinState spin;
@@ -226,7 +226,7 @@ public final class Constants {
         public static final SimpleMotorFeedforward shooterSpinFF = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
         
         // TODO: This must be tuned to specific robot
-        public static final PIDController shooterPID = new PIDController(0.7, 0, 0.05);
+        public static final PIDController shooterPID = new PIDController(0.7, 0, 0.02);
         public static final double kF = 0.0;
     }
 
@@ -272,8 +272,8 @@ public final class Constants {
         );
         /** @param amps Pose2d is in meters */
         public static final Map<Alliance, Pose2d> amps = Map.of(
-            Alliance.Red, new Pose2d(8.2042, 14.7008, Rotation2d.fromDegrees(0)),
-            Alliance.Blue, new Pose2d(8.2042, 1.842, Rotation2d.fromDegrees(0))
+            Alliance.Red, new Pose2d(14.7008, 8.2042, Rotation2d.fromDegrees(90)),
+            Alliance.Blue, new Pose2d(1.842, 8.2042, Rotation2d.fromDegrees(90))
         );
         /** @param G meters / second squared
          * Acceleration due to gravity
