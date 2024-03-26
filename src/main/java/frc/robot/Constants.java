@@ -126,28 +126,17 @@ public final class Constants {
         /* Module Specific Constants */
         /* Front Left Module - Module 0 */
         public static final class Mod0 {
-            public static final int driveMotorID = 1;
-            public static final int angleMotorID = 2;
-            public static final int canCoderID = 1;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-55.5);
-
-            public static final SwerveModuleConstants constants = 
-                new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
-        }
-
-        /* Front Right Module - Module 1 */
-        public static final class Mod1 {
-            public static final int driveMotorID = 3;
-            public static final int angleMotorID = 4;
-            public static final int canCoderID = 2;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-69.5); 
+            public static final int driveMotorID = 7;
+            public static final int angleMotorID = 8;
+            public static final int canCoderID = 4;
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(55.5); 
 
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
         
-        /* Back Left Module - Module 2 */
-        public static final class Mod2 {
+        /* Front Right Module - Module 1 */
+        public static final class Mod1 {
             public static final int driveMotorID = 5;
             public static final int angleMotorID = 6;
             public static final int canCoderID = 3;
@@ -157,12 +146,23 @@ public final class Constants {
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
 
+        /* Back Left Module - Module 2 */
+        public static final class Mod2 {
+            public static final int driveMotorID = 3;
+            public static final int angleMotorID = 4;
+            public static final int canCoderID = 2;
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-69.5); 
+
+            public static final SwerveModuleConstants constants = 
+                new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
+        }
+
         /* Back Right Module - Module 3 */
         public static final class Mod3 {
-            public static final int driveMotorID = 7;
-            public static final int angleMotorID = 8;
-            public static final int canCoderID = 4;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(55.5); 
+            public static final int driveMotorID = 1;
+            public static final int angleMotorID = 2;
+            public static final int canCoderID = 1;
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-55.5);
 
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -188,7 +188,7 @@ public final class Constants {
             GARGLE(Units.degreesToRadians(10.4), SpinState.FW), // just move the motors
             DOWN(Units.degreesToRadians(220), SpinState.FW), // intaking
             RETCH(Units.degreesToRadians(10.4), SpinState.BW), // just move the motors
-            SPIT(Units.degreesToRadians(175), SpinState.BW); // outtaking
+            SPIT(Units.degreesToRadians(220), SpinState.BW); // outtaking
 
             public final double pitch;
             public final SpinState spin;
@@ -226,7 +226,7 @@ public final class Constants {
         public static final SimpleMotorFeedforward shooterSpinFF = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
         
         // TODO: This must be tuned to specific robot
-        public static final PIDController shooterPID = new PIDController(0.7, 0, 0.05);
+        public static final PIDController shooterPID = new PIDController(0.7, 0, 0.02);
         public static final double kF = 0.0;
     }
 
@@ -272,8 +272,8 @@ public final class Constants {
         );
         /** @param amps Pose2d is in meters */
         public static final Map<Alliance, Pose2d> amps = Map.of(
-            Alliance.Red, new Pose2d(8.2042, 14.7008, Rotation2d.fromDegrees(0)),
-            Alliance.Blue, new Pose2d(8.2042, 1.842, Rotation2d.fromDegrees(0))
+            Alliance.Red, new Pose2d(14.7008, 8.2042, Rotation2d.fromDegrees(90)),
+            Alliance.Blue, new Pose2d(1.842, 8.2042, Rotation2d.fromDegrees(90))
         );
         /** @param G meters / second squared
          * Acceleration due to gravity
