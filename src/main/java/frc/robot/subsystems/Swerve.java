@@ -47,7 +47,7 @@ public class Swerve extends SubsystemBase {
                 for(SwerveModule mod : mSwerveMods) mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false);
             }, 
             Constants.Swerve.AutoConfig.pathFollower, // config, includes PID values
-            () -> this.kinesthetics.getAlliance().equals(DriverStation.Alliance.Red), // determines if autos should be flipped (i.e. if on Red Alliance)
+            () -> DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue).equals(DriverStation.Alliance.Red), // determines if autos should be flipped (i.e. if on Red Alliance)
             this // reference to this subsystem to set requirements
         );
         PPHolonomicDriveController.setRotationTargetOverride(() -> {

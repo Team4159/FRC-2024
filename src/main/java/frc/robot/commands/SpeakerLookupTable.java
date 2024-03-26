@@ -7,6 +7,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants;
 import frc.robot.subsystems.Kinesthetics;
@@ -26,9 +27,12 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
         );
     }
 
+    /** @return x right+, y forward+, z up+ */
     private static Translation3d getDifference(Kinesthetics k) {
+        var all = DriverStation.getAlliance();
+        if (all.isEmpty()) return null;
         var t2 = k.getPose().getTranslation();
-        return Constants.Environment.speakers.get(k.getAlliance()).minus(new Translation3d(t2.getX(), t2.getY(), 0));
+        return Constants.Environment.speakers.get(all.get()).minus(new Translation3d(t2.getX(), t2.getY(), 0));
     }
 
     /** @return shooter pitch */
