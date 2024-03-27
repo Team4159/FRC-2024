@@ -100,9 +100,9 @@ public final class Constants {
             public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
             public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
         
-            public static final double kPXController = 3;
-            public static final double kPYController = 3;
-            public static final double kPThetaController = 3;
+            public static final double kPXController = 2;
+            public static final double kPYController = 2;
+            public static final double kPThetaController = 2;
         
             /* Constraint for the motion profilied robot angle controller */
             public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
@@ -111,8 +111,8 @@ public final class Constants {
 
             // used by PathPlanner during setup
             public static final HolonomicPathFollowerConfig autoPathFollowerConfig = new HolonomicPathFollowerConfig( // TODO set values
-                new PIDConstants(3, 0, 0), // translation PID constants
-                new PIDConstants(3, 0, 0), // rotation PID constants
+                new PIDConstants(2, 0, 0), // translation PID constants
+                new PIDConstants(2, 0, 0), // rotation PID constants
                 Constants.Swerve.AutoConfig.kMaxSpeedMetersPerSecond, 
                 wheelBase / Math.sqrt(2), // drive base radius in m
                 new ReplanningConfig() // default path replanning config

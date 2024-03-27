@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
@@ -84,7 +83,9 @@ public class RobotContainer {
 
     // register PathPlanner Commands, must be done before building autos (AutoBuilder.buildAutoChooser)
     private void configureAutoCommands() {
-        NamedCommands.registerCommand("intakeStatic", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true)); // TESTING INTAKE AUTO
+        NamedCommands.registerCommand("intakeStatic", 
+            new RepeatCommand(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true)).withTimeout(3)
+        ); // TESTING INTAKE AUTO
         NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
             s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true, false)
