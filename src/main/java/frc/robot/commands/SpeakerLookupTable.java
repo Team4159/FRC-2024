@@ -20,15 +20,24 @@ import frc.robot.subsystems.Swerve;
 public class SpeakerLookupTable extends ParallelCommandGroup {
     private static final Map<Double, Double> shooterTable = new HashMap<>() {{
         put(1.29, 1.1);
-        put(2.0, 1.0);
-        put(3.0, 0.9);
-        put(4.0, 0.8);
-        put(5.0, 0.7);
+        put(1.5, 0.95);
+        put(2.0, 0.85);
+        put(2.5, 0.75);
+        put(2.7, 0.69);
+        put(2.8, 0.68);
+        put(3.0, 0.63);
+        put(3.5, 0.59);
+        put(4.0, 0.55);
+        put(4.25, 0.51);
+        put(4.5, 0.505);
+        put(4.6, 0.505);
+        put(4.8, 0.47);
+        put(5.0, 0.45);
     }}; // distance: pitch
 
     public SpeakerLookupTable(Kinesthetics k, Shooter sh, Swerve sw, DoubleSupplier translationSup, DoubleSupplier strafeSup){
         super(
-            //sw.new ChangeYaw(translationSup, strafeSup, () -> getDifference(k).toTranslation2d().getAngle().getRadians()),
+            //sw.new ChangeYaw(translationSup, strafeSup, () -> getDifference(k).toTranslation2d().getAngle().getRadians() - Math.PI),
             sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 450d, 350d), true)
         );
     }
