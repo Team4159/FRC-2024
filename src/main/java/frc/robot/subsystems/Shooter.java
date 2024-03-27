@@ -13,6 +13,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -44,6 +45,7 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
+        SmartDashboard.putNumber("desired pitch", desiredPitch);
         mechanism.setAngle(Units.radiansToDegrees(getPitch()));
         angleMotorController.set(
             Constants.Shooter.shooterPID.calculate(getPitch(), desiredPitch)
@@ -52,7 +54,7 @@ public class Shooter extends SubsystemBase {
     }
 
     /** @return radians */
-    private double getPitch() {
+    public double getPitch() {
         return Units.rotationsToRadians(angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition() - Constants.Shooter.pitchOffset);
     }
 

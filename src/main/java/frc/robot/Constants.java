@@ -218,7 +218,7 @@ public final class Constants {
         public static double pitchOffset = Units.degreesToRotations(-3);
         public static final double minimumPitch = Units.degreesToRadians(14);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
-        public static final double neckSpeed = 0.25; // -1 to 1
+        public static final double neckSpeed = 0.35; // -1 to 1
         public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 150d);
         
         public static final ArmFeedforward shooterAngleFF = new ArmFeedforward(0, 1, 0, 0); // TODO tune

@@ -8,15 +8,18 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.RobotState;
 import frc.robot.Constants;
@@ -57,8 +60,16 @@ public class Kinesthetics extends SubsystemBase {
         table.add("Pose Estimation", field);
     }
 
+    private Translation3d getDifference() {
+        var all = DriverStation.getAlliance();
+        if (all.isEmpty()) return null;
+        var t2 = getPose().getTranslation();
+        return Constants.Environment.speakers.get(all.get()).minus(new Translation3d(t2.getX(), t2.getY(), 0));
+    }
+
     @Override
     public void periodic() {
+        SmartDashboard.putNumber("dist from speaker", getDifference().toTranslation2d().getNorm());
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
         var visionPose = Vision.getLimelightData();
         if (visionPose != null)

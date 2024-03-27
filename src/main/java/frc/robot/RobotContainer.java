@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
@@ -17,6 +18,7 @@ import frc.robot.auto.IntakeStatic;
 import frc.robot.Constants.SpinState;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.Shooter.ShooterCommand;
 
 public class RobotContainer {
     /* Controllers */
@@ -24,15 +26,17 @@ public class RobotContainer {
     private static final Joystick secondary = new Joystick(1);
 
     /* Driver Buttons */
-    private static final JoystickButton resetGyro = new JoystickButton(driver, 14);
+    private static final JoystickButton resetGyro = new JoystickButton(driver, 2);
     private static final JoystickButton forceVision = new JoystickButton(driver, 15);
 
     private static final JoystickButton manualAmp = new JoystickButton(secondary, 3);
-    private static final JoystickButton manualShootPodium = new JoystickButton(secondary, 5);
-    private static final JoystickButton manualShootSubwoofer = new JoystickButton(secondary, 4);
+    private static final JoystickButton lookupTableShoot = new JoystickButton(secondary, 5);
+    private static final JoystickButton manualShoot = new JoystickButton(secondary, 4);
     private static final JoystickButton manualShootSourceIn = new JoystickButton(secondary, 6);
     private static final JoystickButton manualIntakeUp = new JoystickButton(secondary, 7);
     private static final JoystickButton manualIntakeDown = new JoystickButton(secondary, 2);
+    private static final JoystickButton addMapValue = new JoystickButton(secondary, 8);
+    private static final JoystickButton printMapValue = new JoystickButton(secondary, 9);
     private static final JoystickButton manualOuttakeUp = new JoystickButton(secondary, 11);
     private static final JoystickButton manualOuttakeDown = new JoystickButton(secondary, 10);
     // private static final JoystickButton manualClimberUp = new JoystickButton(secondary, 8);
@@ -151,16 +155,16 @@ public class RobotContainer {
                 s_Shooter.stopShooter(),
                 s_Deflector.new Lower()
             ));
-        manualShootPodium
+        lookupTableShoot
             .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
-            .whileTrue(s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, true))
+            .whileTrue(new SpeakerLookupTable(kinesthetics, s_Shooter, s_Swerve, () -> 0, () -> 0))
             .onFalse(new SequentialCommandGroup(
                 s_Shooter.new ChangeNeck(SpinState.ST),
                 s_Shooter.stopShooter()
             ));
-        manualShootSubwoofer
+        manualShoot
             .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
-            .whileTrue(s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true))
+            .whileTrue(s_Shooter.new ChangeState(() -> new ShooterCommand(secondary.getThrottle(), 450d, 350d), true))
             .onFalse(new SequentialCommandGroup(
                 s_Shooter.new ChangeNeck(SpinState.ST),
                 s_Shooter.stopShooter()
@@ -205,6 +209,10 @@ public class RobotContainer {
                 s_Shooter.new ChangeNeck(SpinState.ST),
                 s_Intake.new ChangeState(IntakeState.STOW)
             ));
+        addMapValue
+             .onTrue(new InstantCommand(() -> SpeakerLookupTable.addMapValue(s_Shooter, kinesthetics)));
+        printMapValue
+             .onTrue(new InstantCommand(() -> SpeakerLookupTable.printMap()));
         // manualClimberUp
         //     .whileTrue(s_Climber.new ChangeState(SpinState.FW));
         // manualClimberDown
