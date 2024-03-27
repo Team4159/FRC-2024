@@ -68,7 +68,7 @@ public class Swerve extends SubsystemBase {
                                     translation.getX(), 
                                     translation.getY(), 
                                     rotation, 
-                                    kinesthetics.getHeading().plus(driverAngleOffset)
+                                    kinesthetics.getRelativeHeading().plus(driverAngleOffset)
                                 )
                                 : new ChassisSpeeds(
                                     translation.getX(), 
@@ -104,7 +104,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public void setAngleOffset() {
-        driverAngleOffset = Rotation2d.fromRadians(-kinesthetics.getHeading().getRadians());
+        driverAngleOffset = Rotation2d.fromRadians(-kinesthetics.getRelativeHeading().getRadians());
     }
 
     @Override
@@ -134,8 +134,8 @@ public class Swerve extends SubsystemBase {
 
         @Override
         public void execute() {
-            var r = MathUtil.angleModulus(kinesthetics.getHeading().getRadians());
-            var dr= MathUtil.angleModulus(desiredYaw.getAsDouble() - kinesthetics.getHeading().getRadians());
+            var r = MathUtil.angleModulus(kinesthetics.getPose().getRotation().getRadians());
+            var dr= MathUtil.angleModulus(desiredYaw.getAsDouble() - kinesthetics.getPose().getRotation().getRadians());
             drive(
                 new Translation2d(passthroughTranslation.getAsDouble(), passthroughStrafe.getAsDouble()).times(Constants.Swerve.maxSpeed),
                 Constants.CommandConstants.swerveYawPID.calculate(r, r+dr), true, false
@@ -152,7 +152,7 @@ public class Swerve extends SubsystemBase {
 
         @Override
         public boolean isFinished() {
-            return MathUtil.isNear(desiredYaw.getAsDouble(), kinesthetics.getHeading().getRadians(), Constants.Swerve.yawTolerance);
+            return MathUtil.isNear(desiredYaw.getAsDouble(), kinesthetics.getPose().getRotation().getRadians(), Constants.Swerve.yawTolerance);
         }
     }
 }

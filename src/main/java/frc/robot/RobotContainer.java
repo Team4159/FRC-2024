@@ -63,8 +63,8 @@ public class RobotContainer {
         s_Swerve.setDefaultCommand(
             new SwerveManual(
                 s_Swerve, 
-                () -> driver.getY(), 
-                () -> driver.getX(), 
+                () -> -driver.getY(), 
+                () -> -driver.getX(), 
                 () -> driver.getZ(), 
                 () -> false
             )

@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.RobotState;
 import frc.robot.Constants;
@@ -69,6 +70,7 @@ public class Kinesthetics extends SubsystemBase {
                 VecBuilder.fill(visionPose.confidence(), visionPose.confidence(), 2)
             );
         swerveStates.set(s_Swerve.getModuleStates());
+        SmartDashboard.putNumber("yaw", getPose().getRotation().getRadians());
         field.setRobotPose(getPose());
     }
 
@@ -96,9 +98,9 @@ public class Kinesthetics extends SubsystemBase {
     }
 
     /** @return the gyro yaw (for some reason the code kills itself without this) */
-    public Rotation2d getHeading() {
-        var r = getGyroYaw();
-        if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue).equals(DriverStation.Alliance.Red)) {
+    public Rotation2d getRelativeHeading() {
+        var r = getPose().getRotation();
+        if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Red).equals(DriverStation.Alliance.Blue)) {
             r = r.plus(Rotation2d.fromDegrees(180));
         }
         return r;
@@ -106,7 +108,7 @@ public class Kinesthetics extends SubsystemBase {
 
     public RobotState getRobotState() {
         var speeds = Constants.Swerve.swerveKinematics.toChassisSpeeds(s_Swerve.getModuleStates());
-        speeds = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getHeading());
+        speeds = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getGyroYaw());
         return RobotState.fromVelocity(getPose(),
             -speeds.vyMetersPerSecond,
             speeds.vxMetersPerSecond,
