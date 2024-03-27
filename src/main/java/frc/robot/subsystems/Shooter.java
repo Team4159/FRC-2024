@@ -148,11 +148,6 @@ public class Shooter extends SubsystemBase {
             if (instant) return true;
             if (continuous) return false;
             var state = desiredState.get();
-            System.out.println("Left Desired: " + state.lSpin() + " Left Actual: " + getLSpin());
-            System.out.println("Right Desired: " + state.rSpin() + " Right Actual: " + getRSpin());
-            System.out.println("Pitch isNear: " + MathUtil.isNear(state.pitch(), getPitch(), Constants.Shooter.pitchTolerance));
-            System.out.println("Left Spin isNear: " + MathUtil.isNear(state.lSpin(), getLSpin(), Constants.Shooter.spinTolerance));
-            System.out.println("Right Spin isNear: " + MathUtil.isNear(state.rSpin(), getRSpin(), Constants.Shooter.spinTolerance));
             return (state.pitch() == null || MathUtil.isNear(state.pitch(), getPitch(), Constants.Shooter.pitchTolerance))
                 && (!state.hasSpin() || (
                     MathUtil.isNear(state.lSpin(), getLSpin(), Constants.Shooter.spinTolerance) &&

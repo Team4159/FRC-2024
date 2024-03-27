@@ -80,21 +80,29 @@ public class RobotContainer {
 
     // register PathPlanner Commands, must be done before building autos (AutoBuilder.buildAutoChooser)
     private void configureAutoCommands() {
-        NamedCommands.registerCommand("intakeStatic", new IntakeStatic(kinesthetics, s_Shooter, s_Intake));
+        NamedCommands.registerCommand("intakeStatic", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true)); // TESTING INTAKE AUTO
         NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
-            s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, false, false),//.alongWith(new WaitCommand(1)),
+            s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true, false)
+                .withTimeout(1.5),
             s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
-            s_Shooter.new ChangeState(() -> Constants.Shooter.idleCommand, false, false)
+            s_Shooter.new ChangeState(() -> Constants.Shooter.idleCommand, false, true)
         ));
         NamedCommands.registerCommand("speakerPodium", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
-            s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, 
-                false, true).alongWith(new WaitCommand(1.5)),
+            s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, true, false)
+                .alongWith(new WaitCommand(1.5)),
             s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
-            s_Shooter.stopShooter()
+            s_Shooter.new ChangeState(() -> Constants.Shooter.idleCommand, false, true)
         ));
-        NamedCommands.registerCommand("speakerLookupTable", new SpeakerLookupTable(kinesthetics, s_Shooter, s_Swerve, () -> 0, () -> 0));
+        // untested auto commands
+        NamedCommands.registerCommand("speakerLookupTable", new SequentialCommandGroup(
+            s_Shooter.new ChangeNeck(SpinState.ST),
+            new SpeakerLookupTable(kinesthetics, s_Shooter, s_Swerve, () -> 0, () -> 0)
+                .withTimeout(2.75),
+            s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
+            s_Shooter.new ChangeState(() -> Constants.Shooter.idleCommand, false, true)
+        ));
         NamedCommands.registerCommand("ampAuto", new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector));
         NamedCommands.registerCommand("speakerAutoAim", new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0));
         NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake));
