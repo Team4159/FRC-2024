@@ -102,11 +102,16 @@ public class Kinesthetics extends SubsystemBase {
 
     public void setPose(Pose2d pose) {
         poseEstimator.resetPosition(getGyroYaw(), s_Swerve.getModulePositions(), pose);
+        s_Swerve.setAngleOffset();
     }
 
     /** @return the gyro yaw (for some reason the code kills itself without this) */
     public Rotation2d getHeading() {
-        return getGyroYaw();
+        var r = getGyroYaw();
+        if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue).equals(DriverStation.Alliance.Red)) {
+            r = r.plus(Rotation2d.fromDegrees(180));
+        }
+        return r;
     }
 
     public RobotState getRobotState() {
