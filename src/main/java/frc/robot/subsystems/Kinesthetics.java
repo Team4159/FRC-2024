@@ -97,7 +97,7 @@ public class Kinesthetics extends SubsystemBase {
         s_Swerve.setAngleOffset();
     }
 
-    /** @return the gyro yaw (for some reason the code kills itself without this) */
+    /** @return the rotation, inverted based on alliance (for driving) */
     public Rotation2d getRelativeHeading() {
         var r = getPose().getRotation();
         if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Red).equals(DriverStation.Alliance.Blue)) {
