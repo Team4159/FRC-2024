@@ -86,8 +86,8 @@ public class SwerveModule {
     }
 
     public SwerveModulePosition getPosition(){
-        return new SwerveModulePosition(
-            Conversions.rotationsToMeters(mDriveMotor.getPosition().getValue(), Constants.Swerve.wheelCircumference), 
+        return new SwerveModulePosition( // FIXME WHY IS THIS NEGATIVE
+            Conversions.rotationsToMeters(-mDriveMotor.getPosition().getValue(), Constants.Swerve.wheelCircumference), 
             Rotation2d.fromRotations(mAngleMotor.getPosition().getValue())
         );
     }
