@@ -47,7 +47,7 @@ public class Shooter extends SubsystemBase {
         mechanism.setAngle(Units.radiansToDegrees(getPitch()));
         angleMotorController.set(
             Constants.Shooter.shooterPID.calculate(getPitch(), desiredPitch)
-            + Constants.Shooter.kF * Math.cos(getPitch())
+            + Constants.Shooter.kG * Math.cos(getPitch())
         );
     }
 
