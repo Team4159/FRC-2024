@@ -174,7 +174,7 @@ public final class Constants {
         public static final int intakeMotorID = 2;
         public static final int feederMotorID = 3;
 
-        public static final double pitchTolerance = Math.PI/32; // radians
+        public static final double pitchTolerance = Math.PI/64; // radians
         public static final double spinTolerance = Math.PI/16; // radians
 
         public static final double intakeSpin = 0.7; // -1 to 1
@@ -218,7 +218,7 @@ public final class Constants {
         public static double pitchOffset = Units.degreesToRotations(-3);
         public static final double minimumPitch = Units.degreesToRadians(14);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
-        public static final double neckSpeed = 0.25; // -1 to 1
+        public static final double neckSpeed = 0.35; // -1 to 1
         public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 150d);
         
         public static final ArmFeedforward shooterAngleFF = new ArmFeedforward(0, 1, 0, 0); // TODO tune
@@ -226,7 +226,7 @@ public final class Constants {
         public static final SimpleMotorFeedforward shooterSpinFF = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
         
         // TODO: This must be tuned to specific robot
-        public static final PIDController shooterPID = new PIDController(0.7, 0, 0.02);
+        public static final PIDController shooterPID = new PIDController(0.7, 0.00002, 0.02);
         public static final double kF = 0.0;
     }
 
@@ -248,7 +248,7 @@ public final class Constants {
     public static final class CommandConstants {
         public static final double bumperWidth = Units.inchesToMeters(2.75);
 
-        public static final PIDController swerveYawPID = new PIDController(0.1, 0, 0.001);
+        public static final PIDController swerveYawPID = new PIDController(0.1, 0.0001, 0.0005);
 
         public static final ShooterCommand speakerPodiumShooterCommand = new ShooterCommand(
             0.7, 500d, 275d);

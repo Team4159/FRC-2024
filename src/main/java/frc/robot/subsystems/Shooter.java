@@ -13,6 +13,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,6 +25,9 @@ public class Shooter extends SubsystemBase {
     private CANSparkBase angleMotorController, shooterMLeftController, shooterMRightController, neckMotorController;
 
     private final MechanismLigament2d mechanism, mechanismGoal;
+
+    //Temporary values for logging desired spins
+    private double desiredLSpin, desiredRSpin;
 
     public Shooter() {
         angleMotorController = new CANSparkFlex(Constants.Shooter.angleMotorID, MotorType.kBrushless);
@@ -44,6 +48,13 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
+        //log desired pitch and speed with current pitch and spin to test accuracy
+        SmartDashboard.putNumber("desired pitch", desiredPitch);
+        SmartDashboard.putNumber("current pitch", getPitch());
+        SmartDashboard.putNumber("desired L spin", desiredLSpin);
+        SmartDashboard.putNumber("current L spin", getLSpin());
+        SmartDashboard.putNumber("desired R spin", desiredRSpin);
+        SmartDashboard.putNumber("current R spin", getRSpin());
         mechanism.setAngle(Units.radiansToDegrees(getPitch()));
         angleMotorController.set(
             Constants.Shooter.shooterPID.calculate(getPitch(), desiredPitch)
@@ -52,7 +63,7 @@ public class Shooter extends SubsystemBase {
     }
 
     /** @return radians */
-    private double getPitch() {
+    public double getPitch() {
         return Units.rotationsToRadians(angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition() - Constants.Shooter.pitchOffset);
     }
 
@@ -82,7 +93,9 @@ public class Shooter extends SubsystemBase {
      * */
     private void setGoalSpin(double goalLSpin, double goalRSpin) {
         shooterMLeftController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalLSpin), CANSparkBase.ControlType.kSmartVelocity);
-        shooterMRightController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalRSpin), CANSparkBase.ControlType.kSmartVelocity);  
+        shooterMRightController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalRSpin), CANSparkBase.ControlType.kSmartVelocity); 
+        desiredLSpin = goalLSpin;
+        desiredRSpin = goalRSpin; 
     }
 
     private void setNeck(SpinState ss) {

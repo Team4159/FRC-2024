@@ -8,6 +8,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -52,25 +53,33 @@ public class Kinesthetics extends SubsystemBase {
         poseEstimator = new SwerveDrivePoseEstimator(
             Constants.Swerve.swerveKinematics, getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d()
         );
-    
+        // setPose(new Pose2d());
+
         ShuffleboardTab table = Shuffleboard.getTab("Kinesthetics");
 
         table.addBoolean("Shooter Note?", this::shooterHasNote);
         table.add("Pose Estimation", field);
     }
 
+    private Translation3d getDifference() {
+        var all = DriverStation.getAlliance();
+        if (all.isEmpty()) return null;
+        var t2 = getPose().getTranslation();
+        return Constants.Environment.speakers.get(all.get()).minus(new Translation3d(t2.getX(), t2.getY(), 0));
+    }
+
     @Override
     public void periodic() {
+        SmartDashboard.putNumber("dist from speaker", getDifference().toTranslation2d().getNorm());
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
         var visionPose = Vision.getLimelightData();
         if (visionPose != null)
             poseEstimator.addVisionMeasurement(
                 visionPose.pose().toPose2d(),
                 Timer.getFPGATimestamp()-visionPose.ping(),
-                VecBuilder.fill(visionPose.confidence(), visionPose.confidence(), 2)
+                VecBuilder.fill(visionPose.confidence(), visionPose.confidence(), 999)
             );
         swerveStates.set(s_Swerve.getModuleStates());
-        SmartDashboard.putNumber("yaw", getPose().getRotation().getRadians());
         field.setRobotPose(getPose());
     }
 
