@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Intake.IntakeState;
-import frc.robot.auto.IntakeStatic;
 import frc.robot.Constants.SpinState;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;

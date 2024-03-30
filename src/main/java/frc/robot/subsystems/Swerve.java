@@ -38,18 +38,18 @@ public class Swerve extends SubsystemBase {
             this.kinesthetics::getPose, // a supplier for the robot pose
             this.kinesthetics::setPose, // a consumer for the robot pose, accepts Pose2d
             () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(this.getModuleStates()), // a supplier for robot relative ChassisSpeeds
-            // (ChassisSpeeds chassisSpeeds) -> { 
-            //     //ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02); // DO NOT USE
-            //     ChassisSpeeds reversedChassisSpeeds = new ChassisSpeeds(-chassisSpeeds.vxMetersPerSecond, -chassisSpeeds.vyMetersPerSecond, chassisSpeeds.omegaRadiansPerSecond);
-            //     SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(reversedChassisSpeeds);
-            //     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
-            //     for(SwerveModule mod : mSwerveMods) mod.setDesiredState(swerveModuleStates[mod.moduleNumber], true);
-            // }, 
-            (ChassisSpeeds rrChassisSpeeds) -> { // the drive method, accepts ROBOT relative ChassisSpeeds
-                drive(new Translation2d(rrChassisSpeeds.vxMetersPerSecond, rrChassisSpeeds.vyMetersPerSecond), 
-                rrChassisSpeeds.omegaRadiansPerSecond, 
-                false, true);
-            },
+            (ChassisSpeeds chassisSpeeds) -> { // the drive method, accepts ROBOT relative ChassisSpeeds
+                //ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02); // DO NOT USE
+                //ChassisSpeeds reversedChassisSpeeds = new ChassisSpeeds(-chassisSpeeds.vxMetersPerSecond, -chassisSpeeds.vyMetersPerSecond, chassisSpeeds.omegaRadiansPerSecond);
+                SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(chassisSpeeds);
+                SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
+                for(SwerveModule mod : mSwerveMods) mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false);
+            }, 
+            // (ChassisSpeeds rrChassisSpeeds) -> { 
+            //     drive(new Translation2d(rrChassisSpeeds.vxMetersPerSecond, rrChassisSpeeds.vyMetersPerSecond), 
+            //     rrChassisSpeeds.omegaRadiansPerSecond, 
+            //     false, true);
+            // },
             Constants.Swerve.AutoConfig.autoPathFollowerConfig, // config, includes PID values
             () -> DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue).equals(DriverStation.Alliance.Red), // determines if autos should be flipped (i.e. if on Red Alliance)
             this // reference to this subsystem to set requirements
