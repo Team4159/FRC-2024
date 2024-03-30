@@ -58,7 +58,7 @@ public class Vision extends SubsystemBase {
         field.setRobotPose(o.toPose2d());
         return new VisionData(
             o,
-            1 - area * 0.4,
+            2 - area * 0.4,
             Units.millisecondsToSeconds(
                 limelightTable.getEntry("cl").getDouble(0) +
                 limelightTable.getEntry("tl").getDouble(0)

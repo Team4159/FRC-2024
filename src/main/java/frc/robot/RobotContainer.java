@@ -200,10 +200,6 @@ public class RobotContainer {
                 s_Shooter.new ChangeNeck(SpinState.ST),
                 s_Intake.new ChangeState(IntakeState.STOW)
             ));
-        addMapValue
-             .onTrue(new InstantCommand(() -> SpeakerLookupTable.addMapValue(s_Shooter, kinesthetics)));
-        printMapValue
-             .onTrue(new InstantCommand(() -> SpeakerLookupTable.printMap()));
         // manualClimberUp
         //     .whileTrue(s_Climber.new ChangeState(SpinState.FW));
         // manualClimberDown

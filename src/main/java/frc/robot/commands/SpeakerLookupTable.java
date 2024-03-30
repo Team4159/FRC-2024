@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
@@ -27,24 +28,25 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
         put(1.29, 1.1);
         put(1.5, 0.95);
         put(2.0, 0.85);
-        put(2.5, 0.75);
-        put(2.7, 0.69); //could be too low, was testing from at an angle
-        put(2.8, 0.68); //could be too low, was testing from at an angle
+        put(2.5, 0.77);
+        put(2.7, 0.69);
+        put(2.8, 0.68);
         put(3.0, 0.63);
-        put(3.5, 0.59);
-        put(4.0, 0.55);
-        put(4.25, 0.51);
-        put(4.5, 0.505);
-        put(4.6, 0.505);
+        put(3.25, 0.60);
+        put(3.5, 0.54);
+        put(4.0, 0.53);
+        put(4.25, 0.495);
+        put(4.5, 0.48);
+        /*put(4.6, 0.49);
         put(4.8, 0.47);
-        put(5.0, 0.45);
+        put(5.0, 0.46);*/
     }}; // distance: pitch
 
     public SpeakerLookupTable(Kinesthetics k, Shooter sh, Swerve sw, DoubleSupplier translationSup, DoubleSupplier strafeSup){
         super(
-            sw.new ChangeYaw(translationSup, strafeSup, () -> getDifference(k).toTranslation2d().getAngle().getRadians()),
+            sw.new ChangeYaw(translationSup, strafeSup, () -> getDifference(k).toTranslation2d().getAngle().getRadians() - Math.PI),
             new SequentialCommandGroup(
-                sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 450d, 350d), true)
+                sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 500d, 375d), true)
                 //sh.new ChangeNeck(SpinState.FW))
         ));
     }

@@ -77,7 +77,7 @@ public class Kinesthetics extends SubsystemBase {
             poseEstimator.addVisionMeasurement(
                 visionPose.pose().toPose2d(),
                 Timer.getFPGATimestamp()-visionPose.ping(),
-                VecBuilder.fill(visionPose.confidence(), visionPose.confidence(), 999)
+                VecBuilder.fill(visionPose.confidence(), visionPose.confidence(), 9999)
             );
         swerveStates.set(s_Swerve.getModuleStates());
         field.setRobotPose(getPose());
