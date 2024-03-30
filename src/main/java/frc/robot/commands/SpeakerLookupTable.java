@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
@@ -49,19 +48,6 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
                 sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 500d, 375d), true)
                 //sh.new ChangeNeck(SpinState.FW))
         ));
-    }
-
-    public static void addMapValue(Shooter s, Kinesthetics k){
-        shooterTable.put(getDifference(k).getNorm(), s.getPitch());
-    }
-
-    public static void printMap(){
-        Collection<Double> distances = shooterTable.keySet();
-        Collection<Double> pitches = shooterTable.values();
-        Double[] distancesArray = distances.toArray(new Double[0]);
-        Double[] pitchesArray = pitches.toArray(new Double[0]);
-        SmartDashboard.putNumberArray("lookup table distances", distancesArray);
-        SmartDashboard.putNumberArray("lookup table pitches", pitchesArray);
     }
 
     /** @return x right+, y forward+, z up+ */

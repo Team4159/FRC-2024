@@ -48,6 +48,7 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
+<<<<<<< HEAD
         //log desired pitch and speed with current pitch and spin to test accuracy
         SmartDashboard.putNumber("desired pitch", desiredPitch);
         SmartDashboard.putNumber("current pitch", getPitch());
@@ -55,6 +56,9 @@ public class Shooter extends SubsystemBase {
         SmartDashboard.putNumber("current L spin", getLSpin());
         SmartDashboard.putNumber("desired R spin", desiredRSpin);
         SmartDashboard.putNumber("current R spin", getRSpin());
+=======
+        SmartDashboard.putNumber("desired pitch", desiredPitch);
+>>>>>>> 1fb7b9d94839067e2dd02b58d0c983aeaf197f92
         mechanism.setAngle(Units.radiansToDegrees(getPitch()));
         angleMotorController.set(
             Constants.Shooter.shooterPID.calculate(getPitch(), desiredPitch)
