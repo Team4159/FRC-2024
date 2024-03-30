@@ -37,8 +37,8 @@ public class RobotContainer {
     private static final JoystickButton printMapValue = new JoystickButton(secondary, 9);
     private static final JoystickButton manualOuttakeUp = new JoystickButton(secondary, 11);
     private static final JoystickButton manualOuttakeDown = new JoystickButton(secondary, 10);
-    // private static final JoystickButton manualClimberUp = new JoystickButton(secondary, 8);
-    // private static final JoystickButton manualClimberDown = new JoystickButton(secondary, 9);
+    private static final JoystickButton manualClimberUp = new JoystickButton(secondary, 8);
+    private static final JoystickButton manualClimberDown = new JoystickButton(secondary, 9);
     private static final Trigger manualFeed = new JoystickButton(driver, 1)
                                           .or(new JoystickButton(secondary, 1));
 
@@ -51,7 +51,7 @@ public class RobotContainer {
     private final Shooter s_Shooter = new Shooter();
     private final Intake s_Intake = new Intake();
     private final Deflector s_Deflector = new Deflector();
-    // private final Climber s_Climber = new Climber();
+    private final Climber s_Climber = new Climber();
 
     private final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve);
     @SuppressWarnings("unused")
@@ -209,14 +209,10 @@ public class RobotContainer {
                 s_Shooter.new ChangeNeck(SpinState.ST),
                 s_Intake.new ChangeState(IntakeState.STOW)
             ));
-        addMapValue
-             .onTrue(new InstantCommand(() -> SpeakerLookupTable.addMapValue(s_Shooter, kinesthetics)));
-        printMapValue
-             .onTrue(new InstantCommand(() -> SpeakerLookupTable.printMap()));
-        // manualClimberUp
-        //     .whileTrue(s_Climber.new ChangeState(SpinState.FW));
-        // manualClimberDown
-        //     .whileTrue(s_Climber.new ChangeState(SpinState.BW));
+        manualClimberUp
+            .whileTrue(s_Climber.new ChangeState(SpinState.FW));
+        manualClimberDown
+            .whileTrue(s_Climber.new ChangeState(SpinState.BW));
     }
 
     public Command getTeleopInit() {

@@ -9,7 +9,6 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.*;
@@ -200,7 +199,7 @@ public final class Constants {
         }
 
         public static final Pose3d luxonisTranslation = new Pose3d(
-            new Translation3d(0, 0, Units.inchesToMeters(16)),
+            new Translation3d(0, 0, Units.inchesToMeters(24)),
             new Rotation3d(Units.degreesToRadians(90), Units.degreesToRadians(26.57), Units.degreesToRadians(-90))
         ); // TODO: This must be tuned to specific robot
     } 
@@ -218,16 +217,14 @@ public final class Constants {
         public static double pitchOffset = Units.degreesToRotations(-3);
         public static final double minimumPitch = Units.degreesToRadians(14);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
-        public static final double neckSpeed = 0.35; // -1 to 1
+        public static final double neckSpeed = 0.25; // -1 to 1
         public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 150d);
         
-        public static final ArmFeedforward shooterAngleFF = new ArmFeedforward(0, 1, 0, 0); // TODO tune
         /** @param shooterSpinFF kS radians / second, kV radians / second per meter / second */
         public static final SimpleMotorFeedforward shooterSpinFF = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
         
-        // TODO: This must be tuned to specific robot
-        public static final PIDController shooterPID = new PIDController(0.7, 0, 0.02);
-        public static final double kF = 0.0;
+        public static final PIDController shooterPID = new PIDController(0.6, 0, 0.01);
+        public static final double kG = 0.01;
     }
 
     public static final class Deflector {
@@ -237,7 +234,8 @@ public final class Constants {
     }
 
     public static final class Climber {
-        public static final int motorID = 10;
+        public static final int motorLID = 10;
+        public static final int motorRID = 11;
         public static final double climbSpeed = 0.7;
 
         // public static final double heightTolerance = Units.inchesToMeters(1);
