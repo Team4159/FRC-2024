@@ -78,16 +78,14 @@ public class Vision extends SubsystemBase {
     }
 
     public static Translation3d getNoteTranslation() {
-        if (!limelightTable.getEntry("notetrans").exists()) return null;
-        double[] ntdata = rpiTable.getEntry("notetrans").getDoubleArray(new double[3]);
+        var notetrans = rpiTable.getEntry("notetrans");
+        if (!notetrans.exists() || notetrans.equals(null)) return null;
+        double[] ntdata = notetrans.getDoubleArray(new double[3]);
+        notetrans.setValue(null);
         return Constants.Intake.luxonisTranslation.getTranslation().plus(new Translation3d(
             Conversions.millimetersToMeters(ntdata[0]),
             Conversions.millimetersToMeters(ntdata[1]),
             Conversions.millimetersToMeters(ntdata[2])
         ).rotateBy(Constants.Intake.luxonisTranslation.getRotation()));
-    }
-
-    public static double getRpiPing() {
-        return rpiTable.getEntry("cl").getDouble(-1);
     }
 }

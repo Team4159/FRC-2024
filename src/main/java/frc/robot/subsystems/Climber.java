@@ -1,7 +1,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkBase;
-import com.revrobotics.CANSparkFlex;
+import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -10,10 +10,12 @@ import frc.robot.Constants;
 import frc.robot.Constants.SpinState;
 
 public class Climber extends SubsystemBase {
-    private CANSparkBase motorController;
+    private CANSparkBase mLeftController, mRightController;
     
     public Climber(){
-        motorController = new CANSparkFlex(Constants.Climber.motorID, MotorType.kBrushless);
+        mLeftController = new CANSparkMax(Constants.Climber.motorLID, MotorType.kBrushless);
+        mRightController = new CANSparkMax(Constants.Climber.motorRID, MotorType.kBrushless);
+        mRightController.follow(mLeftController);
     }
 
     // /** @return radians */
@@ -27,7 +29,7 @@ public class Climber extends SubsystemBase {
     // }
 
     private void set(SpinState ss) {
-        motorController.set(ss.multiplier * Constants.Climber.climbSpeed);
+        mLeftController.set(ss.multiplier * Constants.Climber.climbSpeed);
     }
 
     public class ChangeState extends Command {
@@ -39,7 +41,7 @@ public class Climber extends SubsystemBase {
         }
 
         @Override
-        public void initialize() {
+        public void execute() {
             set(desiredState);
         }
 

@@ -134,7 +134,7 @@ public class Swerve extends SubsystemBase {
 
         @Override
         public void execute() {
-            var r = MathUtil.angleModulus(kinesthetics.getPose().getRotation().getRadians());
+            var r = kinesthetics.getPose().getRotation().getRadians();
             var dr= MathUtil.angleModulus(desiredYaw.getAsDouble() - kinesthetics.getPose().getRotation().getRadians());
             drive(
                 new Translation2d(passthroughTranslation.getAsDouble(), passthroughStrafe.getAsDouble()).times(Constants.Swerve.maxSpeed),
