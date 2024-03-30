@@ -1,7 +1,6 @@
 package frc.robot.auto;
 
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -17,11 +16,10 @@ public class IntakeStatic extends SequentialCommandGroup {
     public IntakeStatic(Kinesthetics k, Shooter sh, Intake i) {
         addCommands(
             sh.toPitch(Constants.Shooter.minimumPitch),
-            new PrintCommand("static intaking"),
             new ParallelDeadlineGroup(
                 new WaitUntilCommand(k::shooterHasNote),
                 sh.new ChangeNeck(SpinState.FW),
-                i.new ChangeState(IntakeState.DOWN)
+                i.new ChangeState(IntakeState.DOWN, true).withTimeout(4)
             ),
             sh.new ChangeNeck(SpinState.BW, true),
             new WaitCommand(0.02),

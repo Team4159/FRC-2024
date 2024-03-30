@@ -101,7 +101,7 @@ public final class Constants {
         
             public static final double kPXController = 2;
             public static final double kPYController = 2;
-            public static final double kPThetaController = 2;
+            public static final double kPThetaController = 1;
         
             /* Constraint for the motion profilied robot angle controller */
             public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
@@ -111,7 +111,7 @@ public final class Constants {
             // used by PathPlanner during setup
             public static final HolonomicPathFollowerConfig autoPathFollowerConfig = new HolonomicPathFollowerConfig( // TODO set values
                 new PIDConstants(2, 0, 0), // translation PID constants
-                new PIDConstants(2, 0, 0), // rotation PID constants
+                new PIDConstants(1, 0, 0), // rotation PID constants
                 Constants.Swerve.AutoConfig.kMaxSpeedMetersPerSecond, 
                 wheelBase / Math.sqrt(2), // drive base radius in m
                 new ReplanningConfig() // default path replanning config
@@ -139,7 +139,7 @@ public final class Constants {
             public static final int driveMotorID = 3;
             public static final int angleMotorID = 4;
             public static final int canCoderID = 2;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-69.5); 
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-70); 
 
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -150,7 +150,7 @@ public final class Constants {
             public static final int driveMotorID = 5;
             public static final int angleMotorID = 6;
             public static final int canCoderID = 3;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-17.3);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-16.5);
 
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -161,7 +161,7 @@ public final class Constants {
             public static final int driveMotorID = 7;
             public static final int angleMotorID = 8;
             public static final int canCoderID = 4;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(55.5); 
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(55.3); 
 
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -173,8 +173,8 @@ public final class Constants {
         public static final int intakeMotorID = 2;
         public static final int feederMotorID = 3;
 
-        public static final double pitchTolerance = Math.PI/64; // radians
-        public static final double spinTolerance = Math.PI/16; // radians
+        public static final double pitchTolerance = Math.PI/32; // radians
+        public static final double spinTolerance = Math.PI; // radians
 
         public static final double intakeSpin = 0.7; // -1 to 1
         public static final double feederSpin = 0.45; // -1 to 1
@@ -183,10 +183,10 @@ public final class Constants {
         public static final double intakeAngleRange = Units.degreesToRadians(64);
 
         public static enum IntakeState {
-            STOW(Units.degreesToRadians(10.4), SpinState.ST), // starting pos & when moving
-            GARGLE(Units.degreesToRadians(10.4), SpinState.FW), // just move the motors
+            STOW(Units.degreesToRadians(38), SpinState.ST), // starting pos & when moving
+            GARGLE(Units.degreesToRadians(38), SpinState.FW), // just move the motors
             DOWN(Units.degreesToRadians(220), SpinState.FW), // intaking
-            RETCH(Units.degreesToRadians(10.4), SpinState.BW), // just move the motors
+            RETCH(Units.degreesToRadians(38), SpinState.BW), // just move the motors
             SPIT(Units.degreesToRadians(220), SpinState.BW); // outtaking
 
             public final double pitch;

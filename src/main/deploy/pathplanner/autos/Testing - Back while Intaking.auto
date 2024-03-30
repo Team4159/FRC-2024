@@ -2,19 +2,32 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.359011265031077,
-      "y": 5.507946742389212
+      "x": 1.382399573915957,
+      "y": 5.566417514601411
     },
-    "rotation": 0
+    "rotation": 180.0
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "Testing - Back while Intaking"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeStatic"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Testing - Just Back"
+                }
+              }
+            ]
           }
         }
       ]

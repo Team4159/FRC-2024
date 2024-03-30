@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Intake.IntakeState;
+import frc.robot.auto.IntakeStatic;
 import frc.robot.Constants.SpinState;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -33,8 +34,6 @@ public class RobotContainer {
     private static final JoystickButton manualShootSourceIn = new JoystickButton(secondary, 6);
     private static final JoystickButton manualIntakeUp = new JoystickButton(secondary, 7);
     private static final JoystickButton manualIntakeDown = new JoystickButton(secondary, 2);
-    private static final JoystickButton addMapValue = new JoystickButton(secondary, 8);
-    private static final JoystickButton printMapValue = new JoystickButton(secondary, 9);
     private static final JoystickButton manualOuttakeUp = new JoystickButton(secondary, 11);
     private static final JoystickButton manualOuttakeDown = new JoystickButton(secondary, 10);
     private static final JoystickButton manualClimberUp = new JoystickButton(secondary, 8);
@@ -83,7 +82,7 @@ public class RobotContainer {
     // register PathPlanner Commands, must be done before building autos (AutoBuilder.buildAutoChooser)
     private void configureAutoCommands() {
         NamedCommands.registerCommand("intakeStatic", 
-            new RepeatCommand(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake, true)).withTimeout(3)
+            new IntakeStatic(kinesthetics, s_Shooter, s_Intake).withTimeout(4)
         ); // TESTING INTAKE AUTO
         NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
@@ -95,7 +94,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("speakerPodium", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
             s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, true, false)
-                .alongWith(new WaitCommand(1.5)),
+                .withTimeout(1.5),
             s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
             s_Shooter.new ChangeState(() -> Constants.Shooter.idleCommand, false, true)
         ));
@@ -216,7 +215,10 @@ public class RobotContainer {
     }
 
     public Command getTeleopInit() {
-        return s_Shooter.new ChangeState(() -> Constants.Shooter.idleCommand, false);
+        return new SequentialCommandGroup(
+            s_Shooter.new ChangeState(() -> Constants.Shooter.idleCommand, false, true),
+            s_Intake.new ChangeState(IntakeState.STOW)
+        );
     }
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();

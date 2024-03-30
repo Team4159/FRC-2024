@@ -39,11 +39,10 @@ public class Swerve extends SubsystemBase {
             this.kinesthetics::setPose, // a consumer for the robot pose, accepts Pose2d
             () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(this.getModuleStates()), // a supplier for robot relative ChassisSpeeds
             (ChassisSpeeds chassisSpeeds) -> { // the drive method, accepts ROBOT relative ChassisSpeeds
-                //ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(chassisSpeeds, 0.02); // DO NOT USE
-                //ChassisSpeeds reversedChassisSpeeds = new ChassisSpeeds(-chassisSpeeds.vxMetersPerSecond, -chassisSpeeds.vyMetersPerSecond, chassisSpeeds.omegaRadiansPerSecond);
-                SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(chassisSpeeds);
+                ChassisSpeeds reversedChassisSpeeds = new ChassisSpeeds(-chassisSpeeds.vxMetersPerSecond, -chassisSpeeds.vyMetersPerSecond, chassisSpeeds.omegaRadiansPerSecond);
+                SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(reversedChassisSpeeds);
                 SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
-                for(SwerveModule mod : mSwerveMods) mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false);
+                for(SwerveModule mod : mSwerveMods) mod.setDesiredState(swerveModuleStates[mod.moduleNumber], true);
             }, 
             // (ChassisSpeeds rrChassisSpeeds) -> { 
             //     drive(new Translation2d(rrChassisSpeeds.vxMetersPerSecond, rrChassisSpeeds.vyMetersPerSecond), 
