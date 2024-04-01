@@ -53,7 +53,8 @@ public class Kinesthetics extends SubsystemBase {
         poseEstimator = new SwerveDrivePoseEstimator(
             Constants.Swerve.swerveKinematics, getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d()
         );
-    
+        // setPose(new Pose2d());
+
         ShuffleboardTab table = Shuffleboard.getTab("Kinesthetics");
 
         table.addBoolean("Shooter Note?", this::shooterHasNote);
@@ -76,10 +77,9 @@ public class Kinesthetics extends SubsystemBase {
             poseEstimator.addVisionMeasurement(
                 visionPose.pose().toPose2d(),
                 Timer.getFPGATimestamp()-visionPose.ping(),
-                VecBuilder.fill(visionPose.confidence(), visionPose.confidence(), 2)
+                VecBuilder.fill(visionPose.confidence(), visionPose.confidence(), 9999)
             );
         swerveStates.set(s_Swerve.getModuleStates());
-        SmartDashboard.putNumber("yaw", getPose().getRotation().getRadians());
         field.setRobotPose(getPose());
     }
 

@@ -217,14 +217,15 @@ public final class Constants {
         public static double pitchOffset = Units.degreesToRotations(-3);
         public static final double minimumPitch = Units.degreesToRadians(14);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
-        public static final double neckSpeed = 0.25; // -1 to 1
+        public static final double neckSpeed = 0.35; // -1 to 1
         public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 150d);
         
         /** @param shooterSpinFF kS radians / second, kV radians / second per meter / second */
         public static final SimpleMotorFeedforward shooterSpinFF = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
         
-        public static final PIDController shooterPID = new PIDController(0.6, 0, 0.01);
-        public static final double kG = 0.01;
+        // TODO: This must be tuned to specific robot
+        public static final PIDController shooterPID = new PIDController(0.75, 0.0003, 0.02);
+        public static final double kG = 0.016;
     }
 
     public static final class Deflector {
@@ -246,7 +247,7 @@ public final class Constants {
     public static final class CommandConstants {
         public static final double bumperWidth = Units.inchesToMeters(2.75);
 
-        public static final PIDController swerveYawPID = new PIDController(0.1, 0, 0.001);
+        public static final PIDController swerveYawPID = new PIDController(0.1, 0.0001, 0.0005);
 
         public static final ShooterCommand speakerPodiumShooterCommand = new ShooterCommand(
             0.7, 450d, 225d);

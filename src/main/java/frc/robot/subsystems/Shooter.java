@@ -26,6 +26,9 @@ public class Shooter extends SubsystemBase {
 
     private final MechanismLigament2d mechanism, mechanismGoal;
 
+    //Temporary values for logging desired spins
+    private double desiredLSpin, desiredRSpin;
+
     public Shooter() {
         angleMotorController = new CANSparkFlex(Constants.Shooter.angleMotorID, MotorType.kBrushless);
         shooterMLeftController = new CANSparkFlex(Constants.Shooter.shooterMLeftID, MotorType.kBrushless);
@@ -45,6 +48,13 @@ public class Shooter extends SubsystemBase {
 
     @Override
     public void periodic() {
+        //log desired pitch and speed with current pitch and spin to test accuracy
+        SmartDashboard.putNumber("desired pitch", desiredPitch);
+        SmartDashboard.putNumber("current pitch", getPitch());
+        SmartDashboard.putNumber("desired L spin", desiredLSpin);
+        SmartDashboard.putNumber("current L spin", getLSpin());
+        SmartDashboard.putNumber("desired R spin", desiredRSpin);
+        SmartDashboard.putNumber("current R spin", getRSpin());
         SmartDashboard.putNumber("desired pitch", desiredPitch);
         mechanism.setAngle(Units.radiansToDegrees(getPitch()));
         angleMotorController.set(
@@ -84,7 +94,9 @@ public class Shooter extends SubsystemBase {
      * */
     private void setGoalSpin(double goalLSpin, double goalRSpin) {
         shooterMLeftController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalLSpin), CANSparkBase.ControlType.kSmartVelocity);
-        shooterMRightController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalRSpin), CANSparkBase.ControlType.kSmartVelocity);  
+        shooterMRightController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalRSpin), CANSparkBase.ControlType.kSmartVelocity); 
+        desiredLSpin = goalLSpin;
+        desiredRSpin = goalRSpin; 
     }
 
     private void setNeck(SpinState ss) {
