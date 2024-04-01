@@ -16,6 +16,8 @@ import frc.robot.subsystems.Shooter.ShooterCommand;
 import frc.robot.subsystems.Swerve;
 
 public class SpeakerLookupTable extends ParallelCommandGroup {
+    public double latestYaw;
+
     /** @see (distance (meters), pitch (radians)) */
     private static final Map<Double, Double> shooterTable = new HashMap<>() {{
         put(1.29, 1.1);
@@ -42,6 +44,7 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
                 sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 500d, 375d), true)
                 //sh.new ChangeNeck(SpinState.FW))
         ));
+        latestYaw = getDifference(k).toTranslation2d().getAngle().getRadians() - Math.PI;
     }
 
     /** @return x right+, y forward+, z up+ */

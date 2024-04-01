@@ -1,8 +1,10 @@
 package frc.robot.subsystems;
 
+import java.util.Optional;
 import java.util.function.DoubleSupplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.SwerveModule;
+import frc.robot.commands.SpeakerAutoAim;
 
 public class Swerve extends SubsystemBase {
     private Kinesthetics kinesthetics;
@@ -39,25 +42,21 @@ public class Swerve extends SubsystemBase {
             this.kinesthetics::setPose, // a consumer for the robot pose, accepts Pose2d
             () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(this.getModuleStates()), // a supplier for robot relative ChassisSpeeds
             (ChassisSpeeds chassisSpeeds) -> { // the drive method, accepts ROBOT relative ChassisSpeeds
+                // why reversed? no clue but it works
                 ChassisSpeeds reversedChassisSpeeds = new ChassisSpeeds(-chassisSpeeds.vxMetersPerSecond, -chassisSpeeds.vyMetersPerSecond, chassisSpeeds.omegaRadiansPerSecond);
                 SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(reversedChassisSpeeds);
                 SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
                 for(SwerveModule mod : mSwerveMods) mod.setDesiredState(swerveModuleStates[mod.moduleNumber], true);
             }, 
-            // (ChassisSpeeds rrChassisSpeeds) -> { 
-            //     drive(new Translation2d(rrChassisSpeeds.vxMetersPerSecond, rrChassisSpeeds.vyMetersPerSecond), 
-            //     rrChassisSpeeds.omegaRadiansPerSecond, 
-            //     false, true);
-            // },
             Constants.Swerve.AutoConfig.autoPathFollowerConfig, // config, includes PID values
             () -> DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue).equals(DriverStation.Alliance.Red), // determines if autos should be flipped (i.e. if on Red Alliance)
             this // reference to this subsystem to set requirements
         );
-        // PPHolonomicDriveController.setRotationTargetOverride(() -> {
-        //     var cmd = this.getCurrentCommand();
-        //     if (cmd == null || !(cmd instanceof SpeakerAutoAim a) || a.latestYaw == null) return Optional.empty();
-        //     return Optional.of(Rotation2d.fromRadians(a.latestYaw));
-        // });
+        PPHolonomicDriveController.setRotationTargetOverride(() -> {
+            var cmd = this.getCurrentCommand();
+            if (cmd == null || !(cmd instanceof SpeakerAutoAim a) || a.latestYaw == null) return Optional.empty();
+            return Optional.of(Rotation2d.fromRadians(a.latestYaw));
+        });
         
         Timer.delay(0.1);
         for (SwerveModule mod : mSwerveMods) mod.resetToAbsolute();
