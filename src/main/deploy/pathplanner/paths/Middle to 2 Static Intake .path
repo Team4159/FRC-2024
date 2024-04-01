@@ -20,8 +20,8 @@
         "y": 5.53133505126845
       },
       "prevControl": {
-        "x": 4.200690794543981,
-        "y": 5.546251348027573
+        "x": 2.5401208637175103,
+        "y": 5.507946742389212
       },
       "nextControl": null,
       "isLocked": false,
@@ -41,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "intakeStatic"
+                "name": "shooterIntaking"
               }
             }
           ]

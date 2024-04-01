@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.7856981070087494,
-        "y": 6.993104356579084
+        "x": 2.832474724778265,
+        "y": 6.981410202142006
       },
       "prevControl": null,
       "nextControl": {
-        "x": -0.2781703569105145,
-        "y": 5.4377818157345725
+        "x": 1.9086365238257539,
+        "y": 4.560720232551577
       },
       "isLocked": false,
       "linkedName": "1"
@@ -20,8 +20,8 @@
         "y": 4.1046482092964185
       },
       "prevControl": {
-        "x": 3.3470175202458665,
-        "y": 3.85907096600518
+        "x": 2.1659079215594326,
+        "y": 4.0110949737569
       },
       "nextControl": null,
       "isLocked": false,
@@ -41,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "intakeStatic"
+                "name": "shooterIntaking"
               }
             }
           ]
@@ -58,7 +58,7 @@
   "goalEndState": {
     "velocity": 0,
     "rotation": 152.5924245621816,
-    "rotateFast": false
+    "rotateFast": true
   },
   "reversed": false,
   "folder": null,

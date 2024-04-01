@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.276852593591227,
-        "y": 1.1577212898015548
+        "x": 4.49304465560498,
+        "y": 1.9646179463299098
       },
       "isLocked": false,
       "linkedName": "Source Score"
@@ -20,8 +20,8 @@
         "y": 0.7835083476434771
       },
       "prevControl": {
-        "x": 9.404589521429756,
-        "y": 0.7016492665463968
+        "x": 8.37550393049504,
+        "y": 0.7367317298737166
       },
       "nextControl": null,
       "isLocked": false,
@@ -41,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "intakeStatic"
+                "name": "shooterIntaking"
               }
             }
           ]

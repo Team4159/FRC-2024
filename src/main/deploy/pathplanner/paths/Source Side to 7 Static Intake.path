@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 7.779102053926322,
-        "y": 2.4323841240231827
+        "x": 7.825878671700363,
+        "y": 2.467466587354827
       },
       "prevControl": {
-        "x": 9.47475444807612,
-        "y": 2.9001503017192416
+        "x": 8.398892239384201,
+        "y": 2.86506783840211
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.65,
+      "waypointRelativePos": 0.6,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "intakeStatic"
+                "name": "shooterIntaking"
               }
             }
           ]

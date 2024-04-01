@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Intake.IntakeState;
-import frc.robot.auto.IntakeStatic;
+import frc.robot.auto.ShooterIntaking;
 import frc.robot.Constants.SpinState;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -81,34 +81,51 @@ public class RobotContainer {
 
     // register PathPlanner Commands, must be done before building autos (AutoBuilder.buildAutoChooser)
     private void configureAutoCommands() {
-        NamedCommands.registerCommand("intakeStatic", 
-            new IntakeStatic(kinesthetics, s_Shooter, s_Intake).withTimeout(4)
-        ); // TESTING INTAKE AUTO
+        NamedCommands.registerCommand("intakeDown", 
+            new InstantCommand(() -> s_Intake.new ChangeState(IntakeState.DOWN, true).raceWith(new WaitCommand(0.5)))
+        );
+        NamedCommands.registerCommand("shooterSpinUp", 
+            s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 450d, 325d), false, true)
+        );
+        NamedCommands.registerCommand("shooterIntaking",
+            new ShooterIntaking(kinesthetics, s_Shooter)
+        );
         NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
             s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true, false)
-                .withTimeout(1.5),
+                .raceWith(new WaitCommand(1.0)),
             s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
-            s_Shooter.new ChangeState(() -> Constants.Shooter.idleCommand, false, true)
+            s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 200d), false, true),
+            s_Shooter.new ChangeNeck(SpinState.ST)
         ));
         NamedCommands.registerCommand("speakerPodium", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
             s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, true, false)
-                .withTimeout(1.5),
+                .raceWith(new WaitCommand(1.25)),
             s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
-            s_Shooter.new ChangeState(() -> Constants.Shooter.idleCommand, false, true)
+            s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 200d), false, true),
+            s_Shooter.new ChangeNeck(SpinState.ST)
         ));
         // untested auto commands
         NamedCommands.registerCommand("speakerLookupTable", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
-            new SpeakerLookupTable(kinesthetics, s_Shooter, s_Swerve, () -> 0, () -> 0)
-                .withTimeout(2.75),
+            new RepeatCommand(new SpeakerLookupTable(kinesthetics, s_Shooter, s_Swerve, () -> 0, () -> 0))
+                .raceWith(new WaitCommand(1.75)),
             s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
-            s_Shooter.new ChangeState(() -> Constants.Shooter.idleCommand, false, true)
+            s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 200d), false, true),
+            s_Shooter.new ChangeNeck(SpinState.ST)
         ));
-        NamedCommands.registerCommand("ampAuto", new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector));
-        NamedCommands.registerCommand("speakerAutoAim", new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0));
-        NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake));
+        NamedCommands.registerCommand("speakerLookupTableFast", new SequentialCommandGroup(
+            s_Shooter.new ChangeNeck(SpinState.ST),
+            new RepeatCommand(new SpeakerLookupTable(kinesthetics, s_Shooter, s_Swerve, () -> 0, () -> 0))
+                .raceWith(new WaitCommand(0.4)),
+            s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
+            s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 200d), false, true),
+            s_Shooter.new ChangeNeck(SpinState.ST)
+        ));
+        // NamedCommands.registerCommand("ampAuto", new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector));
+        // NamedCommands.registerCommand("speakerAutoAim", new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0));
+        // NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake));
     }
 
     /**

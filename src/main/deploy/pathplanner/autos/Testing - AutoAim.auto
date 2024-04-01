@@ -1,0 +1,31 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.692444461807719,
+      "y": 4.420390379237972
+    },
+    "rotation": 121.13310317033942
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Source Side to Source Score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "speakerLookupTable"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Testing",
+  "choreoAuto": false
+}
