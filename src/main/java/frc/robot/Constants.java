@@ -11,7 +11,6 @@ import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -226,7 +225,7 @@ public final class Constants {
         
         // TODO: This must be tuned to specific robot
         public static final PIDController shooterPID = new PIDController(0.75, 0.0003, 0.02);
-        public static final double kF = 0.016;
+        public static final double kG = 0.016;
     }
 
     public static final class Deflector {

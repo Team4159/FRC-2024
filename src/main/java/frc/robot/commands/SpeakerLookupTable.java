@@ -1,21 +1,15 @@
 package frc.robot.commands;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
 
-import javax.management.ConstructorParameters;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants;
-import frc.robot.Constants.SpinState;
 import frc.robot.subsystems.Kinesthetics;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShooterCommand;
