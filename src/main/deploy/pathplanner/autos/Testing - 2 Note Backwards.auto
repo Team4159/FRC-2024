@@ -12,6 +12,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "intakeDown"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -31,7 +37,7 @@
           }
         },
         {
-          "type": "race",
+          "type": "parallel",
           "data": {
             "commands": [
               {

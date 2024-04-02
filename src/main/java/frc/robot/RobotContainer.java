@@ -82,7 +82,7 @@ public class RobotContainer {
     // register PathPlanner Commands, must be done before building autos (AutoBuilder.buildAutoChooser)
     private void configureAutoCommands() {
         NamedCommands.registerCommand("intakeDown", 
-            new InstantCommand(() -> s_Intake.new ChangeState(IntakeState.DOWN, true).raceWith(new WaitCommand(0.5)))
+            new InstantCommand(() -> s_Intake.new ChangeState(IntakeState.DOWN, true).raceWith(new WaitCommand(1)))
         );
         NamedCommands.registerCommand("shooterSpinUp", 
             s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 450d, 325d), false, true)

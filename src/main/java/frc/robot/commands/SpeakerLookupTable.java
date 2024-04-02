@@ -28,23 +28,25 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
         put(2.8, 0.68);
         put(3.0, 0.63);
         put(3.25, 0.60);
-        put(3.5, 0.54);
+        put(3.5, 0.56);
         put(4.0, 0.53);
         put(4.25, 0.495);
         put(4.5, 0.48);
-        /*put(4.6, 0.49);
+        put(4.6, 0.475);
         put(4.8, 0.47);
-        put(5.0, 0.46);*/
+        put(4.9, 0.465);
+        put(5.0, 0.46);
     }}; // distance: pitch
 
     public SpeakerLookupTable(Kinesthetics k, Shooter sh, Swerve sw, DoubleSupplier translationSup, DoubleSupplier strafeSup){
-        super(
+        k.forceVision();
+        latestYaw = getDifference(k).toTranslation2d().getAngle().getRadians() - Math.PI;
+        addCommands(
             sw.new ChangeYaw(translationSup, strafeSup, () -> getDifference(k).toTranslation2d().getAngle().getRadians() - Math.PI),
             new SequentialCommandGroup(
                 sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 500d, 375d), true)
                 //sh.new ChangeNeck(SpinState.FW))
         ));
-        latestYaw = getDifference(k).toTranslation2d().getAngle().getRadians() - Math.PI;
     }
 
     /** @return x right+, y forward+, z up+ */
