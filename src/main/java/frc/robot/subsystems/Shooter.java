@@ -5,7 +5,6 @@ import java.util.function.Supplier;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkAbsoluteEncoder;
 
 import edu.wpi.first.math.MathUtil;
@@ -19,10 +18,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.Conversions;
 import frc.robot.Constants;
-import frc.robot.Constants.SpinState;
 
 public class Shooter extends SubsystemBase {  
-    private CANSparkBase angleMotorController, shooterMLeftController, shooterMRightController, neckMotorController;
+    private CANSparkBase angleMotorController, shooterMLeftController, shooterMRightController;
 
     private final MechanismLigament2d mechanism, mechanismGoal;
 
@@ -34,7 +32,6 @@ public class Shooter extends SubsystemBase {
         shooterMLeftController = new CANSparkFlex(Constants.Shooter.shooterMLeftID, MotorType.kBrushless);
         shooterMRightController= new CANSparkFlex(Constants.Shooter.shooterMRightID,MotorType.kBrushless);
         shooterMRightController.setInverted(true);
-        neckMotorController = new CANSparkMax(Constants.Shooter.neckMotorID, MotorType.kBrushless);
         
         Constants.Shooter.pitchOffset = angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition() - Units.radiansToRotations(Constants.Shooter.minimumPitch) - 0.00041;
 
@@ -94,29 +91,11 @@ public class Shooter extends SubsystemBase {
      * */
     private void setGoalSpin(double goalLSpin, double goalRSpin) {
         shooterMLeftController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalLSpin), CANSparkBase.ControlType.kSmartVelocity);
-        shooterMRightController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalRSpin), CANSparkBase.ControlType.kSmartVelocity); 
-        desiredLSpin = goalLSpin;
-        desiredRSpin = goalRSpin; 
-    }
-
-    private void setNeck(SpinState ss) {
-        setNeck(ss, 1);
-    }
-
-    private void setNeck(SpinState ss, double multiplier) {
-        neckMotorController.set(ss.multiplier * multiplier * Constants.Shooter.neckSpeed);
-    }
-
-    public ChangeState toPitch(double pitch) {
-        return new ChangeState(() -> new ShooterCommand(pitch, null, null), false);
-    }
-
-    public ChangeState toSpin(double lSpin, double rSpin) {
-        return new ChangeState(() -> new ShooterCommand(null, lSpin, rSpin), false);
+        shooterMRightController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalRSpin), CANSparkBase.ControlType.kSmartVelocity);  
     }
 
     public ChangeState stopShooter() {
-        return new ChangeState(() -> Constants.Shooter.idleCommand, false);
+        return new ChangeState(Constants.Shooter.idleCommand);
     }
 
     /**
@@ -129,6 +108,10 @@ public class Shooter extends SubsystemBase {
             this(pitch, spin, spin);
         }
 
+        public ShooterCommand spinOnly() {
+            return new ShooterCommand(null, this.lSpin, this.rSpin);
+        }
+
         public boolean hasSpin() {
             return lSpin != null || rSpin != null;
         }
@@ -138,6 +121,10 @@ public class Shooter extends SubsystemBase {
         private boolean continuous = false;
         private boolean instant = false;
         private Supplier<ShooterCommand> desiredState;
+
+        public ChangeState(ShooterCommand shooterState) {
+            this(() -> shooterState, false);
+        }
 
         public ChangeState(Supplier<ShooterCommand> shooterStateSupplier, boolean continuous) {
             this(shooterStateSupplier, continuous, false);
@@ -179,71 +166,4 @@ public class Shooter extends SubsystemBase {
         }
     }
 
-    public class ChangeNeck extends Command {
-        private Kinesthetics kinesthetics;
-
-        private boolean beamBreakMode; // should this command end when the beam break opens
-        private SpinState desiredNeck;
-        private boolean desiredSlow;
-
-        public ChangeNeck(SpinState ss) {
-            this(ss, false);
-        }
-
-        public ChangeNeck(SpinState ss, boolean slow) {
-            desiredNeck = ss;
-            desiredSlow = slow;
-            addRequirements(Shooter.this);
-        }
-
-        public ChangeNeck(Kinesthetics k, SpinState ss) {
-            kinesthetics = k;
-            desiredNeck = ss;
-            beamBreakMode = kinesthetics.shooterHasNote();
-            addRequirements(Shooter.this);
-        }
-
-        @Override
-        public void initialize() {
-            setNeck(desiredNeck, desiredSlow ? 0.1 : 1);
-        }
-
-        @Override
-        public boolean isFinished() {
-            return !beamBreakMode || !(kinesthetics.shooterHasNote());
-        }
-
-        @Override
-        public void end(boolean interrupted) {
-            System.out.println("ending changeneck, interrupted: " + interrupted + ", beambreakmode: " + beamBreakMode);
-            if (interrupted || beamBreakMode) setNeck(SpinState.ST);
-            super.end(interrupted);
-        }
-    }
-
-    public class ChangeStaticState extends Command {
-        private Supplier<ShooterCommand> desiredState;
-
-        public ChangeStaticState(Supplier<ShooterCommand> shooterStateSupplier) {
-            desiredState = shooterStateSupplier;
-            addRequirements(Shooter.this);
-        }
-        
-        @Override
-        public void initialize() {
-            var state = desiredState.get();
-            if (state.pitch() != null) setGoalPitch(state.pitch());
-            if (state.hasSpin()) setGoalSpin(state.lSpin(), state.rSpin());
-        }
-    
-        @Override
-        public boolean isFinished() {
-            return true;
-        }
-    
-        @Override
-        public void end(boolean interrupted) {
-            super.end(interrupted);
-        }
-    }
 }

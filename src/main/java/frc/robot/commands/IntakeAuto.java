@@ -16,16 +16,17 @@ import frc.robot.Constants.Intake.IntakeState;
 import frc.robot.Constants.SpinState;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Kinesthetics;
+import frc.robot.subsystems.Neck;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 
 public class IntakeAuto extends SequentialCommandGroup {
-    public IntakeAuto(Kinesthetics k, Swerve sw, Shooter sh, Intake i) {
-        this(k, sw, sh, i, false);
+    public IntakeAuto(Kinesthetics k, Swerve sw, Shooter sh, Neck n, Intake i) {
+        this(k, sw, sh, n, i, false);
     }
 
-    public IntakeAuto(Kinesthetics k, Swerve sw, Shooter sh, Intake i, boolean disableMovement) {
+    public IntakeAuto(Kinesthetics k, Swerve sw, Shooter sh, Neck n, Intake i, boolean disableMovement) {
         var notetrans3d = Vision.getNoteTranslation();
         if (!disableMovement && notetrans3d != null) {
             Translation2d notetrans = notetrans3d.toTranslation2d();
@@ -35,15 +36,15 @@ public class IntakeAuto extends SequentialCommandGroup {
             }
         }
         addCommands(
-            sh.toPitch(Constants.Shooter.minimumPitch),
+            sh.stopShooter(), // return to initial angle
             new ParallelDeadlineGroup(
                 new WaitUntilCommand(k::shooterHasNote),
-                sh.new ChangeNeck(SpinState.FW),
+                n.new ChangeNeck(SpinState.FW),
                 i.new ChangeState(IntakeState.DOWN)
             ),
-            sh.new ChangeNeck(SpinState.BW, true),
+            n.new ChangeNeck(SpinState.BW, true),
             new WaitCommand(0.02),
-            sh.new ChangeNeck(SpinState.ST)
+            n.new ChangeNeck(SpinState.ST)
         );
     }
 
