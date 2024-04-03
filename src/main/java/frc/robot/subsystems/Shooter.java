@@ -205,7 +205,7 @@ public class Shooter extends SubsystemBase {
 
         @Override
         public void initialize() {
-            setNeck(desiredNeck, desiredSlow ? 0.5 : 1);
+            setNeck(desiredNeck, desiredSlow ? 0.1 : 1);
         }
 
         @Override

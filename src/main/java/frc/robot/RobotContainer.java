@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Intake.IntakeState;
+import frc.robot.auto.IntakeStatic;
 import frc.robot.auto.ShooterIntaking;
 import frc.robot.Constants.SpinState;
 import frc.robot.commands.*;
@@ -81,8 +82,8 @@ public class RobotContainer {
 
     // register PathPlanner Commands, must be done before building autos (AutoBuilder.buildAutoChooser)
     private void configureAutoCommands() {
-        NamedCommands.registerCommand("intakeDown", 
-            new InstantCommand(() -> s_Intake.new ChangeState(Constants.Intake.IntakeState.DOWN, true).withTimeout(5))
+        NamedCommands.registerCommand("intakeStatic",
+            new IntakeStatic(kinesthetics, s_Intake).withTimeout(4)
         );
         NamedCommands.registerCommand("shooterSpinUp", 
             s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 450d, 325d), false, true)
@@ -94,7 +95,7 @@ public class RobotContainer {
             s_Shooter.new ChangeNeck(SpinState.ST),
             s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true, false)
                 .raceWith(new WaitCommand(1.0)),
-            s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
+            s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW).raceWith(new WaitCommand(1)),
             s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 200d), false, true),
             s_Shooter.new ChangeNeck(SpinState.ST)
         ));
@@ -194,7 +195,8 @@ public class RobotContainer {
                 s_Shooter.new ChangeNeck(SpinState.ST)
             ));
         manualFeed
-            .whileTrue(s_Shooter.new ChangeNeck(SpinState.FW));
+            .whileTrue(s_Shooter.new ChangeNeck(SpinState.FW))
+            .onFalse(s_Shooter.new ChangeNeck(SpinState.FW));
         manualIntakeUp
             .whileTrue(new ParallelCommandGroup(
                 s_Shooter.new ChangeNeck(SpinState.FW),
