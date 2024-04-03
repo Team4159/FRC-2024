@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.692444461807719,
-      "y": 4.420390379237972
+      "x": 0.7158327706968803,
+      "y": 6.689056341075646
     },
-    "rotation": 121.13310317033942
+    "rotation": -122.00245336021047
   },
   "command": {
     "type": "sequential",
@@ -14,7 +14,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Source Side to Source Score"
+            "pathName": "Testing - Towards Amp Side"
           }
         },
         {

@@ -110,7 +110,7 @@ public final class Constants {
 
             // used by PathPlanner during setup
             public static final HolonomicPathFollowerConfig autoPathFollowerConfig = new HolonomicPathFollowerConfig( // TODO set values
-                new PIDConstants(1, 0, 0), // translation PID constants
+                new PIDConstants(2.5, 0, 0), // translation PID constants
                 new PIDConstants(1, 0, 0), // rotation PID constants
                 Constants.Swerve.AutoConfig.kMaxSpeedMetersPerSecond, 
                 wheelBase / Math.sqrt(2), // drive base radius in m
@@ -217,7 +217,7 @@ public final class Constants {
         public static double pitchOffset = Units.degreesToRotations(-3);
         public static final double minimumPitch = Units.degreesToRadians(14);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
-        public static final double neckSpeed = 0.35; // -1 to 1
+        public static final double neckSpeed = 0.65; // -1 to 1
         public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 150d);
         
         /** @param shooterSpinFF kS radians / second, kV radians / second per meter / second */
@@ -231,7 +231,7 @@ public final class Constants {
     public static final class Deflector {
         public static final int motorID = 9;
 
-        public static final double maximumPitch = Units.rotationsToRadians(2.5);
+        public static final double maximumPitch = Units.rotationsToRadians(2.5*3);
     }
 
     public static final class Climber {

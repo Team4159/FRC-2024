@@ -94,15 +94,15 @@ public class RobotContainer {
         NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
             s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true, false)
-                .raceWith(new WaitCommand(1.0)),
-            s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW).raceWith(new WaitCommand(1)),
+                .withTimeout(1.5),
+            s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
             s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 200d), false, true),
             s_Shooter.new ChangeNeck(SpinState.ST)
         ));
         NamedCommands.registerCommand("speakerPodium", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
             s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, true, false)
-                .raceWith(new WaitCommand(1.25)),
+                .withTimeout(1.75),
             s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
             s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 200d), false, true),
             s_Shooter.new ChangeNeck(SpinState.ST)
@@ -111,7 +111,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("speakerLookupTable", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
             new RepeatCommand(new SpeakerLookupTable(kinesthetics, s_Shooter, s_Swerve, () -> 0, () -> 0))
-                .raceWith(new WaitCommand(1.75)),
+                .withTimeout(3),
             s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
             s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 200d), false, true),
             s_Shooter.new ChangeNeck(SpinState.ST)
@@ -119,7 +119,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("speakerLookupTableFast", new SequentialCommandGroup(
             s_Shooter.new ChangeNeck(SpinState.ST),
             new RepeatCommand(new SpeakerLookupTable(kinesthetics, s_Shooter, s_Swerve, () -> 0, () -> 0))
-                .raceWith(new WaitCommand(0.4)),
+                .withTimeout(0.5),
             s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW),
             s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 200d), false, true),
             s_Shooter.new ChangeNeck(SpinState.ST)

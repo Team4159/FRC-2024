@@ -136,6 +136,7 @@ public class Swerve extends SubsystemBase {
 
         @Override
         public void execute() {
+            if (isFinished()) return;
             var r = kinesthetics.getPose().getRotation().getRadians();
             var dr= MathUtil.angleModulus(desiredYaw.getAsDouble() - kinesthetics.getPose().getRotation().getRadians());
             drive(

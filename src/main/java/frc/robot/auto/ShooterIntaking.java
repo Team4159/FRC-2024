@@ -18,7 +18,7 @@ public class ShooterIntaking extends SequentialCommandGroup {
                 sh.new ChangeNeck(SpinState.FW)
             ),
             sh.new ChangeNeck(SpinState.BW, true),
-            new WaitCommand(0.02),
+            new WaitCommand(0.005),
             sh.new ChangeNeck(SpinState.ST)
         );
     }

@@ -210,11 +210,12 @@ public class Shooter extends SubsystemBase {
 
         @Override
         public boolean isFinished() {
-            return !beamBreakMode || !kinesthetics.shooterHasNote();
+            return !beamBreakMode || !(kinesthetics.shooterHasNote());
         }
 
         @Override
         public void end(boolean interrupted) {
+            System.out.println("ending changeneck, interrupted: " + interrupted + ", beambreakmode: " + beamBreakMode);
             if (interrupted || beamBreakMode) setNeck(SpinState.ST);
             super.end(interrupted);
         }
