@@ -218,7 +218,7 @@ public final class Constants {
         public static final double minimumPitch = Units.degreesToRadians(14);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
         public static final double neckSpeed = 0.25; // -1 to 1
-        public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 0d);
+        public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 120d);
         
         /** @param shooterSpinFF kS radians / second, kV radians / second per meter / second */
         public static final SimpleMotorFeedforward shooterSpinFF = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);

@@ -15,7 +15,7 @@ public class Climber extends SubsystemBase {
     public Climber(){
         mLeftController = new CANSparkMax(Constants.Climber.motorLID, MotorType.kBrushless);
         mRightController = new CANSparkMax(Constants.Climber.motorRID, MotorType.kBrushless);
-        mRightController.follow(mLeftController);
+        mRightController.follow(mLeftController, true);
     }
 
     // /** @return radians */
@@ -41,18 +41,18 @@ public class Climber extends SubsystemBase {
         }
 
         @Override
-        public void execute() {
+        public void initialize() {
             set(desiredState);
         }
 
         @Override
         public boolean isFinished() {
-            return true;
+            return false;
         }
 
         @Override
         public void end(boolean interrupted) {
-            if (interrupted) set(SpinState.ST);
+            set(SpinState.ST);
             super.end(interrupted);
         }
     }
