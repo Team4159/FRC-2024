@@ -184,10 +184,10 @@ public final class Constants {
         public static final double intakeAngleRange = Units.degreesToRadians(64);
 
         public static enum IntakeState {
-            STOW(Units.degreesToRadians(10.4), SpinState.ST), // starting pos & when moving
-            GARGLE(Units.degreesToRadians(10.4), SpinState.FW), // just move the motors
+            STOW(Units.degreesToRadians(38), SpinState.ST), // starting pos & when moving
+            GARGLE(Units.degreesToRadians(38), SpinState.FW), // just move the motors
             DOWN(Units.degreesToRadians(220), SpinState.FW), // intaking
-            RETCH(Units.degreesToRadians(10.4), SpinState.BW), // just move the motors
+            RETCH(Units.degreesToRadians(38), SpinState.BW), // just move the motors
             SPIT(Units.degreesToRadians(220), SpinState.BW); // outtaking
 
             public final double pitch;
@@ -198,6 +198,9 @@ public final class Constants {
                 this.spin = s;
             }
         }
+
+        public static PIDController intakePIDController = new PIDController(0.2, 0, 0);
+        public static final double kG = 0;
 
         public static final Pose3d luxonisTranslation = new Pose3d(
             new Translation3d(0, 0, Units.inchesToMeters(24)),
@@ -218,7 +221,7 @@ public final class Constants {
         public static double pitchOffset = Units.degreesToRotations(-3);
         public static final double minimumPitch = Units.degreesToRadians(14);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
-        public static final double neckSpeed = 0.35; // -1 to 1
+        public static final double neckSpeed = 0.45; // -1 to 1
         public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 150d);
         
         /** @param shooterSpinFF kS radians / second, kV radians / second per meter / second */
@@ -226,13 +229,13 @@ public final class Constants {
         
         // TODO: This must be tuned to specific robot
         public static final PIDController shooterPID = new PIDController(0.75, 0.0003, 0.02);
-        public static final double kF = 0.016;
+        public static final double kG = 0.016;
     }
 
     public static final class Deflector {
         public static final int motorID = 9;
 
-        public static final double maximumPitch = Units.rotationsToRadians(2.5);
+        public static final double maximumPitch = Units.rotationsToRadians(7.5);
     }
 
     public static final class Climber {

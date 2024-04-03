@@ -42,7 +42,8 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
     }}; // distance: pitch
 
     public SpeakerLookupTable(Kinesthetics k, Shooter sh, Swerve sw, DoubleSupplier translationSup, DoubleSupplier strafeSup){
-        super(
+        k.forceVision();
+        addCommands(
             sw.new ChangeYaw(translationSup, strafeSup, () -> getDifference(k).toTranslation2d().getAngle().getRadians() - Math.PI),
             new SequentialCommandGroup(
                 sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 500d, 375d), true)

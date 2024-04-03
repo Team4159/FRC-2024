@@ -12,15 +12,18 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.SpinState;
+import frc.robot.Constants.Intake.IntakeState;
 
 public class Intake extends SubsystemBase {
     private CANSparkBase angleMotorController, intakeMotorController, feederMotorController;
+    private double desiredPitch;
 
     public Intake() {
         angleMotorController = new CANSparkFlex(Constants.Intake.angleMotorID, MotorType.kBrushless);
         intakeMotorController = new CANSparkFlex(Constants.Intake.intakeMotorID, MotorType.kBrushless);
         intakeMotorController.setInverted(true);
         feederMotorController = new CANSparkMax(Constants.Intake.feederMotorID, MotorType.kBrushless);
+        desiredPitch = IntakeState.STOW.pitch;
     }
 
     /** @return radians */
@@ -31,6 +34,8 @@ public class Intake extends SubsystemBase {
     /** @param goalPitch radians */
     private void setGoalPitch(double goalPitch) {
         angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch), CANSparkBase.ControlType.kSmartMotion);
+        //desiredPitch = goalPitch;
+
     }
 
     /** @return radians / second */
@@ -41,6 +46,12 @@ public class Intake extends SubsystemBase {
     private void setSpin(SpinState ss) {
         intakeMotorController.set(ss.multiplier * Constants.Intake.intakeSpin);
         feederMotorController.set(ss.multiplier * Constants.Intake.feederSpin);
+    }
+
+    @Override
+    public void periodic(){
+        //double ff = Constants.Intake.kG * Math.cos(getPitch());
+        //angleMotorController.set(Constants.Intake.intakePIDController.calculate(getPitch(), desiredPitch) + ff);
     }
 
     public class ChangeState extends Command {

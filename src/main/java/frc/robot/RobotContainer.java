@@ -31,13 +31,12 @@ public class RobotContainer {
     private static final JoystickButton forceVision = new JoystickButton(driver, 15);
 
     private static final JoystickButton manualAmp = new JoystickButton(secondary, 3);
-    private static final JoystickButton lookupTableShoot = new JoystickButton(secondary, 5);
+    private static final Trigger lookupTableShoot = new JoystickButton(secondary, 5)
+                                                .or(new JoystickButton(driver, 3));
     private static final JoystickButton manualShoot = new JoystickButton(secondary, 4);
     private static final JoystickButton manualShootSourceIn = new JoystickButton(secondary, 6);
     private static final JoystickButton manualIntakeUp = new JoystickButton(secondary, 7);
     private static final JoystickButton manualIntakeDown = new JoystickButton(secondary, 2);
-    private static final JoystickButton addMapValue = new JoystickButton(secondary, 8);
-    private static final JoystickButton printMapValue = new JoystickButton(secondary, 9);
     private static final JoystickButton manualOuttakeUp = new JoystickButton(secondary, 11);
     private static final JoystickButton manualOuttakeDown = new JoystickButton(secondary, 10);
     private static final JoystickButton manualClimberUp = new JoystickButton(secondary, 8);
@@ -45,8 +44,8 @@ public class RobotContainer {
     private static final Trigger manualFeed = new JoystickButton(driver, 1)
                                           .or(new JoystickButton(secondary, 1));
 
-    private static final JoystickButton autoAmp = new JoystickButton(driver, 4);
-    private static final JoystickButton autoSpk = new JoystickButton(driver, 3);
+    //private static final JoystickButton autoAmp = new JoystickButton(driver, 4);
+    //private static final JoystickButton autoSpk = new JoystickButton(driver, 3);
     private static final JoystickButton autoIntake = new JoystickButton(driver, 5);
     
     /* Subsystems */
@@ -117,18 +116,18 @@ public class RobotContainer {
         forceVision.onTrue(new InstantCommand(kinesthetics::forceVision));
 
         // Automatic Command Groups
-        autoSpk.and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
-            .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
-            .whileTrue(new SequentialCommandGroup(
-                new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()),
-                s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW)
-            )).onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
-        autoAmp.and(kinesthetics::shooterHasNote)//.and(() -> AmpAuto.isInRange(kinesthetics)) FIXME BROKEN LMAO
-            .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
-            .whileTrue(new SequentialCommandGroup(
-                new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector),
-                s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW)
-            )).onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
+        // autoSpk.and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
+        //     .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
+        //     .whileTrue(new SequentialCommandGroup(
+        //         new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()),
+        //         s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW)
+        //     )).onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
+        // autoAmp.and(kinesthetics::shooterHasNote)//.and(() -> AmpAuto.isInRange(kinesthetics)) FIXME BROKEN LMAO
+        //     .onTrue(s_Shooter.new ChangeNeck(SpinState.ST))
+        //     .whileTrue(new SequentialCommandGroup(
+        //         new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Deflector),
+        //         s_Shooter.new ChangeNeck(kinesthetics, SpinState.FW)
+        //     )).onFalse(s_Shooter.new ChangeNeck(SpinState.ST));
         autoIntake.and(() -> !kinesthetics.shooterHasNote()).and(() -> IntakeAuto.canRun(kinesthetics))
             .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Intake))
             .onFalse(new ParallelCommandGroup(
