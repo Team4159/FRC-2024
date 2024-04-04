@@ -52,6 +52,12 @@
         {
           "type": "named",
           "data": {
+            "name": "shooterIntaking"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
             "name": "speakerPodium"
           }
         }
