@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 
@@ -59,16 +60,21 @@ public class Kinesthetics extends SubsystemBase {
         table.add("Pose Estimation", field);
     }
 
+    /** @param velocityOmega degrees / second */
+    private StatusSignal<Double> velocityOmega = gyro.getAngularVelocityZDevice();
     @Override
     public void periodic() {
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
-        var visionPose = Vision.getLimelightData();
-        if (visionPose != null)
-            poseEstimator.addVisionMeasurement(
-                visionPose.pose().toPose2d(),
-                Timer.getFPGATimestamp()-visionPose.ping(),
-                VecBuilder.fill(visionPose.confidence(), visionPose.confidence(), 2)
-            );
+        Vision.setRobotYaw(getGyroYaw(), velocityOmega.getValueAsDouble());
+        if (Math.abs(velocityOmega.getValueAsDouble()) <= Constants.Environment.visionAngularCutoff) {
+            var visionPose = Vision.getLimelightData();
+            if (visionPose != null)
+                poseEstimator.addVisionMeasurement(
+                    visionPose.pose().toPose2d(),
+                    Timer.getFPGATimestamp()-visionPose.ping(),
+                    VecBuilder.fill(visionPose.confidence(), visionPose.confidence(), 999999999)
+                );
+        }
         swerveStates.set(s_Swerve.getModuleStates());
         SmartDashboard.putNumber("yaw", getPose().getRotation().getRadians());
         field.setRobotPose(getPose());

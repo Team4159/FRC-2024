@@ -281,6 +281,10 @@ public final class Constants {
          * Some sort of aerodynamic constant
         */
         public static final double B = 0.096;
+        /** @param visionAngularCutoff degrees / second
+         * The maximum omega before vision is discarded
+        */
+        public static final double visionAngularCutoff = 720;
     }
 
     public static enum SpinState {
