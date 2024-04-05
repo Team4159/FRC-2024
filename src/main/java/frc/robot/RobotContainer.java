@@ -26,9 +26,9 @@ public class RobotContainer {
     private static final Joystick secondary = new Joystick(1);
 
     /* Driver Buttons */
-    private static final JoystickButton resetGyro = new JoystickButton(driver, 2);
-    private static final JoystickButton lookupTableShoot = new JoystickButton(driver, 4);
-    private static final JoystickButton forceVision = new JoystickButton(driver, 15);
+    private static final JoystickButton lookupTableShoot = new JoystickButton(driver, 2);
+    private static final JoystickButton resetGyro = new JoystickButton(driver, 4);
+    private static final JoystickButton forceVision = new JoystickButton(driver, 9);
 
     private static final JoystickButton manualAmp = new JoystickButton(secondary, 3);
     private static final JoystickButton manualShoot = new JoystickButton(secondary, 4);
@@ -42,8 +42,8 @@ public class RobotContainer {
     private static final Trigger manualFeed = new JoystickButton(driver, 1)
                                           .or(new JoystickButton(secondary, 1));
 
-    private static final JoystickButton autoAmp = new JoystickButton(driver, 4);
-    private static final JoystickButton autoSpk = new JoystickButton(driver, 3);
+    //private static final JoystickButton autoAmp = new JoystickButton(driver, 4);
+    //private static final JoystickButton autoSpk = new JoystickButton(driver, 3);
     private static final JoystickButton autoIntake = new JoystickButton(driver, 5);
     
     /* Subsystems */
@@ -135,18 +135,18 @@ public class RobotContainer {
         forceVision.onTrue(new InstantCommand(kinesthetics::forceVision));
 
         // Automatic Command Groups
-        autoSpk.and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
-            .onTrue(s_Neck.new ChangeNeck(SpinState.ST))
-            .whileTrue(new SequentialCommandGroup(
-                new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()),
-                s_Neck.new ChangeNeck(kinesthetics, SpinState.FW)
-            )).onFalse(s_Neck.new ChangeNeck(SpinState.ST));
-        autoAmp.and(kinesthetics::shooterHasNote)//.and(() -> AmpAuto.isInRange(kinesthetics)) FIXME BROKEN LMAO
-            .onTrue(s_Neck.new ChangeNeck(SpinState.ST))
-            .whileTrue(new SequentialCommandGroup(
-                new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Deflector),
-                s_Neck.new ChangeNeck(kinesthetics, SpinState.FW)
-            )).onFalse(s_Neck.new ChangeNeck(SpinState.ST));
+        // autoSpk.and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
+        //     .onTrue(s_Neck.new ChangeNeck(SpinState.ST))
+        //     .whileTrue(new SequentialCommandGroup(
+        //         new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()),
+        //         s_Neck.new ChangeNeck(kinesthetics, SpinState.FW)
+        //     )).onFalse(s_Neck.new ChangeNeck(SpinState.ST));
+        // autoAmp.and(kinesthetics::shooterHasNote)//.and(() -> AmpAuto.isInRange(kinesthetics)) FIXME BROKEN LMAO
+        //     .onTrue(s_Neck.new ChangeNeck(SpinState.ST))
+        //     .whileTrue(new SequentialCommandGroup(
+        //         new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Deflector),
+        //         s_Neck.new ChangeNeck(kinesthetics, SpinState.FW)
+        //     )).onFalse(s_Neck.new ChangeNeck(SpinState.ST));
         autoIntake.and(() -> !kinesthetics.shooterHasNote()).and(() -> IntakeAuto.canRun(kinesthetics))
             .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake))
             .onFalse(new ParallelCommandGroup(
