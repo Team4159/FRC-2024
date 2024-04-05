@@ -3,45 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.6924444618120005,
-        "y": 4.373613761472538
+        "x": 0.692444461807719,
+        "y": 4.420390379237972
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.4642586550130365,
-        "y": 3.765517730465661
+        "x": 2.8324747247742277,
+        "y": -0.5145427954716814
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Source Side"
     },
     {
       "anchor": {
-        "x": 5.580601018751895,
-        "y": 1.8008997841357512
+        "x": 7.825878671700363,
+        "y": 2.467466587354827
       },
       "prevControl": {
-        "x": 4.668470116354218,
-        "y": 1.7654772248193369
-      },
-      "nextControl": {
-        "x": 6.785098926323209,
-        "y": 1.8476764019055107
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 7.556913119524244,
-        "y": 2.385607506257749
-      },
-      "prevControl": {
-        "x": 8.667857791556038,
-        "y": 2.619490595106547
+        "x": 8.398892239384201,
+        "y": 2.86506783840211
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "7"
     }
   ],
   "rotationTargets": [],
@@ -49,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 1.3,
+      "waypointRelativePos": 0.6,
       "command": {
         "type": "parallel",
         "data": {
@@ -57,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "intakeStatic"
+                "name": "shooterIntaking"
               }
             }
           ]

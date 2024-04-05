@@ -1,0 +1,116 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.3089291736778261,
+      "y": 5.52811290895741
+    },
+    "rotation": 180.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "speakerSubwoofer"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeStatic"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Middle to 2 Static Intake "
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shooterIntaking"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "speakerPodium"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2 to 1 Static Intake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shooterIntaking"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "speakerPodium"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1 to 3 Static Intake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shooterIntaking"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "speakerPodium"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "3 to 6 Static Intaking"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "6 to Stage"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shooterIntaking"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "speakerLookupTable"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Testing",
+  "choreoAuto": false
+}

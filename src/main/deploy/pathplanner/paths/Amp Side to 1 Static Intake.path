@@ -12,20 +12,20 @@
         "y": 7.367317298737161
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Amp Side"
     },
     {
       "anchor": {
-        "x": 3.651065535749305,
-        "y": 6.911245275482004
+        "x": 2.832474724778265,
+        "y": 6.981410202142006
       },
       "prevControl": {
-        "x": 2.651065535749305,
-        "y": 6.911245275482004
+        "x": 1.832474724778265,
+        "y": 6.981410202142006
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "1"
     }
   ],
   "rotationTargets": [
@@ -47,7 +47,7 @@
             {
               "type": "named",
               "data": {
-                "name": "intakeStatic"
+                "name": "shooterIntaking"
               }
             }
           ]

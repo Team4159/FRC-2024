@@ -2,30 +2,30 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.6924444618120005,
-      "y": 4.373613761472538
+      "x": 0.7158327706968803,
+      "y": 6.689056341075646
     },
-    "rotation": 121.53948190016658
+    "rotation": -122.00245336021047
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "speakerSubwoofer"
+            "pathName": "Testing - Towards Amp Side"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "Source Side to 7 Static Intake"
+            "name": "speakerLookupTable"
           }
         }
       ]
     }
   },
-  "folder": null,
+  "folder": "Testing",
   "choreoAuto": false
 }

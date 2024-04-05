@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.611171678400365,
-        "y": 5.52811290895741
+        "x": 1.861859906055994,
+        "y": 5.5430292057165325
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Middle"
     },
     {
       "anchor": {
-        "x": 2.839641213724234,
+        "x": 2.6933948404713925,
         "y": 5.52811290895741
       },
       "prevControl": {
-        "x": 3.9998624415301083,
-        "y": 5.547612425391122
+        "x": 2.072354686019913,
+        "y": 5.5430292057165325
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "2"
     }
   ],
   "rotationTargets": [],
@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.3,
+      "waypointRelativePos": 0.2,
       "command": {
         "type": "parallel",
         "data": {
@@ -41,7 +41,7 @@
             {
               "type": "named",
               "data": {
-                "name": "intakeStatic"
+                "name": "shooterIntaking"
               }
             }
           ]

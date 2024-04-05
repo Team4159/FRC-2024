@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.382399573915957,
-      "y": 5.566417514601411
+      "x": 0.6924444618120005,
+      "y": 6.689056341075646
     },
-    "rotation": 180.0
+    "rotation": -121.11533231474182
   },
   "command": {
     "type": "sequential",
@@ -20,12 +20,12 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Testing - Just Back"
+            "pathName": "Amp Side to Disrupt"
           }
         }
       ]
     }
   },
-  "folder": "Testing",
+  "folder": null,
   "choreoAuto": false
 }
