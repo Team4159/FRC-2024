@@ -31,7 +31,8 @@ public class RobotContainer {
     private static final JoystickButton forceVision = new JoystickButton(driver, 9);
 
     private static final JoystickButton manualAmp = new JoystickButton(secondary, 3);
-    private static final JoystickButton manualShoot = new JoystickButton(secondary, 4);
+    private static final JoystickButton manualShootSubwoofer = new JoystickButton(secondary, 4);
+    private static final JoystickButton manualShootPodium = new JoystickButton(secondary, 5);
     private static final JoystickButton manualShootSourceIn = new JoystickButton(secondary, 6);
     private static final JoystickButton manualIntakeUp = new JoystickButton(secondary, 7);
     private static final JoystickButton manualIntakeDown = new JoystickButton(secondary, 2);
@@ -164,14 +165,14 @@ public class RobotContainer {
                 s_Shooter.stopShooter(),
                 s_Deflector.new Lower()
             ));
-        // manualShoot // podium
-        //     .onTrue(s_Neck.new ChangeNeck(SpinState.ST))
-        //     .whileTrue(s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, true))
-        //     .onFalse(new SequentialCommandGroup(
-        //         s_Neck.new ChangeNeck(SpinState.ST),
-        //         s_Shooter.stopShooter()
-        //     ));
-        manualShoot // subwoofer
+        manualShootPodium // podium
+            .onTrue(s_Neck.new ChangeNeck(SpinState.ST))
+            .whileTrue(s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, true))
+            .onFalse(new SequentialCommandGroup(
+                s_Neck.new ChangeNeck(SpinState.ST),
+                s_Shooter.stopShooter()
+            ));
+        manualShootSubwoofer // subwoofer
             .onTrue(s_Neck.new ChangeNeck(SpinState.ST))
             .whileTrue(s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true))
             .onFalse(new SequentialCommandGroup(

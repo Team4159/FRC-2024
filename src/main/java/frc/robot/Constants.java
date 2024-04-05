@@ -183,11 +183,11 @@ public final class Constants {
         public static final double intakeAngleRange = Units.degreesToRadians(64);
 
         public static enum IntakeState {
-            STOW(Units.degreesToRadians(38), SpinState.ST), // starting pos & when moving
-            GARGLE(Units.degreesToRadians(38), SpinState.FW), // just move the motors
-            DOWN(Units.degreesToRadians(220), SpinState.FW), // intaking
-            RETCH(Units.degreesToRadians(38), SpinState.BW), // just move the motors
-            SPIT(Units.degreesToRadians(220), SpinState.BW); // outtaking
+            STOW(Units.rotationsToRadians(0.007), SpinState.ST), // starting pos & when moving
+            GARGLE(Units.rotationsToRadians(0.007), SpinState.FW), // just move the motors
+            DOWN(Units.rotationsToRadians(0.400), SpinState.FW), // intaking
+            RETCH(Units.rotationsToRadians(0.007), SpinState.BW), // just move the motors
+            SPIT(Units.rotationsToRadians(0.400), SpinState.BW); // outtaking
 
             public final double pitch;
             public final SpinState spin;
@@ -217,7 +217,7 @@ public final class Constants {
         public static double pitchOffset = Units.degreesToRotations(-3);
         public static final double minimumPitch = Units.degreesToRadians(14);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
-        public static final double neckSpeed = 0.80; // -1 to 1
+        public static final double neckSpeed = 0.60; // -1 to 1
         public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 150d);
         
         /** @param shooterSpinFF kS radians / second, kV radians / second per meter / second */
