@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
@@ -37,9 +36,9 @@ public class Vision extends SubsystemBase {
     }
 
     /** @param omega degrees / second */
-    public static void setRobotYaw(Rotation2d theta, double omega) {
+    public static void setRobotYaw(double theta, double omega) {
         limelightTable.putValue("robot_orientation_set", NetworkTableValue.makeDoubleArray(new double[]{
-            theta.getDegrees(),omega, 0,0, 0,0
+            theta,omega, 0,0, 0,0
         }));
     }
 
