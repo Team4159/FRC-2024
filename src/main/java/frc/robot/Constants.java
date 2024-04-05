@@ -114,7 +114,7 @@ public final class Constants {
                 new PIDConstants(1, 0, 0), // rotation PID constants
                 Constants.Swerve.AutoConfig.kMaxSpeedMetersPerSecond, 
                 wheelBase / Math.sqrt(2), // drive base radius in m
-                new ReplanningConfig(true, true) // default path replanning config
+                new ReplanningConfig(true, true)
             );
         }
 
