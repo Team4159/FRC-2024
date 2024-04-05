@@ -89,7 +89,7 @@ public class Shooter extends SubsystemBase {
     }
 
     /**
-     * @param pitch radians
+     * @param pitch radians (0 is horizontal)
      * @param lSpin radians / second
      * @param rSpin radians / second
      * */
@@ -135,7 +135,7 @@ public class Shooter extends SubsystemBase {
             return (state.pitch() == null || MathUtil.isNear(state.pitch(), getPitch(), Constants.Shooter.pitchTolerance))
                 && (!state.hasSpin() || (
                     MathUtil.isNear(state.lSpin(), getLSpin(), Constants.Shooter.spinTolerance) &&
-                    MathUtil.isNear(state.rSpin(), getRSpin(), Constants.Shooter.spinTolerance + Math.PI / 2) // god chain is so bad
+                    MathUtil.isNear(state.rSpin(), getRSpin(), Constants.Shooter.spinTolerance)
                 ));
         }
     
