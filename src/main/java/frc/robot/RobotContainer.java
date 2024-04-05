@@ -25,8 +25,8 @@ public class RobotContainer {
     private static final Joystick secondary = new Joystick(1);
 
     /* Driver Buttons */
-    private static final JoystickButton resetGyro = new JoystickButton(driver, 14);
-    private static final JoystickButton forceVision = new JoystickButton(driver, 15);
+    private static final JoystickButton resetGyro = new JoystickButton(driver, 4);
+    private static final JoystickButton forceVision = new JoystickButton(driver, 9);
 
     private static final JoystickButton manualAmp = new JoystickButton(secondary, 3);
     private static final JoystickButton manualShootPodium = new JoystickButton(secondary, 5);
@@ -41,8 +41,8 @@ public class RobotContainer {
     private static final Trigger manualFeed = new JoystickButton(driver, 1)
                                           .or(new JoystickButton(secondary, 1));
 
-    private static final JoystickButton autoAmp = new JoystickButton(driver, 4);
-    private static final JoystickButton autoSpk = new JoystickButton(driver, 3);
+    private static final JoystickButton autoAmp = new JoystickButton(driver, 3);
+    private static final JoystickButton autoSpk = new JoystickButton(driver, 2);
     private static final JoystickButton autoIntake = new JoystickButton(driver, 5);
     
     /* Subsystems */
@@ -82,23 +82,50 @@ public class RobotContainer {
 
     // register PathPlanner Commands, must be done before building autos
     private void configureAutoCommands() {
+        NamedCommands.registerCommand("intakeStatic", new WrapperCommand(s_Intake.new ChangeState(IntakeState.DOWN)) {
+            @Override
+            public void end(boolean interrupted) {
+                super.end(false);
+            }
+        }); // intake only intake
+        NamedCommands.registerCommand("shooterSpinUp", 
+            s_Shooter.new ChangeState(new Shooter.ShooterCommand(null, 450d, 325d))
+        );
+        NamedCommands.registerCommand("shooterIntaking", new SequentialCommandGroup( // intake without intake
+            s_Shooter.new ChangeState(() -> new Shooter.ShooterCommand(Constants.Shooter.idleCommand.pitch(), null, null), false),
+            new ParallelDeadlineGroup(
+                new WaitUntilCommand(kinesthetics::shooterHasNote),
+                s_Neck.new ChangeNeck(SpinState.FW)
+            ),
+            s_Neck.new ChangeNeck(SpinState.BW, true),
+            new WaitCommand(0.01),
+            s_Neck.new ChangeNeck(SpinState.ST)
+        ).withTimeout(5));
+
         NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
             new ParallelCommandGroup(
                 s_Neck.new ChangeNeck(SpinState.ST),
-                s_Shooter.new ChangeState(Constants.CommandConstants.speakerSubwooferShooterCommand)
+                s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true).withTimeout(1.25)
             ),
-            s_Neck.new ChangeNeck(kinesthetics, SpinState.FW),
-            s_Shooter.stopShooter()
+            s_Neck.new ChangeNeck(kinesthetics, SpinState.FW).withTimeout(2)
         ));
         NamedCommands.registerCommand("speakerPodium", new SequentialCommandGroup(
-            s_Neck.new ChangeNeck(SpinState.ST),
-            s_Shooter.new ChangeState(Constants.CommandConstants.speakerPodiumShooterCommand),
-            s_Neck.new ChangeNeck(kinesthetics, SpinState.FW),
-            s_Shooter.stopShooter()
+            new ParallelCommandGroup(
+                s_Neck.new ChangeNeck(SpinState.ST),
+                s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, true).withTimeout(1.25)
+            ),
+            s_Neck.new ChangeNeck(kinesthetics, SpinState.FW).withTimeout(2)
         ));
-        NamedCommands.registerCommand("speakerLookupTable", new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0));
-        NamedCommands.registerCommand("ampAuto", new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Deflector));
+        NamedCommands.registerCommand("speakerLookupTable", new SequentialCommandGroup(
+            new ParallelCommandGroup(
+                s_Neck.new ChangeNeck(SpinState.ST),
+                new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0).withTimeout(2)
+            ),
+            s_Neck.new ChangeNeck(kinesthetics, SpinState.FW).withTimeout(2),
+            s_Shooter.stopShooter().withTimeout(0.2)
+        ));
         NamedCommands.registerCommand("speakerAutoAim", new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0));
+
         NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake));
     }
 
@@ -208,16 +235,22 @@ public class RobotContainer {
     }
 
     public Command getTeleopInit() {
-        return s_Shooter.new ChangeState(Constants.Shooter.idleCommand);
+        return new ParallelCommandGroup(
+            s_Shooter.new ChangeState(Constants.Shooter.idleCommand),
+            s_Intake.new ChangeState(IntakeState.STOW)
+        );
     }
 
     public Command getAutonomousCommand() {
-        return new InstantCommand(() -> kinesthetics.setPose(
-            DriverStation.getAlliance().map((a) -> a == DriverStation.Alliance.Red ?
-                new Pose2d(15.2, 5.53, Rotation2d.fromDegrees(0)) :
-                new Pose2d(1.31, 5.53, Rotation2d.fromDegrees(180))
-            ).orElse(new Pose2d())
-        ));
-        // return autoChooser.getSelected();
+        var a = autoChooser.getSelected();
+        if (a == null) { // Sets the starting position of the robot
+            a = new InstantCommand(() -> kinesthetics.setPose(
+                DriverStation.getAlliance().map((all) -> all == DriverStation.Alliance.Red ?
+                    new Pose2d(15.2, 5.53, Rotation2d.fromDegrees(0)) :
+                    new Pose2d(1.31, 5.53, Rotation2d.fromDegrees(180))
+                ).orElse(new Pose2d())
+            ));
+        }
+        return a;
     }
 }

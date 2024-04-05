@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.SwerveModule;
 import frc.robot.commands.SpeakerAutoAim;
+import frc.robot.commands.SpeakerLookupTable;
 
 public class Swerve extends SubsystemBase {
     private Kinesthetics kinesthetics;
@@ -42,6 +43,7 @@ public class Swerve extends SubsystemBase {
             this.kinesthetics::setPose, // a consumer for the robot pose, accepts Pose2d
             () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(this.getModuleStates()), // a supplier for robot relative ChassisSpeeds
             (ChassisSpeeds chassisSpeeds) -> { // the drive method, accepts robot relative ChassisSpeeds
+                chassisSpeeds = chassisSpeeds.times(-1); // invert the chassispeeds to account for "FIXME WHY IS THIS NEGATIVE"
                 SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(chassisSpeeds);
                 SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
                 for(SwerveModule mod : mSwerveMods) mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false);
@@ -52,8 +54,10 @@ public class Swerve extends SubsystemBase {
         );
         PPHolonomicDriveController.setRotationTargetOverride(() -> {
             var cmd = this.getCurrentCommand();
-            if (cmd == null || !(cmd instanceof SpeakerAutoAim a) || a.latestYaw == null) return Optional.empty();
-            return Optional.of(Rotation2d.fromRadians(a.latestYaw));
+            if (cmd == null) return Optional.empty();
+            if ((cmd instanceof SpeakerAutoAim a) && a.latestYaw != null) return Optional.of(Rotation2d.fromRadians(a.latestYaw));
+            if ((cmd instanceof SpeakerLookupTable a) && a.latestYaw != null) return Optional.of(Rotation2d.fromRadians(a.latestYaw));
+            return Optional.empty();
         });
         
         Timer.delay(0.1);

@@ -28,11 +28,16 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
         put(4.0, 0.53);
         put(4.25, 0.495);
         put(4.5, 0.48);
+        put(4.6, 0.475);
+        put(4.8, 0.47);
+        put(4.9, 0.465);
+        put(5.0, 0.46);
     }}; // distance: pitch
+    public Double latestYaw;
 
     public SpeakerLookupTable(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup){
-        super(
-            sw.new ChangeYaw(translationSup, strafeSup, () -> getDifference(k).toTranslation2d().getAngle().getRadians() + Math.PI),
+        addCommands(
+            sw.new ChangeYaw(translationSup, strafeSup, () -> latestYaw = getDifference(k).toTranslation2d().getAngle().getRadians() + Math.PI), // adding pi because back azimuth
             sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 500d, 375d), true)
         );
     }
