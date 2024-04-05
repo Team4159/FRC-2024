@@ -1,13 +1,13 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -19,7 +19,6 @@ public class Vision extends SubsystemBase {
     private static final NetworkTable rpiTable = NetworkTableInstance.getDefault().getTable("raspberrypi");
 
     private Kinesthetics kinesthetics;
-    private final GenericEntry isSingleTarget;
 
     private static final Field2d field = new Field2d(); 
 
@@ -28,9 +27,6 @@ public class Vision extends SubsystemBase {
 
         var table = Shuffleboard.getTab("Vision");
 
-        isSingleTarget = table
-            .add("Single-Target", false)
-            .withWidget(BuiltInWidgets.kToggleButton).getEntry("boolean");
         table.addDouble("LL Error", () -> {
             var v = Vision.getLimelightData();
             if (v == null) return -1d;
@@ -40,42 +36,32 @@ public class Vision extends SubsystemBase {
         table.add("Vision Field", field);
     }
 
-    @Override
-    public void periodic() {
-        int desiredPipeline = isSingleTarget.getBoolean(false) ? 1 : 0;
-        if (getLimelightPipe() != desiredPipeline) setLimelightPipe(desiredPipeline);
+    /** @param omega degrees / second */
+    public static void setRobotYaw(Rotation2d theta, double omega) {
+        limelightTable.putValue("robot_orientation_set", NetworkTableValue.makeDoubleArray(new double[]{
+            theta.getDegrees(),omega, 0,0, 0,0
+        }));
     }
 
     public static VisionData getLimelightData() {
-        if (!limelightTable.getEntry("botpose_wpiblue").exists()) return null;
-        double[] ntdata = limelightTable.getEntry("botpose_wpiblue").getDoubleArray(new double[6]);
+        if (!limelightTable.getEntry("botpose_wpiblue_orb").exists()) return null;
+        double[] ntdata = limelightTable.getEntry("botpose_wpiblue_orb").getDoubleArray(new double[7]);
         if (ntdata[0] == ntdata[1] && ntdata[1] == ntdata[2] && ntdata[2] == 0) return null;
         var o = new Pose3d(
             new Translation3d(ntdata[0], ntdata[1], ntdata[2]),
             new Rotation3d(0, 0, Units.degreesToRadians(ntdata[5]))
         );
-        double area = limelightTable.getEntry("ta").getDouble(0.25);
+        double area = limelightTable.getEntry("ta").getDouble(0.5);
         field.setRobotPose(o.toPose2d());
         return new VisionData(
             o,
-            2 - area * 0.4,
-            Units.millisecondsToSeconds(
-                limelightTable.getEntry("cl").getDouble(0) +
-                limelightTable.getEntry("tl").getDouble(0)
-            )
+            1 - area * 0.5,
+            ntdata[6]
         );
     } // limelight translation is y 12.947", z 8.03", pitch 64 deg
 
     /** @param ping seconds since image taken (+) */
     public static record VisionData(Pose3d pose, double confidence, double ping) {};
-
-    public static void setLimelightPipe(int pipeline) {
-        limelightTable.getEntry("pipeline").setNumber(pipeline);
-    }
-
-    public static double getLimelightPipe() {
-        return limelightTable.getEntry("pipeline").getDouble(-1);
-    }
 
     public static Translation3d getNoteTranslation() {
         var notetrans = rpiTable.getEntry("notetrans");

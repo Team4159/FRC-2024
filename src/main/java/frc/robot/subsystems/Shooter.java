@@ -99,7 +99,7 @@ public class Shooter extends SubsystemBase {
     }
 
     /**
-     * @param pitch radians
+     * @param pitch radians (0 is horizontal)
      * @param lSpin radians / second
      * @param rSpin radians / second
      * */

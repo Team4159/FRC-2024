@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 
@@ -61,24 +62,21 @@ public class Kinesthetics extends SubsystemBase {
         table.add("Pose Estimation", field);
     }
 
-    private Translation3d getDifference() {
-        var all = DriverStation.getAlliance();
-        if (all.isEmpty()) return null;
-        var t2 = getPose().getTranslation();
-        return Constants.Environment.speakers.get(all.get()).minus(new Translation3d(t2.getX(), t2.getY(), 0));
-    }
-
+    
     @Override
     public void periodic() {
         SmartDashboard.putNumber("dist from speaker", getDifference().toTranslation2d().getNorm());
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
-        var visionPose = Vision.getLimelightData();
-        if (visionPose != null)
-            poseEstimator.addVisionMeasurement(
-                visionPose.pose().toPose2d(),
-                Timer.getFPGATimestamp()-visionPose.ping(),
-                VecBuilder.fill(visionPose.confidence(), visionPose.confidence(), 9999)
-            );
+        Vision.setRobotYaw(getGyroYaw(), velocityOmega.getValueAsDouble());
+        if (Math.abs(velocityOmega.getValueAsDouble()) <= Constants.Environment.visionAngularCutoff) {
+            var visionPose = Vision.getLimelightData();
+            if (visionPose != null)
+                poseEstimator.addVisionMeasurement(
+                    visionPose.pose().toPose2d(),
+                    Timer.getFPGATimestamp()-visionPose.ping(),
+                    VecBuilder.fill(visionPose.confidence(), visionPose.confidence(), 999999999)
+                );
+        }
         swerveStates.set(s_Swerve.getModuleStates());
         field.setRobotPose(getPose());
     }

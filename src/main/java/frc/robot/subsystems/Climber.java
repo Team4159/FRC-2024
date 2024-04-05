@@ -12,7 +12,7 @@ import frc.robot.Constants.SpinState;
 public class Climber extends SubsystemBase {
     private CANSparkBase mLeftController, mRightController;
     
-    public Climber(){
+    public Climber() {
         mLeftController = new CANSparkMax(Constants.Climber.motorLID, MotorType.kBrushless);
         mRightController = new CANSparkMax(Constants.Climber.motorRID, MotorType.kBrushless);
         mRightController.follow(mLeftController, true);
