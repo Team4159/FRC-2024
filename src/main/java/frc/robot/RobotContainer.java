@@ -96,7 +96,7 @@ public class RobotContainer {
             s_Neck.new ChangeNeck(kinesthetics, SpinState.FW),
             s_Shooter.stopShooter()
         ));
-        NamedCommands.registerCommand("speakerLookupTable", new SpeakerLookupTable(kinesthetics, s_Shooter, s_Swerve, () -> 0, () -> 0));
+        NamedCommands.registerCommand("speakerLookupTable", new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0));
         NamedCommands.registerCommand("ampAuto", new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Deflector));
         NamedCommands.registerCommand("speakerAutoAim", new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0));
         NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake));
@@ -119,7 +119,7 @@ public class RobotContainer {
         autoSpk.and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
             .onTrue(s_Neck.new ChangeNeck(SpinState.ST))
             .whileTrue(new SequentialCommandGroup(
-                new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()),
+                new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0),
                 s_Neck.new ChangeNeck(kinesthetics, SpinState.FW)
             )).onFalse(s_Neck.new ChangeNeck(SpinState.ST));
         autoAmp.and(kinesthetics::shooterHasNote)//.and(() -> AmpAuto.isInRange(kinesthetics)) FIXME BROKEN LMAO

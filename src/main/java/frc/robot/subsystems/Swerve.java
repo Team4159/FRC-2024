@@ -134,7 +134,7 @@ public class Swerve extends SubsystemBase {
 
         @Override
         public void execute() {
-            if (isFinished()) return;
+            if (isDone()) return;
             drive(
                 new Translation2d(passthroughTranslation.getAsDouble(), passthroughStrafe.getAsDouble()).times(Constants.Swerve.maxSpeed),
                 Constants.CommandConstants.swerveYawPID.calculate(
@@ -152,9 +152,13 @@ public class Swerve extends SubsystemBase {
             );
         }
 
+        private boolean isDone() {
+            return MathUtil.isNear(desiredYaw.getAsDouble(), kinesthetics.getPose().getRotation().getRadians(), Constants.Swerve.yawTolerance);
+        }
+
         @Override
         public boolean isFinished() {
-            return MathUtil.isNear(desiredYaw.getAsDouble(), kinesthetics.getPose().getRotation().getRadians(), Constants.Swerve.yawTolerance);
+            return isDone();
         }
     }
 }

@@ -6,7 +6,6 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants;
@@ -17,13 +16,24 @@ import frc.robot.subsystems.Swerve;
 
 public class SpeakerLookupTable extends ParallelCommandGroup {
     private static final Map<Double, Double> shooterTable = new HashMap<>() {{
-        put(Units.inchesToMeters(51), 1.0);
+        put(1.29, 1.1);
+        put(1.5, 0.95);
+        put(2.0, 0.85);
+        put(2.5, 0.77);
+        put(2.7, 0.69);
+        put(2.8, 0.68);
+        put(3.0, 0.63);
+        put(3.25, 0.60);
+        put(3.5, 0.54);
+        put(4.0, 0.53);
+        put(4.25, 0.495);
+        put(4.5, 0.48);
     }}; // distance: pitch
 
-    public SpeakerLookupTable(Kinesthetics k, Shooter sh, Swerve sw, DoubleSupplier translationSup, DoubleSupplier strafeSup){
+    public SpeakerLookupTable(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup){
         super(
-            sw.new ChangeYaw(translationSup, strafeSup, () -> getDifference(k).toTranslation2d().getAngle().getRadians()),
-            sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 450d, 350d), true)
+            sw.new ChangeYaw(translationSup, strafeSup, () -> getDifference(k).toTranslation2d().getAngle().getRadians() + Math.PI),
+            sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 500d, 375d), true)
         );
     }
 
@@ -60,7 +70,7 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
         return MathUtil.interpolate(
             shooterTable.get(closestMatch),
             shooterTable.get(secClosestMatch),
-            secClosestAccuracy / (secClosestAccuracy + closestAccuracy)
+            closestAccuracy / (secClosestAccuracy + closestAccuracy)
         );
     }
 }
