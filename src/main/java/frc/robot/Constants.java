@@ -247,7 +247,7 @@ public final class Constants {
     public static final class CommandConstants {
         public static final double bumperWidth = Units.inchesToMeters(2.75);
 
-        public static final PIDController swerveYawPID = new PIDController(0.1, 0, 0.001) {{
+        public static final PIDController swerveYawPID = new PIDController(0.5, 0, 0.001) {{
             enableContinuousInput(-Math.PI, Math.PI);
         }};
 
