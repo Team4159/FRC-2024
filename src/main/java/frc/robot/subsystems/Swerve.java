@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.SwerveModule;
-import frc.robot.commands.SpeakerAutoAim;
+import frc.robot.commands.SpeakerLookupTable;
 
 public class Swerve extends SubsystemBase {
     private Kinesthetics kinesthetics;
@@ -54,7 +54,7 @@ public class Swerve extends SubsystemBase {
         );
         PPHolonomicDriveController.setRotationTargetOverride(() -> {
             var cmd = this.getCurrentCommand();
-            if (cmd == null || !(cmd instanceof SpeakerAutoAim a) || a.latestYaw == null) return Optional.empty();
+            if (cmd == null || !(cmd instanceof SpeakerLookupTable a) || a.latestYaw == null) return Optional.empty();
             return Optional.of(Rotation2d.fromRadians(a.latestYaw));
         });
         
