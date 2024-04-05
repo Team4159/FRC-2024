@@ -109,7 +109,7 @@ public final class Constants {
                     kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
 
             // used by PathPlanner during setup
-            public static final HolonomicPathFollowerConfig autoPathFollowerConfig = new HolonomicPathFollowerConfig( // TODO set values
+            public static final HolonomicPathFollowerConfig autoPathFollowerConfig = new HolonomicPathFollowerConfig(
                 new PIDConstants(2.5, 0, 0), // translation PID constants
                 new PIDConstants(1, 0, 0), // rotation PID constants
                 Constants.Swerve.AutoConfig.kMaxSpeedMetersPerSecond, 

@@ -12,8 +12,8 @@ public class IntakeStatic extends SequentialCommandGroup {
     public IntakeStatic(Kinesthetics k, Intake i) {
         addCommands(
             new ParallelDeadlineGroup(
-                new WaitUntilCommand(k::shooterHasNote),
-                i.new ChangeState(IntakeState.DOWN, true).withTimeout(4)
+                new WaitUntilCommand(k::shooterHasNote), // deadline
+                i.new ChangeState(IntakeState.DOWN, true).withTimeout(0.5)
             )
         );
     }
