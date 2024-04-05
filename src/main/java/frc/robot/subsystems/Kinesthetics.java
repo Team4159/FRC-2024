@@ -32,6 +32,9 @@ public class Kinesthetics extends SubsystemBase {
     private DigitalInput shooterBeamBreak;
     private Debouncer shooterBeamBreakDebouncer = new Debouncer(0.05, Debouncer.DebounceType.kRising);
 
+    /** @param velocityOmega degrees / second */
+    private StatusSignal<Double> velocityOmega;
+    
     // Data Fields
     private SwerveDrivePoseEstimator poseEstimator;
 
@@ -52,21 +55,19 @@ public class Kinesthetics extends SubsystemBase {
         poseEstimator = new SwerveDrivePoseEstimator(
             Constants.Swerve.swerveKinematics, getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d()
         );
-        // setPose(new Pose2d());
-
+    
+        velocityOmega = gyro.getAngularVelocityZDevice();
         ShuffleboardTab table = Shuffleboard.getTab("Kinesthetics");
 
         table.addBoolean("Shooter Note?", this::shooterHasNote);
         table.add("Pose Estimation", field);
     }
 
-    /* @param velocityOmega degrees / second */
-    private StatusSignal<Double> velocityOmega = gyro.getAngularVelocityZDevice();
     @Override
     public void periodic() {
         //SmartDashboard.putNumber("dist from speaker", getDifference().toTranslation2d().getNorm());
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
-        Vision.setRobotYaw(getGyroYaw(), velocityOmega.getValueAsDouble());
+        Vision.setRobotYaw(getPose().getRotation().getDegrees(), velocityOmega.getValueAsDouble());
         if (Math.abs(velocityOmega.getValueAsDouble()) <= Constants.Environment.visionAngularCutoff) {
             var visionPose = Vision.getLimelightData();
             if (visionPose != null)
@@ -77,6 +78,7 @@ public class Kinesthetics extends SubsystemBase {
                 );
         }
         swerveStates.set(s_Swerve.getModuleStates());
+        SmartDashboard.putNumber("Rotation", getPose().getRotation().getRadians());
         field.setRobotPose(getPose());
     }
 
