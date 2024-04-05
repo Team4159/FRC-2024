@@ -11,12 +11,17 @@ import frc.robot.Constants;
 import frc.robot.Constants.SpinState;
 import frc.robot.subsystems.Deflector;
 import frc.robot.subsystems.Kinesthetics;
+import frc.robot.subsystems.Neck;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Shooter.ShooterCommand;
 import frc.lib.math.RobotState;
 
 public class AmpAuto extends ParallelCommandGroup {
-    public AmpAuto(Kinesthetics k, Swerve sw, Shooter sh, Deflector d) {
+    private static final ShooterCommand spinOnly = Constants.CommandConstants.ampShooterCommand.spinOnly();
+    private static final ShooterCommand pitchOnly= new ShooterCommand(Constants.CommandConstants.ampShooterCommand.pitch(), null, null);
+
+    public AmpAuto(Kinesthetics k, Swerve sw, Shooter sh, Neck n, Deflector d) {
         var all = DriverStation.getAlliance();
         if (all.isEmpty()) return;
         var desiredPose = Constants.Environment.amps.get(all.get());
@@ -26,17 +31,14 @@ public class AmpAuto extends ParallelCommandGroup {
             new SwerveAuto(k, sw, new RobotState(desiredPose)),
             new SequentialCommandGroup(
                 new ParallelCommandGroup(
-                    sh.toPitch(Constants.CommandConstants.ampShooterCommand.pitch()),
+                    sh.new ChangeState(pitchOnly),
                     new WaitUntilCommand(() ->
                         k.getPose().minus(desiredPose).getTranslation().getNorm() < Constants.CommandConstants.ampAutoDistanceToStartSpinning
                     )
                 ),
-                sh.toSpin(
-                    Constants.CommandConstants.ampShooterCommand.lSpin(),
-                    Constants.CommandConstants.ampShooterCommand.rSpin()
-                ),
+                sh.new ChangeState(spinOnly),
                 new ParallelDeadlineGroup(
-                    sh.new ChangeNeck(k, SpinState.FW),
+                    n.new ChangeNeck(k, SpinState.FW),
                     d.new Raise()
                 ),
                 d.new Lower(),

@@ -135,11 +135,11 @@ public class Swerve extends SubsystemBase {
         @Override
         public void execute() {
             if(isFinished()) return;
-            var r = kinesthetics.getPose().getRotation().getRadians();
-            var dr= MathUtil.angleModulus(desiredYaw.getAsDouble() - kinesthetics.getPose().getRotation().getRadians());
+            // var r = kinesthetics.getPose().getRotation().getRadians();
+            // var dr= MathUtil.angleModulus(desiredYaw.getAsDouble() - kinesthetics.getPose().getRotation().getRadians());
             drive(
                 new Translation2d(passthroughTranslation.getAsDouble(), passthroughStrafe.getAsDouble()).times(Constants.Swerve.maxSpeed),
-                Constants.CommandConstants.swerveYawPID.calculate(r, r+dr), true, false
+                Constants.CommandConstants.swerveYawPID.calculate(MathUtil.angleModulus(kinesthetics.getPose().getRotation().getRadians()), MathUtil.angleModulus(desiredYaw.getAsDouble())), true, false
             );
         }
 

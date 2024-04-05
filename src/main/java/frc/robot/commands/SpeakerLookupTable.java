@@ -44,7 +44,7 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
     public SpeakerLookupTable(Kinesthetics k, Shooter sh, Swerve sw, DoubleSupplier translationSup, DoubleSupplier strafeSup){
         k.forceVision();
         addCommands(
-            sw.new ChangeYaw(translationSup, strafeSup, () -> getDifference(k).toTranslation2d().getAngle().getRadians() - Math.PI),
+            sw.new ChangeYaw(translationSup, strafeSup, () -> getDifference(k).toTranslation2d().getAngle().getRadians()),
             new SequentialCommandGroup(
                 sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 500d, 375d), true)
                 //sh.new ChangeNeck(SpinState.FW))
