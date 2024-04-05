@@ -62,10 +62,11 @@ public class Kinesthetics extends SubsystemBase {
         table.add("Pose Estimation", field);
     }
 
-    
+    /* @param velocityOmega degrees / second */
+    private StatusSignal<Double> velocityOmega = gyro.getAngularVelocityZDevice();
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("dist from speaker", getDifference().toTranslation2d().getNorm());
+        //SmartDashboard.putNumber("dist from speaker", getDifference().toTranslation2d().getNorm());
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
         Vision.setRobotYaw(getGyroYaw(), velocityOmega.getValueAsDouble());
         if (Math.abs(velocityOmega.getValueAsDouble()) <= Constants.Environment.visionAngularCutoff) {
