@@ -48,16 +48,17 @@ public class Vision extends SubsystemBase {
         if (ntdata[0] == ntdata[1] && ntdata[1] == ntdata[2] && ntdata[2] == 0) return null;
         var o = new Pose3d(
             new Translation3d(ntdata[0], ntdata[1], ntdata[2]),
-            new Rotation3d(0, 0, Units.degreesToRadians(ntdata[5]))
+            new Rotation3d(0, 0, Units.degreesToRadians(ntdata[5] + 180)) // note: offset because of mt2
         );
-        double area = limelightTable.getEntry("ta").getDouble(0.5);
+        double area = limelightTable.getEntry("ta").getDouble(0.25);
         field.setRobotPose(o.toPose2d());
         return new VisionData(
             o,
-            1 - area * 0.5,
+            1 - area * 0.6,
             ntdata[6]
         );
     } // limelight translation is y 12.947", z 8.03", pitch 64 deg
+    // LL FW -0.3288538 LL UP 0.203962 LL Pitch 26 LL Yaw 180
 
     /** @param ping seconds since image taken (+) */
     public static record VisionData(Pose3d pose, double confidence, double ping) {};

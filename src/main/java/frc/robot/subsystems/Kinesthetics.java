@@ -68,14 +68,14 @@ public class Kinesthetics extends SubsystemBase {
     public void periodic() {
         //SmartDashboard.putNumber("dist from speaker", getDifference().toTranslation2d().getNorm());
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
-        Vision.setRobotYaw(getPose().getRotation().getDegrees(), velocityOmega.getValueAsDouble());
+        Vision.setRobotYaw(getGyroYaw().getDegrees(), velocityOmega.getValueAsDouble());
         if (Math.abs(velocityOmega.getValueAsDouble()) <= Constants.Environment.visionAngularCutoff) {
             var visionPose = Vision.getLimelightData();
             if (visionPose != null)
                 poseEstimator.addVisionMeasurement(
                     visionPose.pose().toPose2d(),
                     Timer.getFPGATimestamp()-visionPose.ping(),
-                    VecBuilder.fill(visionPose.confidence(), visionPose.confidence(), 999999999)
+                    VecBuilder.fill(visionPose.confidence(), visionPose.confidence(), 99)
                 );
         }
         swerveStates.set(s_Swerve.getModuleStates());
