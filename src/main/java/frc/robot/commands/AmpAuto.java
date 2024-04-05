@@ -41,8 +41,10 @@ public class AmpAuto extends ParallelCommandGroup {
                     n.new ChangeNeck(k, SpinState.FW),
                     d.new Raise()
                 ),
-                d.new Lower(),
-                sh.stopShooter()
+                new ParallelCommandGroup(
+                    sh.stopShooter(),
+                    d.new Lower()
+                )
             )
         );
     }

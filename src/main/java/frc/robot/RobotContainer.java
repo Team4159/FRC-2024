@@ -148,14 +148,14 @@ public class RobotContainer {
         manualShootPodium
             .onTrue(s_Neck.new ChangeNeck(SpinState.ST))
             .whileTrue(s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, true))
-            .onFalse(new SequentialCommandGroup(
+            .onFalse(new ParallelCommandGroup(
                 s_Neck.new ChangeNeck(SpinState.ST),
                 s_Shooter.stopShooter()
             ));
         manualShootSubwoofer
             .onTrue(s_Neck.new ChangeNeck(SpinState.ST))
             .whileTrue(s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true))
-            .onFalse(new SequentialCommandGroup(
+            .onFalse(new ParallelCommandGroup(
                 s_Neck.new ChangeNeck(SpinState.ST),
                 s_Shooter.stopShooter()
             ));
