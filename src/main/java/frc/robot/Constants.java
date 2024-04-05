@@ -251,9 +251,9 @@ public final class Constants {
     public static final class CommandConstants {
         public static final double bumperWidth = Units.inchesToMeters(2.75);
 
-        public static final PIDController swerveYawPID = new PIDController(0.5, 0.0001, 0.0005);//{{
-            //enableContinuousInput(-Math.PI, Math.PI);
-        //}};
+        public static final PIDController swerveYawPID = new PIDController(0.5, 0.0001, 0.0005){{
+            enableContinuousInput(0, 2 * Math.PI);
+        }};
 
         public static final ShooterCommand speakerPodiumShooterCommand = new ShooterCommand(
             0.7, 500d, 275d);
