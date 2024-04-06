@@ -42,7 +42,7 @@ public final class Constants {
             new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
             new Translation2d(-wheelBase / 2.0, trackWidth / 2.0),
             new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0));
-        public static final double yawTolerance = Math.PI/8; // Radians
+        public static final double yawTolerance = Math.PI/4; // Radians
 
         /* Module Gear Ratios */
         public static final double driveGearRatio = chosenModule.driveGearRatio;
@@ -56,20 +56,21 @@ public final class Constants {
         public static final SensorDirectionValue cancoderInvert = chosenModule.cancoderInvert;
 
         /* Swerve Current Limiting */
-        public static final int angleCurrentLimit = 25;
+        public static final int angleCurrentLimit = 20;
         public static final int angleCurrentThreshold = 40;
         public static final double angleCurrentThresholdTime = 0.1;
         public static final boolean angleEnableCurrentLimit = true;
 
         public static final int driveCurrentLimit = 35;
         public static final int driveCurrentThreshold = 60;
-        public static final double driveCurrentThresholdTime = 0.05;
+        public static final double driveCurrentThresholdTime = 0.01;
+        public static final int driveStatorCurrentLimit = 90;
         public static final boolean driveEnableCurrentLimit = true;
 
         /* These values are used by the drive falcon to ramp in open loop and closed loop driving.
          * We found a small open loop ramp (0.25) helps with tread wear, tipping, etc */
-        public static final double openLoopRamp = 0.25;
-        public static final double closedLoopRamp = 0.0;
+        public static final double openLoopRamp = 0.4;
+        public static final double closedLoopRamp = 0.2;
 
         /* Angle Motor PID Values */
         public static final double angleKP = chosenModule.angleKP;
@@ -247,8 +248,9 @@ public final class Constants {
     public static final class CommandConstants {
         public static final double bumperWidth = Units.inchesToMeters(2.75);
 
-        public static final PIDController swerveYawPID = new PIDController(0.4, 0, 0.2) {{
+        public static final PIDController swerveYawPID = new PIDController(0.35, 0, 0.5) {{
             enableContinuousInput(-Math.PI, Math.PI);
+            setTolerance(Constants.Swerve.yawTolerance);
         }};
 
         public static final ShooterCommand speakerPodiumShooterCommand = new ShooterCommand(

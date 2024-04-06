@@ -5,6 +5,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -203,7 +204,9 @@ public class RobotContainer {
             ));
         manualShootLob
             .onTrue(s_Neck.new ChangeState(SpinState.ST))
-            .whileTrue(s_Shooter.new ChangeState(new Shooter.ShooterCommand(1d, 575d, 400d)))
+            .whileTrue(s_Shooter.new ChangeState(new Shooter.ShooterCommand(
+                Units.degreesToRadians(45), 525d, 300d
+            )))
             .onFalse(new ParallelCommandGroup(
                 s_Neck.new ChangeState(SpinState.ST),
                 s_Shooter.stopShooter()
