@@ -23,14 +23,25 @@ public class Intake extends SubsystemBase {
         feederMotorController = new CANSparkMax(Constants.Intake.feederMotorID, MotorType.kBrushless);
     }
 
+    @Override
+    public void periodic() {
+        angleMotorController.set(
+            Constants.Intake.anglePID.calculate(getPitch(), desiredPitch)
+            + Constants.Intake.kG * Math.cos(getPitch())
+        );
+    }
+
     /** @return radians */
     private double getPitch() {
         return Units.rotationsToRadians(angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
     }
     
+    private double desiredPitch;
+
     /** @param goalPitch radians */
     private void setGoalPitch(double goalPitch) {
-        angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch), CANSparkBase.ControlType.kSmartMotion);
+        desiredPitch = MathUtil.clamp(goalPitch, Constants.Intake.IntakeState.STOW.pitch, Constants.Intake.IntakeState.DOWN.pitch);
+        // angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch), CANSparkBase.ControlType.kSmartMotion);
     }
 
     /** @return radians / second */

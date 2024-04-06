@@ -43,7 +43,7 @@ public class Shooter extends SubsystemBase {
     public void periodic() {
         mechanism.setAngle(Units.radiansToDegrees(getPitch()));
         angleMotorController.set(
-            Constants.Shooter.shooterPID.calculate(getPitch(), desiredPitch)
+            Constants.Shooter.anglePID.calculate(getPitch(), desiredPitch)
             + Constants.Shooter.kG * Math.cos(getPitch())
         );
     }

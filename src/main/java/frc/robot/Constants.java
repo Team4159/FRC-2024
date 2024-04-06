@@ -98,9 +98,8 @@ public final class Constants {
             public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
             public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
         
-            public static final double kPXController = 2.5;
-            public static final double kPYController = 2.5;
-            public static final double kPThetaController = 1;
+            public static final double kPTransController = 5;
+            public static final double kPRotatController = 1;
         
             /* Constraint for the motion profilied robot angle controller */
             public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
@@ -109,8 +108,8 @@ public final class Constants {
 
             // used by PathPlanner during setup
             public static final HolonomicPathFollowerConfig pathFollower = new HolonomicPathFollowerConfig( // TODO set values
-                new PIDConstants(kPXController, 0, 0), // translation PID constants
-                new PIDConstants(kPThetaController, 0, 0), // rotation PID constants
+                new PIDConstants(kPTransController, 0, 0), // translation PID constants
+                new PIDConstants(kPRotatController, 0, 0), // rotation PID constants
                 Constants.Swerve.maxSpeed,
                 Constants.Swerve.wheelBase / Math.sqrt(2), // drive base radius in m
                 new ReplanningConfig(true, true)
@@ -178,8 +177,8 @@ public final class Constants {
         public static final double intakeSpin = 0.7; // -1 to 1
         public static final double feederSpin = 0.45; // -1 to 1
 
-        public static final double intakeRange = 0.2; // meters
-        public static final double intakeAngleRange = Units.degreesToRadians(64);
+        public static final PIDController anglePID = new PIDController(0.2, 0.0, 0.0);
+        public static final double kG = 0.0;
 
         public static enum IntakeState {
             STOW(Units.rotationsToRadians(0.007), SpinState.ST), // starting pos & when moving
@@ -196,6 +195,9 @@ public final class Constants {
                 this.spin = s;
             }
         }
+
+        public static final double intakeRange = 0.2; // meters
+        public static final double intakeAngleRange = Units.degreesToRadians(64);
 
         public static final Pose3d luxonisTranslation = new Pose3d(
             new Translation3d(0, 0, Units.inchesToMeters(24)),
@@ -222,7 +224,7 @@ public final class Constants {
         /** @param shooterSpinFF kS radians / second, kV radians / second per meter / second */
         public static final SimpleMotorFeedforward shooterSpinFF = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
         
-        public static final PIDController shooterPID = new PIDController(0.75, 0.0003, 0.02);
+        public static final PIDController anglePID = new PIDController(0.75, 0.0003, 0.02);
         public static final double kG = 0.016;
     }
 

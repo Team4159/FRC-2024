@@ -18,9 +18,9 @@ import frc.robot.subsystems.Swerve;
 
 public class SwerveAuto extends Command {
     private static final HolonomicDriveController controller = new HolonomicDriveController(
-            new PIDController(AutoConfig.kPXController, 0, 0),
-            new PIDController(AutoConfig.kPYController, 0, 0),
-            new ProfiledPIDController(AutoConfig.kPThetaController, 0, 0,
+            new PIDController(AutoConfig.kPTransController, 0, 0),
+            new PIDController(AutoConfig.kPTransController, 0, 0),
+            new ProfiledPIDController(AutoConfig.kPRotatController, 0, 0,
                     AutoConfig.kThetaControllerConstraints));
     
     private Kinesthetics kinesthetics;
