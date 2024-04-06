@@ -15,6 +15,7 @@ public class Climber extends SubsystemBase {
     public Climber() {
         mLeftController = new CANSparkMax(Constants.Climber.motorLID, MotorType.kBrushless);
         mRightController = new CANSparkMax(Constants.Climber.motorRID, MotorType.kBrushless);
+        // mRightController.setInverted(true);
         mRightController.follow(mLeftController, true);
     }
 
@@ -24,12 +25,13 @@ public class Climber extends SubsystemBase {
     // }
     
     // /** @param goalPitch radians */
-    // private void setGoalPitch(double goalPitch) {
-    //     motorController.getPIDController().setReference(Conversions.metersToRotations(goalPitch, Constants.Climber.sprocketCircumference), CANSparkBase.ControlType.kPosition);
+    // private void setGoalHeight(double goalHeight) {
+    //     motorController.getPIDController().setReference(Conversions.metersToRotations(goalHeight, Constants.Climber.sprocketCircumference), CANSparkBase.ControlType.kPosition);
     // }
 
     private void set(SpinState ss) {
         mLeftController.set(ss.multiplier * Constants.Climber.climbSpeed);
+        // mRightController.set(ss.multiplier * Constants.Climber.climbSpeed);
     }
 
     public class ChangeState extends Command {

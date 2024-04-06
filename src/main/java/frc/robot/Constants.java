@@ -238,7 +238,7 @@ public final class Constants {
     public static final class Climber {
         public static final int motorLID = 10;
         public static final int motorRID = 11;
-        public static final double climbSpeed = 0.7;
+        public static final double climbSpeed = 0.8;
 
         // public static final double heightTolerance = Units.inchesToMeters(1);
         // public static final double maximumHeight = Units.inchesToMeters(15);

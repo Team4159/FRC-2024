@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
+import java.util.ArrayDeque;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.function.DoubleSupplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -127,23 +129,28 @@ public class Swerve extends SubsystemBase {
 
     public class ChangeYaw extends Command {
         private DoubleSupplier passthroughTranslation, passthroughStrafe, desiredYaw;
+        private Queue<Double> prevRequests;
 
         public ChangeYaw(DoubleSupplier translation, DoubleSupplier strafe, DoubleSupplier yaw) {
             passthroughTranslation = translation;
             passthroughStrafe = strafe;
             desiredYaw = yaw;
+            prevRequests = new ArrayDeque<Double>(2);
             addRequirements(Swerve.this);
         }
 
         @Override
         public void execute() {
-            if (isDone()) return;
+            if (isFinished()) return;
+            if (prevRequests.size() >= 2) prevRequests.remove();
+            var newValue = Constants.CommandConstants.swerveYawPID.calculate(
+                kinesthetics.getPose().getRotation().getRadians(),
+                desiredYaw.getAsDouble()
+            );
+            prevRequests.add(newValue);
             drive(
                 new Translation2d(passthroughTranslation.getAsDouble(), passthroughStrafe.getAsDouble()).times(Constants.Swerve.maxSpeed),
-                Constants.CommandConstants.swerveYawPID.calculate(
-                    kinesthetics.getPose().getRotation().getRadians(),
-                    desiredYaw.getAsDouble()
-                ), true, false
+                prevRequests.stream().reduce(0d, (a, b) -> a+b) / prevRequests.size(), true, false
             );
         }
 
@@ -155,13 +162,9 @@ public class Swerve extends SubsystemBase {
             );
         }
 
-        private boolean isDone() {
-            return Constants.CommandConstants.swerveYawPID.atSetpoint();
-        }
-
         @Override
         public boolean isFinished() {
-            return isDone();
+            return Constants.CommandConstants.swerveYawPID.atSetpoint();
         }
     }
 }

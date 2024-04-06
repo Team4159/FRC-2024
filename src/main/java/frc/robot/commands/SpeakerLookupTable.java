@@ -35,7 +35,7 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
     }}; // distance: pitch
     public Double latestYaw;
 
-    public SpeakerLookupTable(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup){
+    public SpeakerLookupTable(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
         addCommands(
             sw.new ChangeYaw(translationSup, strafeSup, () -> latestYaw = getDifference(k).toTranslation2d().getAngle().getRadians() + Math.PI), // adding pi because back azimuth
             sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 500d, 375d), true)

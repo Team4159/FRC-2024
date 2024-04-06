@@ -17,6 +17,7 @@ import frc.robot.subsystems.Kinesthetics;
 import frc.robot.subsystems.Swerve;
 
 public class SwerveAuto extends Command {
+    private static final TrajectoryConfig config = new TrajectoryConfig(Constants.Swerve.maxSpeed, AutoConfig.kMaxAccelerationMetersPerSecondSquared);
     private static final HolonomicDriveController controller = new HolonomicDriveController(
             new PIDController(AutoConfig.kPTransController, 0, 0),
             new PIDController(AutoConfig.kPTransController, 0, 0),
@@ -32,7 +33,7 @@ public class SwerveAuto extends Command {
     public SwerveAuto(Kinesthetics k, Swerve s, RobotState end) {
         kinesthetics = k;
         swerve = s;
-        trajectory = TrajectoryGenerator.generateTrajectory(kinesthetics.getPose(), new ArrayList<>(), end, new TrajectoryConfig(Constants.Swerve.maxSpeed, AutoConfig.kMaxAccelerationMetersPerSecondSquared));
+        trajectory = TrajectoryGenerator.generateTrajectory(kinesthetics.getPose(), new ArrayList<>(), end, config);
         addRequirements(swerve);
     }
 
@@ -42,6 +43,11 @@ public class SwerveAuto extends Command {
         trajectory = t;
         addRequirements(swerve);
     }
+
+    // public void replan(RobotState end) {
+    //     trajectory = TrajectoryGenerator.generateTrajectory(kinesthetics.getPose(), new ArrayList<>(), end, config);
+    //     timer.reset();
+    // }
 
     @Override
     public void initialize() {

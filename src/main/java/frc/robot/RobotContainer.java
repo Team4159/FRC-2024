@@ -117,14 +117,14 @@ public class RobotContainer {
             s_Neck.new ChangeState(kinesthetics, SpinState.FW),
             s_Shooter.stopShooter().withTimeout(0.1)
         ));
-        NamedCommands.registerCommand("speakerLookupTable", new SequentialCommandGroup(
-            new ParallelCommandGroup(
-                s_Neck.new ChangeState(SpinState.ST),
-                new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0).withTimeout(2)
-            ),
-            s_Neck.new ChangeState(kinesthetics, SpinState.FW),
-            s_Shooter.stopShooter().withTimeout(0.1)
-        ));
+        // NamedCommands.registerCommand("speakerLookupTable", new SequentialCommandGroup(
+        //     new ParallelCommandGroup(
+        //         s_Neck.new ChangeState(SpinState.ST),
+        //         new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0).withTimeout(2)
+        //     ),
+        //     s_Neck.new ChangeState(kinesthetics, SpinState.FW),
+        //     s_Shooter.stopShooter().withTimeout(0.1)
+        // ));
         NamedCommands.registerCommand("speakerAutoAim", new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0));
 
         NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake));
@@ -151,16 +151,16 @@ public class RobotContainer {
                 s_Shooter.stopShooter(),
                 s_Neck.new ChangeState(SpinState.ST)
             ));
-        autoAmp.and(kinesthetics::shooterHasNote)//.and(() -> AmpAuto.isInRange(kinesthetics)) FIXME BROKEN LMAO
-            .onTrue(s_Neck.new ChangeState(SpinState.ST))
-            .whileTrue(new SequentialCommandGroup(
-                new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Deflector),
-                s_Neck.new ChangeState(kinesthetics, SpinState.FW)
-            ))
-            .onFalse(new ParallelCommandGroup(
-                s_Shooter.stopShooter(),
-                s_Neck.new ChangeState(SpinState.ST)
-            ));
+        // autoAmp.and(kinesthetics::shooterHasNote)//.and(() -> AmpAuto.isInRange(kinesthetics)) FIXME BROKEN LMAO
+        //     .onTrue(s_Neck.new ChangeState(SpinState.ST))
+        //     .whileTrue(new SequentialCommandGroup(
+        //         new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Deflector),
+        //         s_Neck.new ChangeState(kinesthetics, SpinState.FW)
+        //     ))
+        //     .onFalse(new ParallelCommandGroup(
+        //         s_Shooter.stopShooter(),
+        //         s_Neck.new ChangeState(SpinState.ST)
+        //     ));
         autoIntake.and(() -> !kinesthetics.shooterHasNote()).and(() -> IntakeAuto.canRun(kinesthetics))
             .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake))
             .onFalse(new ParallelCommandGroup(
