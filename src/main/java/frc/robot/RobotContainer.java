@@ -230,7 +230,10 @@ public class RobotContainer {
                 s_Neck.new ChangeState(SpinState.BW),
                 s_Intake.new ChangeState(IntakeState.RETCH)
             ))
-            .onFalse(s_Neck.new ChangeState(SpinState.ST));
+            .onFalse(new ParallelCommandGroup(
+                s_Neck.new ChangeState(SpinState.ST),
+                s_Intake.new ChangeState(IntakeState.STOW)
+            ));
         manualClimberUp
             .whileTrue(s_Climber.new ChangeState(SpinState.FW));
         manualClimberDown

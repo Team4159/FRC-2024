@@ -36,11 +36,12 @@ public class IntakeAuto extends SequentialCommandGroup {
             }
         }
         addCommands(
-            sh.stopShooter(), // return to initial angle
+            sh.new ChangeState(new Shooter.ShooterCommand(Constants.Shooter.idleCommand.pitch(), null)), // return to initial angle
             new ParallelDeadlineGroup(
                 new WaitUntilCommand(k::shooterHasNote),
                 n.new ChangeState(SpinState.FW),
-                i.new ChangeState(IntakeState.DOWN)
+                i.new ChangeState(IntakeState.DOWN),
+                sh.stopShooter()
             ),
             n.new ChangeState(SpinState.BW, true),
             new WaitCommand(0.02),

@@ -28,7 +28,7 @@ public final class Constants {
         public static final int pigeonID = 1;
 
         public static final COTSTalonFXSwerveConstants chosenModule =
-            COTSTalonFXSwerveConstants.SDS.MK4i.KrakenX60(COTSTalonFXSwerveConstants.SDS.MK4i.driveRatios.L3);
+            COTSTalonFXSwerveConstants.SDS.MK4i.KrakenX60(COTSTalonFXSwerveConstants.SDS.MK4i.driveRatios.L3ANDAHALF);
 
         /* Drivetrain Constants */
         public static final double trackWidth = Units.inchesToMeters(21.75);
@@ -42,7 +42,7 @@ public final class Constants {
             new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
             new Translation2d(-wheelBase / 2.0, trackWidth / 2.0),
             new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0));
-        public static final double yawTolerance = Math.PI/16; // Radians
+        public static final double yawTolerance = Math.PI/8; // Radians
 
         /* Module Gear Ratios */
         public static final double driveGearRatio = chosenModule.driveGearRatio;
@@ -68,7 +68,7 @@ public final class Constants {
 
         /* These values are used by the drive falcon to ramp in open loop and closed loop driving.
          * We found a small open loop ramp (0.25) helps with tread wear, tipping, etc */
-        public static final double openLoopRamp = 0.4;
+        public static final double openLoopRamp = 0.25;
         public static final double closedLoopRamp = 0.0;
 
         /* Angle Motor PID Values */
@@ -181,11 +181,11 @@ public final class Constants {
         public static final double kG = 0.0;
 
         public static enum IntakeState {
-            STOW(Units.rotationsToRadians(0.007), SpinState.ST), // starting pos & when moving
-            GARGLE(Units.rotationsToRadians(0.007), SpinState.FW), // just move the motors
-            DOWN(Units.rotationsToRadians(0.400), SpinState.FW), // intaking
-            RETCH(Units.rotationsToRadians(0.007), SpinState.BW), // just move the motors
-            SPIT(Units.rotationsToRadians(0.400), SpinState.BW); // outtaking
+            STOW(Units.rotationsToRadians(0.05), SpinState.ST), // starting pos & when moving
+            GARGLE(Units.rotationsToRadians(0.05), SpinState.FW), // just move the motors
+            DOWN(Units.rotationsToRadians(0.405), SpinState.FW), // intaking
+            RETCH(Units.rotationsToRadians(0.05), SpinState.BW), // just move the motors
+            SPIT(Units.rotationsToRadians(0.405), SpinState.BW); // outtaking
 
             public final double pitch;
             public final SpinState spin;
@@ -247,7 +247,7 @@ public final class Constants {
     public static final class CommandConstants {
         public static final double bumperWidth = Units.inchesToMeters(2.75);
 
-        public static final PIDController swerveYawPID = new PIDController(0.5, 0, 0.005) {{
+        public static final PIDController swerveYawPID = new PIDController(0.4, 0, 0.2) {{
             enableContinuousInput(-Math.PI, Math.PI);
         }};
 

@@ -50,7 +50,7 @@ public class Neck extends SubsystemBase {
 
         @Override
         public void initialize() {
-            setNeck(desiredNeck, desiredSlow ? 0.5 : 1);
+            setNeck(desiredNeck, desiredSlow ? 0.3 : 1);
         }
 
         @Override
