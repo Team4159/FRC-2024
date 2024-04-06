@@ -31,11 +31,11 @@ public class RobotContainer {
     private static final JoystickButton manualAmp = new JoystickButton(secondary, 3);
     private static final JoystickButton manualShootPodium = new JoystickButton(secondary, 5);
     private static final JoystickButton manualShootSubwoofer = new JoystickButton(secondary, 4);
+    private static final JoystickButton manualShootLob = new JoystickButton(secondary, 10);
     private static final JoystickButton manualShootSourceIn = new JoystickButton(secondary, 6);
     private static final JoystickButton manualIntakeUp = new JoystickButton(secondary, 7);
     private static final JoystickButton manualIntakeDown = new JoystickButton(secondary, 2);
     private static final JoystickButton manualOuttakeUp = new JoystickButton(secondary, 11);
-    private static final JoystickButton manualOuttakeDown = new JoystickButton(secondary, 10);
     private static final JoystickButton manualClimberUp = new JoystickButton(secondary, 8);
     private static final JoystickButton manualClimberDown = new JoystickButton(secondary, 9);
     private static final Trigger manualFeed = new JoystickButton(driver, 1)
@@ -84,9 +84,7 @@ public class RobotContainer {
     private void configureAutoCommands() {
         NamedCommands.registerCommand("intakeStatic", new WrapperCommand(s_Intake.new ChangeState(IntakeState.DOWN)) {
             @Override
-            public boolean isFinished() {
-                return true;
-            }
+            public boolean isFinished() {return true;}
         }); // intake only intake
         NamedCommands.registerCommand("shooterSpinUp", 
             s_Shooter.new ChangeState(new Shooter.ShooterCommand(null, 450d, 325d))
@@ -124,7 +122,7 @@ public class RobotContainer {
                 new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0).withTimeout(2)
             ),
             s_Neck.new ChangeState(kinesthetics, SpinState.FW),
-            s_Shooter.stopShooter().withTimeout(0.2)
+            s_Shooter.stopShooter().withTimeout(0.1)
         ));
         NamedCommands.registerCommand("speakerAutoAim", new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0));
 
@@ -147,16 +145,21 @@ public class RobotContainer {
         // Automatic Command Groups
         autoSpk.and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
             .onTrue(s_Neck.new ChangeState(SpinState.ST))
-            .whileTrue(new SequentialCommandGroup(
-                new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0),
-                s_Neck.new ChangeState(kinesthetics, SpinState.FW)
-            )).onFalse(s_Neck.new ChangeState(SpinState.ST));
+            .whileTrue(new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0))
+            .onFalse(new ParallelCommandGroup(
+                s_Shooter.stopShooter(),
+                s_Neck.new ChangeState(SpinState.ST)
+            ));
         autoAmp.and(kinesthetics::shooterHasNote)//.and(() -> AmpAuto.isInRange(kinesthetics)) FIXME BROKEN LMAO
             .onTrue(s_Neck.new ChangeState(SpinState.ST))
             .whileTrue(new SequentialCommandGroup(
                 new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Deflector),
                 s_Neck.new ChangeState(kinesthetics, SpinState.FW)
-            )).onFalse(s_Neck.new ChangeState(SpinState.ST));
+            ))
+            .onFalse(new ParallelCommandGroup(
+                s_Shooter.stopShooter(),
+                s_Neck.new ChangeState(SpinState.ST)
+            ));
         autoIntake.and(() -> !kinesthetics.shooterHasNote()).and(() -> IntakeAuto.canRun(kinesthetics))
             .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake))
             .onFalse(new ParallelCommandGroup(
@@ -198,6 +201,13 @@ public class RobotContainer {
                 new WaitCommand(0.05),
                 s_Neck.new ChangeState(SpinState.ST)
             ));
+        manualShootLob
+            .onTrue(s_Neck.new ChangeState(SpinState.ST))
+            .whileTrue(s_Shooter.new ChangeState(new Shooter.ShooterCommand(1d, 575d, 400d)))
+            .onFalse(new ParallelCommandGroup(
+                s_Neck.new ChangeState(SpinState.ST),
+                s_Shooter.stopShooter()
+            ));
         manualFeed
             .whileTrue(s_Neck.new ChangeState(SpinState.FW));
         manualIntakeUp
@@ -221,15 +231,6 @@ public class RobotContainer {
                 s_Intake.new ChangeState(IntakeState.RETCH)
             ))
             .onFalse(s_Neck.new ChangeState(SpinState.ST));
-        manualOuttakeDown
-            .whileTrue(new ParallelCommandGroup(
-                s_Neck.new ChangeState(SpinState.BW),
-                s_Intake.new ChangeState(IntakeState.SPIT)
-            ))
-            .onFalse(new ParallelCommandGroup(
-                s_Neck.new ChangeState(SpinState.ST),
-                s_Intake.new ChangeState(IntakeState.STOW)
-            ));
         manualClimberUp
             .whileTrue(s_Climber.new ChangeState(SpinState.FW));
         manualClimberDown

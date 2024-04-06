@@ -7,15 +7,15 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
+import frc.lib.math.RobotState;
 import frc.robot.Constants;
 import frc.robot.Constants.SpinState;
 import frc.robot.subsystems.Deflector;
 import frc.robot.subsystems.Kinesthetics;
 import frc.robot.subsystems.Neck;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Shooter.ShooterCommand;
-import frc.lib.math.RobotState;
+import frc.robot.subsystems.Swerve;
 
 public class AmpAuto extends ParallelCommandGroup {
     private static final ShooterCommand spinOnly = Constants.CommandConstants.ampShooterCommand.spinOnly();
