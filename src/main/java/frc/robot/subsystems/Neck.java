@@ -24,24 +24,24 @@ public class Neck extends SubsystemBase {
         setNeck(ss, 1);
     }
     
-    public class ChangeNeck extends Command {
+    public class ChangeState extends Command {
         private Kinesthetics kinesthetics;
 
         private boolean beamBreakMode; // should this command end when the beam break opens
         private SpinState desiredNeck;
         private boolean desiredSlow;
 
-        public ChangeNeck(SpinState ss) {
+        public ChangeState(SpinState ss) {
             this(ss, false);
         }
 
-        public ChangeNeck(SpinState ss, boolean slow) {
+        public ChangeState(SpinState ss, boolean slow) {
             desiredNeck = ss;
             desiredSlow = slow;
             addRequirements(Neck.this);
         }
 
-        public ChangeNeck(Kinesthetics k, SpinState ss) {
+        public ChangeState(Kinesthetics k, SpinState ss) {
             kinesthetics = k;
             desiredNeck = ss;
             beamBreakMode = kinesthetics.shooterHasNote();

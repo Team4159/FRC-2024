@@ -153,6 +153,23 @@
               ]
             }
           },
+          "3,1": {
+            "size": [
+              2,
+              2
+            ],
+            "content": {
+              "_type": "Gyro",
+              "_source0": "network_table:///SmartDashboard/Rotation",
+              "_title": "Rotation",
+              "_glyph": 148,
+              "_showGlyph": false,
+              "Visuals/Major tick spacing": 45.0,
+              "Visuals/Starting angle": 180.0,
+              "Visuals/Show tick mark ring": true,
+              "Visuals/Counter clockwise": false
+            }
+          },
           "5,0": {
             "size": [
               1,
@@ -190,36 +207,6 @@
               "_title": "limelight_Stream",
               "_glyph": 148,
               "_showGlyph": false
-            }
-          },
-          "3,1": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/yaw",
-              "_title": "yaw",
-              "_glyph": 148,
-              "_showGlyph": false
-            }
-          },
-          "4,1": {
-            "size": [
-              2,
-              2
-            ],
-            "content": {
-              "_type": "Gyro",
-              "_source0": "network_table:///SmartDashboard/Rotation",
-              "_title": "Rotation",
-              "_glyph": 148,
-              "_showGlyph": false,
-              "Visuals/Major tick spacing": 45.0,
-              "Visuals/Starting angle": 180.0,
-              "Visuals/Show tick mark ring": true,
-              "Visuals/Counter clockwise": false
             }
           }
         }
@@ -262,10 +249,14 @@
               "_showGlyph": false,
               "Graph/Visible time": 30.0,
               "Graph/X-axis auto scrolling": true,
-              "Y-axis/Automatic bounds": true,
-              "Y-axis/Upper bound": 1.0,
-              "Y-axis/Lower bound": -1.0,
-              "Y-axis/Unit": "ul"
+              "Y-axis/Automatic bounds": false,
+              "Y-axis/Upper bound": 100.0,
+              "Y-axis/Lower bound": 0.0,
+              "Y-axis/Unit": "A",
+              "Visible data/SmartDashboard/Angle Current[0]": true,
+              "Visible data/SmartDashboard/Angle Current[1]": true,
+              "Visible data/SmartDashboard/Angle Current[2]": true,
+              "Visible data/SmartDashboard/Angle Current[3]": true
             }
           },
           "3,0": {
@@ -281,10 +272,14 @@
               "_showGlyph": false,
               "Graph/Visible time": 30.0,
               "Graph/X-axis auto scrolling": true,
-              "Y-axis/Automatic bounds": true,
-              "Y-axis/Upper bound": 1.0,
-              "Y-axis/Lower bound": -1.0,
-              "Y-axis/Unit": "ul"
+              "Y-axis/Automatic bounds": false,
+              "Y-axis/Upper bound": 100.0,
+              "Y-axis/Lower bound": 0.0,
+              "Y-axis/Unit": "A",
+              "Visible data/SmartDashboard/Drive Current[0]": true,
+              "Visible data/SmartDashboard/Drive Current[1]": true,
+              "Visible data/SmartDashboard/Drive Current[2]": true,
+              "Visible data/SmartDashboard/Drive Current[3]": true
             }
           }
         }

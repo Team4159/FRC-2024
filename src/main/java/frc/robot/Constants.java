@@ -56,7 +56,7 @@ public final class Constants {
         public static final SensorDirectionValue cancoderInvert = chosenModule.cancoderInvert;
 
         /* Swerve Current Limiting */
-        public static final int angleCurrentLimit = 20; //25
+        public static final int angleCurrentLimit = 25;
         public static final int angleCurrentThreshold = 40;
         public static final double angleCurrentThresholdTime = 0.1;
         public static final boolean angleEnableCurrentLimit = true;
@@ -68,7 +68,7 @@ public final class Constants {
 
         /* These values are used by the drive falcon to ramp in open loop and closed loop driving.
          * We found a small open loop ramp (0.25) helps with tread wear, tipping, etc */
-        public static final double openLoopRamp = 0.5;
+        public static final double openLoopRamp = 0.4;
         public static final double closedLoopRamp = 0.0;
 
         /* Angle Motor PID Values */
@@ -94,13 +94,12 @@ public final class Constants {
         public static final double maxAngularVelocity = 3.0;
 
         public static final class AutoConfig { //TODO: must be tuned to specific robot
-            public static final double kMaxSpeedMetersPerSecond = 3;
             public static final double kMaxAccelerationMetersPerSecondSquared = 3;
             public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
             public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
         
-            public static final double kPXController = 1;
-            public static final double kPYController = 1;
+            public static final double kPXController = 2.5;
+            public static final double kPYController = 2.5;
             public static final double kPThetaController = 1;
         
             /* Constraint for the motion profilied robot angle controller */
@@ -110,9 +109,9 @@ public final class Constants {
 
             // used by PathPlanner during setup
             public static final HolonomicPathFollowerConfig pathFollower = new HolonomicPathFollowerConfig( // TODO set values
-                new PIDConstants(2.5, 0, 0), // translation PID constants
-                new PIDConstants(1, 0, 0), // rotation PID constants
-                Constants.Swerve.AutoConfig.kMaxSpeedMetersPerSecond,
+                new PIDConstants(kPXController, 0, 0), // translation PID constants
+                new PIDConstants(kPThetaController, 0, 0), // rotation PID constants
+                Constants.Swerve.maxSpeed,
                 Constants.Swerve.wheelBase / Math.sqrt(2), // drive base radius in m
                 new ReplanningConfig(true, true)
             );
@@ -218,7 +217,7 @@ public final class Constants {
         public static final double minimumPitch = Units.degreesToRadians(14);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
         public static final double neckSpeed = 0.60; // -1 to 1
-        public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 150d);
+        public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 200d);
         
         /** @param shooterSpinFF kS radians / second, kV radians / second per meter / second */
         public static final SimpleMotorFeedforward shooterSpinFF = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);

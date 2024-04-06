@@ -32,7 +32,7 @@ public class SwerveAuto extends Command {
     public SwerveAuto(Kinesthetics k, Swerve s, RobotState end) {
         kinesthetics = k;
         swerve = s;
-        trajectory = TrajectoryGenerator.generateTrajectory(kinesthetics.getPose(), new ArrayList<>(), end, new TrajectoryConfig(AutoConfig.kMaxAccelerationMetersPerSecondSquared, AutoConfig.kMaxAccelerationMetersPerSecondSquared));
+        trajectory = TrajectoryGenerator.generateTrajectory(kinesthetics.getPose(), new ArrayList<>(), end, new TrajectoryConfig(Constants.Swerve.maxSpeed, AutoConfig.kMaxAccelerationMetersPerSecondSquared));
         addRequirements(swerve);
     }
 

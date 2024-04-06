@@ -84,8 +84,8 @@ public class RobotContainer {
     private void configureAutoCommands() {
         NamedCommands.registerCommand("intakeStatic", new WrapperCommand(s_Intake.new ChangeState(IntakeState.DOWN)) {
             @Override
-            public void end(boolean interrupted) {
-                super.end(false);
+            public boolean isFinished() {
+                return true;
             }
         }); // intake only intake
         NamedCommands.registerCommand("shooterSpinUp", 
@@ -95,33 +95,35 @@ public class RobotContainer {
             s_Shooter.new ChangeState(() -> new Shooter.ShooterCommand(Constants.Shooter.idleCommand.pitch(), null, null), false),
             new ParallelDeadlineGroup(
                 new WaitUntilCommand(kinesthetics::shooterHasNote),
-                s_Neck.new ChangeNeck(SpinState.FW)
+                s_Neck.new ChangeState(SpinState.FW)
             ),
-            s_Neck.new ChangeNeck(SpinState.BW, true),
+            s_Neck.new ChangeState(SpinState.BW, true),
             new WaitCommand(0.01),
-            s_Neck.new ChangeNeck(SpinState.ST)
+            s_Neck.new ChangeState(SpinState.ST)
         ).withTimeout(5));
 
         NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
             new ParallelCommandGroup(
-                s_Neck.new ChangeNeck(SpinState.ST),
+                s_Neck.new ChangeState(SpinState.ST),
                 s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true).withTimeout(1.25)
             ),
-            s_Neck.new ChangeNeck(kinesthetics, SpinState.FW).withTimeout(2)
+            s_Neck.new ChangeState(kinesthetics, SpinState.FW),
+            s_Shooter.stopShooter().withTimeout(0.1)
         ));
         NamedCommands.registerCommand("speakerPodium", new SequentialCommandGroup(
             new ParallelCommandGroup(
-                s_Neck.new ChangeNeck(SpinState.ST),
+                s_Neck.new ChangeState(SpinState.ST),
                 s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, true).withTimeout(1.25)
             ),
-            s_Neck.new ChangeNeck(kinesthetics, SpinState.FW).withTimeout(2)
+            s_Neck.new ChangeState(kinesthetics, SpinState.FW),
+            s_Shooter.stopShooter().withTimeout(0.1)
         ));
         NamedCommands.registerCommand("speakerLookupTable", new SequentialCommandGroup(
             new ParallelCommandGroup(
-                s_Neck.new ChangeNeck(SpinState.ST),
+                s_Neck.new ChangeState(SpinState.ST),
                 new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0).withTimeout(2)
             ),
-            s_Neck.new ChangeNeck(kinesthetics, SpinState.FW).withTimeout(2),
+            s_Neck.new ChangeState(kinesthetics, SpinState.FW),
             s_Shooter.stopShooter().withTimeout(0.2)
         ));
         NamedCommands.registerCommand("speakerAutoAim", new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0));
@@ -144,21 +146,21 @@ public class RobotContainer {
 
         // Automatic Command Groups
         autoSpk.and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
-            .onTrue(s_Neck.new ChangeNeck(SpinState.ST))
+            .onTrue(s_Neck.new ChangeState(SpinState.ST))
             .whileTrue(new SequentialCommandGroup(
                 new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0),
-                s_Neck.new ChangeNeck(kinesthetics, SpinState.FW)
-            )).onFalse(s_Neck.new ChangeNeck(SpinState.ST));
+                s_Neck.new ChangeState(kinesthetics, SpinState.FW)
+            )).onFalse(s_Neck.new ChangeState(SpinState.ST));
         autoAmp.and(kinesthetics::shooterHasNote)//.and(() -> AmpAuto.isInRange(kinesthetics)) FIXME BROKEN LMAO
-            .onTrue(s_Neck.new ChangeNeck(SpinState.ST))
+            .onTrue(s_Neck.new ChangeState(SpinState.ST))
             .whileTrue(new SequentialCommandGroup(
                 new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Deflector),
-                s_Neck.new ChangeNeck(kinesthetics, SpinState.FW)
-            )).onFalse(s_Neck.new ChangeNeck(SpinState.ST));
+                s_Neck.new ChangeState(kinesthetics, SpinState.FW)
+            )).onFalse(s_Neck.new ChangeState(SpinState.ST));
         autoIntake.and(() -> !kinesthetics.shooterHasNote()).and(() -> IntakeAuto.canRun(kinesthetics))
             .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake))
             .onFalse(new ParallelCommandGroup(
-                s_Neck.new ChangeNeck(SpinState.ST),
+                s_Neck.new ChangeState(SpinState.ST),
                 s_Intake.new ChangeState(IntakeState.STOW)
             ));
 
@@ -173,59 +175,59 @@ public class RobotContainer {
                 s_Deflector.new Lower()
             ));
         manualShootPodium
-            .onTrue(s_Neck.new ChangeNeck(SpinState.ST))
+            .onTrue(s_Neck.new ChangeState(SpinState.ST))
             .whileTrue(s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, true))
             .onFalse(new ParallelCommandGroup(
-                s_Neck.new ChangeNeck(SpinState.ST),
+                s_Neck.new ChangeState(SpinState.ST),
                 s_Shooter.stopShooter()
             ));
         manualShootSubwoofer
-            .onTrue(s_Neck.new ChangeNeck(SpinState.ST))
+            .onTrue(s_Neck.new ChangeState(SpinState.ST))
             .whileTrue(s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true))
             .onFalse(new ParallelCommandGroup(
-                s_Neck.new ChangeNeck(SpinState.ST),
+                s_Neck.new ChangeState(SpinState.ST),
                 s_Shooter.stopShooter()
             ));
         manualShootSourceIn
             .whileTrue(new SequentialCommandGroup(
                 new ParallelDeadlineGroup(
                     new WaitUntilCommand(kinesthetics::shooterHasNote),
-                    s_Neck.new ChangeNeck(SpinState.BW, true),
+                    s_Neck.new ChangeState(SpinState.BW, true),
                     s_Shooter.new ChangeState(Constants.CommandConstants.sourceInShooterCommand)
                 ),
                 new WaitCommand(0.05),
-                s_Neck.new ChangeNeck(SpinState.ST)
+                s_Neck.new ChangeState(SpinState.ST)
             ));
         manualFeed
-            .whileTrue(s_Neck.new ChangeNeck(SpinState.FW));
+            .whileTrue(s_Neck.new ChangeState(SpinState.FW));
         manualIntakeUp
             .whileTrue(new ParallelCommandGroup(
-                s_Neck.new ChangeNeck(SpinState.FW),
+                s_Neck.new ChangeState(SpinState.FW),
                 s_Intake.new ChangeState(IntakeState.GARGLE)
             ))
             .onFalse(new ParallelCommandGroup(
-                s_Neck.new ChangeNeck(SpinState.ST),
+                s_Neck.new ChangeState(SpinState.ST),
                 s_Intake.new ChangeState(IntakeState.STOW) 
             ));
         manualIntakeDown
             .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake, true))
             .onFalse(new ParallelCommandGroup(
                 s_Intake.new ChangeState(IntakeState.STOW),
-                s_Neck.new ChangeNeck(SpinState.ST)
+                s_Neck.new ChangeState(SpinState.ST)
             ));
         manualOuttakeUp
             .whileTrue(new ParallelCommandGroup(
-                s_Neck.new ChangeNeck(SpinState.BW),
+                s_Neck.new ChangeState(SpinState.BW),
                 s_Intake.new ChangeState(IntakeState.RETCH)
             ))
-            .onFalse(s_Neck.new ChangeNeck(SpinState.ST));
+            .onFalse(s_Neck.new ChangeState(SpinState.ST));
         manualOuttakeDown
             .whileTrue(new ParallelCommandGroup(
-                s_Neck.new ChangeNeck(SpinState.BW),
+                s_Neck.new ChangeState(SpinState.BW),
                 s_Intake.new ChangeState(IntakeState.SPIT)
             ))
             .onFalse(new ParallelCommandGroup(
-                s_Neck.new ChangeNeck(SpinState.ST),
+                s_Neck.new ChangeState(SpinState.ST),
                 s_Intake.new ChangeState(IntakeState.STOW)
             ));
         manualClimberUp

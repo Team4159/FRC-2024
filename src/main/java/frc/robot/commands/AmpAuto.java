@@ -38,7 +38,7 @@ public class AmpAuto extends ParallelCommandGroup {
                 ),
                 sh.new ChangeState(spinOnly),
                 new ParallelDeadlineGroup(
-                    n.new ChangeNeck(k, SpinState.FW),
+                    n.new ChangeState(k, SpinState.FW),
                     d.new Raise()
                 ),
                 new ParallelCommandGroup(
