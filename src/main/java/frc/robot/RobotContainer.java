@@ -151,16 +151,16 @@ public class RobotContainer {
                 s_Shooter.stopShooter(),
                 s_Neck.new ChangeState(SpinState.ST)
             ));
-        // autoAmp.and(kinesthetics::shooterHasNote)//.and(() -> AmpAuto.isInRange(kinesthetics)) FIXME BROKEN LMAO
-        //     .onTrue(s_Neck.new ChangeState(SpinState.ST))
-        //     .whileTrue(new SequentialCommandGroup(
-        //         new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Deflector),
-        //         s_Neck.new ChangeState(kinesthetics, SpinState.FW)
-        //     ))
-        //     .onFalse(new ParallelCommandGroup(
-        //         s_Shooter.stopShooter(),
-        //         s_Neck.new ChangeState(SpinState.ST)
-        //     ));
+        autoAmp.and(kinesthetics::shooterHasNote).and(() -> AmpAuto.isInRange(kinesthetics)) // FIXME BROKEN LMAO
+            .onTrue(s_Neck.new ChangeState(SpinState.ST))
+            .whileTrue(new SequentialCommandGroup(
+                new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Deflector),
+                s_Neck.new ChangeState(kinesthetics, SpinState.FW)
+            ))
+            .onFalse(new ParallelCommandGroup(
+                s_Shooter.stopShooter(),
+                s_Neck.new ChangeState(SpinState.ST)
+            ));
         autoIntake.and(() -> !kinesthetics.shooterHasNote()).and(() -> IntakeAuto.canRun(kinesthetics))
             .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake))
             .onFalse(new ParallelCommandGroup(
@@ -225,8 +225,8 @@ public class RobotContainer {
         manualIntakeDown
             .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake, true))
             .onFalse(new ParallelCommandGroup(
-                s_Intake.new ChangeState(IntakeState.STOW),
-                s_Neck.new ChangeState(SpinState.ST)
+                s_Neck.new ChangeState(SpinState.ST),
+                s_Intake.new ChangeState(IntakeState.STOW)
             ));
         manualOuttakeUp
             .whileTrue(new ParallelCommandGroup(

@@ -23,10 +23,10 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
         put(2.7, 0.69);
         put(2.8, 0.68);
         put(3.0, 0.63);
-        put(3.25, 0.60);
+        put(3.25,0.60);
         put(3.5, 0.54);
         put(4.0, 0.53);
-        put(4.25, 0.495);
+        put(4.25,0.495);
         put(4.5, 0.48);
         put(4.6, 0.475);
         put(4.8, 0.47);

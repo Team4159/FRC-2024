@@ -1,13 +1,12 @@
 package frc.robot.subsystems;
 
-import java.util.ArrayDeque;
 import java.util.Optional;
-import java.util.Queue;
 import java.util.function.DoubleSupplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -109,7 +108,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public void setAngleOffset() {
-        driverAngleOffset = Rotation2d.fromRadians(-kinesthetics.getRelativeHeading().getRadians());
+        driverAngleOffset = Rotation2d.fromRadians(-kinesthetics.getPose().getRotation().getRadians());
     }
 
     @Override
@@ -129,28 +128,23 @@ public class Swerve extends SubsystemBase {
 
     public class ChangeYaw extends Command {
         private DoubleSupplier passthroughTranslation, passthroughStrafe, desiredYaw;
-        private Queue<Double> prevRequests;
 
         public ChangeYaw(DoubleSupplier translation, DoubleSupplier strafe, DoubleSupplier yaw) {
             passthroughTranslation = translation;
             passthroughStrafe = strafe;
             desiredYaw = yaw;
-            prevRequests = new ArrayDeque<Double>(2);
             addRequirements(Swerve.this);
         }
 
         @Override
         public void execute() {
             if (isFinished()) return;
-            if (prevRequests.size() >= 2) prevRequests.remove();
-            var newValue = Constants.CommandConstants.swerveYawPID.calculate(
-                kinesthetics.getPose().getRotation().getRadians(),
-                desiredYaw.getAsDouble()
-            );
-            prevRequests.add(newValue);
             drive(
                 new Translation2d(passthroughTranslation.getAsDouble(), passthroughStrafe.getAsDouble()).times(Constants.Swerve.maxSpeed),
-                prevRequests.stream().reduce(0d, (a, b) -> a+b) / prevRequests.size(), true, false
+                MathUtil.clamp(Constants.CommandConstants.swerveYawPID.calculate(
+                    kinesthetics.getPose().getRotation().getRadians(),
+                    desiredYaw.getAsDouble()
+                ), -2, 2), true, false
             );
         }
 

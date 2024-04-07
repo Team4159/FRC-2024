@@ -31,7 +31,7 @@ public class Kinesthetics extends SubsystemBase {
     // Sensor Information
     private Pigeon2 gyro;
     private DigitalInput shooterBeamBreak;
-    private Debouncer shooterBeamBreakDebouncer = new Debouncer(0.03, Debouncer.DebounceType.kRising);
+    private Debouncer shooterBeamBreakDebouncer = new Debouncer(0.03, Debouncer.DebounceType.kBoth);
 
     /** @param velocityOmega degrees / second */
     private StatusSignal<Double> velocityOmega;
