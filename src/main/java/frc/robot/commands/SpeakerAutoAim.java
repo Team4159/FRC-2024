@@ -14,10 +14,11 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 
 public class SpeakerAutoAim extends ParallelCommandGroup {
+    private static double rootg = Math.sqrt(Constants.Environment.G);
+
     public Double latestYaw;
 
     public SpeakerAutoAim(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
-        double rootg = Math.sqrt(Constants.Environment.G);
         addCommands(
             sh.new ChangeState(() -> {
                 var transform = getDifference(k);

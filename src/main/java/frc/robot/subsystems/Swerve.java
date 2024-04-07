@@ -158,7 +158,7 @@ public class Swerve extends SubsystemBase {
 
         @Override
         public boolean isFinished() {
-            return Constants.CommandConstants.swerveYawPID.atSetpoint();
+            return MathUtil.isNear(desiredYaw.getAsDouble(), kinesthetics.getPose().getRotation().getRadians(), Constants.Swerve.yawTolerance);
         }
     }
 }

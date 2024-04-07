@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 
@@ -32,9 +31,6 @@ public class Kinesthetics extends SubsystemBase {
     private Pigeon2 gyro;
     private DigitalInput shooterBeamBreak;
     private Debouncer shooterBeamBreakDebouncer = new Debouncer(0.03, Debouncer.DebounceType.kBoth);
-
-    /** @param velocityOmega degrees / second */
-    private StatusSignal<Double> velocityOmega;
     
     // Data Fields
     private SwerveDrivePoseEstimator poseEstimator;
@@ -57,7 +53,6 @@ public class Kinesthetics extends SubsystemBase {
             Constants.Swerve.swerveKinematics, getGyroYaw(), s_Swerve.getModulePositions(), new Pose2d()
         );
     
-        velocityOmega = gyro.getAngularVelocityZDevice();
         ShuffleboardTab table = Shuffleboard.getTab("Kinesthetics");
 
         table.addBoolean("Shooter Note?", this::shooterHasNote);
@@ -66,16 +61,16 @@ public class Kinesthetics extends SubsystemBase {
 
     @Override
     public void periodic() {
+        double velocityOmega = gyro.getAngularVelocityZDevice().getValueAsDouble();
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
-        Vision.setRobotYaw(getGyroYaw().getDegrees(), velocityOmega.getValueAsDouble());
-        if (Math.abs(velocityOmega.getValueAsDouble()) <= Constants.Environment.visionAngularCutoff) {
+        Vision.setRobotYaw(getGyroYaw().getDegrees(), velocityOmega);
+        if (Math.abs(velocityOmega) <= Constants.Environment.visionAngularCutoff) {
             var visionPose = Vision.getLimelightData();
-            if (visionPose != null)
-                poseEstimator.addVisionMeasurement(
-                    visionPose.pose().toPose2d(),
-                    Timer.getFPGATimestamp()-visionPose.ping(),
-                    VecBuilder.fill(visionPose.confidence(), visionPose.confidence(), 99)
-                );
+            if (visionPose != null) poseEstimator.addVisionMeasurement(
+                visionPose.pose().toPose2d(),
+                Timer.getFPGATimestamp()-visionPose.ping(),
+                VecBuilder.fill(visionPose.confidence(), visionPose.confidence(), 999)
+            );
         }
         swerveStates.set(s_Swerve.getModuleStates());
         SmartDashboard.putNumber("Rotation", getPose().getRotation().getRadians());

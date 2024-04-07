@@ -104,7 +104,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
             new ParallelCommandGroup(
                 s_Neck.new ChangeState(SpinState.ST),
-                s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true).withTimeout(1.25)
+                s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true).withTimeout(2)
             ),
             s_Neck.new ChangeState(kinesthetics, SpinState.FW),
             s_Shooter.stopShooter().withTimeout(0.1)
@@ -112,7 +112,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("speakerPodium", new SequentialCommandGroup(
             new ParallelCommandGroup(
                 s_Neck.new ChangeState(SpinState.ST),
-                s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, true).withTimeout(1.25)
+                s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, true).withTimeout(2)
             ),
             s_Neck.new ChangeState(kinesthetics, SpinState.FW),
             s_Shooter.stopShooter().withTimeout(0.1)
@@ -144,9 +144,9 @@ public class RobotContainer {
         forceVision.onTrue(new InstantCommand(kinesthetics::forceVision));
 
         // Automatic Command Groups
-        autoSpk.and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
+        autoSpk.and(kinesthetics::shooterHasNote).and(() -> SpeakerLookupTable.isInRange(kinesthetics))
             .onTrue(s_Neck.new ChangeState(SpinState.ST))
-            .whileTrue(new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0))
+            .whileTrue(new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()))
             .onFalse(new ParallelCommandGroup(
                 s_Shooter.stopShooter(),
                 s_Neck.new ChangeState(SpinState.ST)

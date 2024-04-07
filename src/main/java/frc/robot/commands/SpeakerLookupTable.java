@@ -7,6 +7,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants;
 import frc.robot.subsystems.Kinesthetics;
@@ -15,6 +16,7 @@ import frc.robot.subsystems.Shooter.ShooterCommand;
 import frc.robot.subsystems.Swerve;
 
 public class SpeakerLookupTable extends ParallelCommandGroup {
+    // private static double rootg = Math.sqrt(Constants.Environment.G);
     private static final Map<Double, Double> shooterTable = new HashMap<>() {{
         put(1.29, 1.1);
         put(1.5, 0.95);
@@ -37,6 +39,28 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
 
     public SpeakerLookupTable(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
         addCommands(
+            // sw.new ChangeYaw(translationSup, strafeSup, () -> {
+            //     var transform = getDifference(k);
+            //     var state = k.getRobotState();
+
+            //     double roottwoh = Math.sqrt(2*transform.getZ()); // Z, up +
+            //     boolean speakerIsOnRight = transform.getX() > 0;
+
+            //     double relativex  = Math.abs(transform.getX()); // left+ right+
+            //     double relativey  = (speakerIsOnRight ? -1 : 1) * transform.getY(); // forward backward
+            //     double relativexv = (speakerIsOnRight ? 1 : -1) * state.getvx(); // speaker relative towards+ away-
+            //     double relativeyv = (speakerIsOnRight ? -1 : 1) * state.getvy(); // speaker relative left- right+
+                
+            //     double n = relativex * rootg / roottwoh - relativexv;
+
+            //     double desiredYaw = -Math.atan(- ((rootg * relativey) / roottwoh + relativeyv) / n); // CCW+, facing speaker = 0
+            //     if (!speakerIsOnRight) desiredYaw += Math.PI; // flip it around
+
+            //     SmartDashboard.putNumber("Speaker absolute theta", Units.radiansToDegrees(desiredYaw)); // CCW+, 0 = North
+
+            //     latestYaw = desiredYaw;
+            //     return desiredYaw;
+            // }),
             sw.new ChangeYaw(translationSup, strafeSup, () -> latestYaw = getDifference(k).toTranslation2d().getAngle().getRadians() + Math.PI), // adding pi because back azimuth
             sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 500d, 375d), true)
         );
@@ -77,5 +101,11 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
             shooterTable.get(secClosestMatch),
             closestAccuracy / (secClosestAccuracy + closestAccuracy)
         );
+    }
+
+    public static boolean isInRange(Kinesthetics k) {
+        var isValid = Math.abs(getDifference(k).toTranslation2d().getNorm()) < 5;
+        SmartDashboard.putBoolean("Can AutoAim", isValid);
+        return isValid;
     }
 }
