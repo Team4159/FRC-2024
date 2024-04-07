@@ -6,7 +6,6 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -57,12 +56,10 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
                 double desiredYaw = Math.atan(- ((rootg * relativey) / roottwoh + relativeyv) / n); // CCW+, facing speaker = 0
                 if (speakerIsOnRight) desiredYaw += Math.PI; // flip it around
 
-                SmartDashboard.putNumber("Speaker absolute theta", Units.radiansToDegrees(desiredYaw)); // CCW+, 0 = North
-
                 latestYaw = desiredYaw;
                 return desiredYaw;
             }),
-            // sw.new ChangeYaw(translationSup, strafeSup, () -> latestYaw = getDifference(k).toTranslation2d().getAngle().getRadians()/* + Math.PI*/), // adding pi because back azimuth
+            // sw.new ChangeYaw(translationSup, strafeSup, () -> latestYaw = getDifference(k).toTranslation2d().getAngle().getRadians()), // adding pi because back azimuth
             sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 500d, 375d), true)
         );
     }

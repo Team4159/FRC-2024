@@ -74,10 +74,8 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                 
                 double n = relativex * rootg / roottwoh - relativexv;
 
-                double desiredYaw = -Math.atan(- ((rootg * relativey) / roottwoh + relativeyv) / n); // CCW+, facing speaker = 0
+                double desiredYaw = Math.atan(- ((rootg * relativey) / roottwoh + relativeyv) / n); // CCW+, facing speaker = 0
                 if (speakerIsOnRight) desiredYaw += Math.PI; // flip it around
-
-                SmartDashboard.putNumber("Speaker absolute theta", Units.radiansToDegrees(desiredYaw)); // CCW+, 0 = North
 
                 latestYaw = desiredYaw;
                 return desiredYaw;

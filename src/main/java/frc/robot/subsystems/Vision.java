@@ -4,11 +4,9 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,8 +18,6 @@ public class Vision extends SubsystemBase {
     private static final NetworkTable rpiTable = NetworkTableInstance.getDefault().getTable("raspberrypi");
 
     private Kinesthetics kinesthetics;
-    private static boolean megatag2 = false;
-    private static GenericEntry megatag2Entry;
 
     private static final Field2d field = new Field2d();
 
@@ -30,7 +26,6 @@ public class Vision extends SubsystemBase {
 
         var table = Shuffleboard.getTab("Vision");
 
-        megatag2Entry = table.add("MT2", megatag2).withWidget(BuiltInWidgets.kToggleButton).getEntry();
         table.addDouble("LL Error", () -> {
             var v = Vision.getLimelightData();
             if (v == null) return -1d;
@@ -44,11 +39,6 @@ public class Vision extends SubsystemBase {
         })); // forward+, right+, up+, roll, pitch, yaw (ccw+)
     }
 
-    // @Override
-    // public void periodic() {
-    //     megatag2 = megatag2Entry.getBoolean(false);
-    // }
-
     /** @param omega degrees / second */
     public static void setRobotYaw(double theta, double omega) {
         limelightTable.putValue("robot_orientation_set", NetworkTableValue.makeDoubleArray(new double[]{
@@ -57,10 +47,10 @@ public class Vision extends SubsystemBase {
     }
 
     public static VisionData getLimelightData() {
-        var entry = limelightTable.getEntry(megatag2 ? "botpose_orb_wpiblue" : "botpose_wpiblue");
+        var entry = limelightTable.getEntry(false ? "botpose_orb_wpiblue" : "botpose_wpiblue");
         if (!entry.exists()) return null;
         double[] ntdata = entry.getDoubleArray(new double[7]);
-        if (limelightTable.getEntry("tv").getDouble(0) != 1) return null;
+        if (ntdata[0] == 0 && ntdata[1] == 0 && ntdata[2] == 0) return null;
         var o = new Pose3d(
             new Translation3d(ntdata[0], ntdata[1], ntdata[2]),
             new Rotation3d(0, 0, Units.degreesToRadians(ntdata[5]))

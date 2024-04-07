@@ -144,9 +144,9 @@ public class RobotContainer {
         forceVision.onTrue(new InstantCommand(kinesthetics::forceVision));
 
         // Automatic Command Groups
-        autoSpk.and(kinesthetics::shooterHasNote).and(() -> SpeakerLookupTable.isInRange(kinesthetics))
+        autoSpk.and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
             .onTrue(s_Neck.new ChangeState(SpinState.ST))
-            .whileTrue(new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY() / 3, () -> -driver.getX() / 3))
+            .whileTrue(new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()))
             .onFalse(new ParallelCommandGroup(
                 s_Shooter.stopShooter(),
                 s_Neck.new ChangeState(SpinState.ST)
