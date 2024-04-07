@@ -1,12 +1,8 @@
 package frc.robot.commands;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -36,7 +32,7 @@ public class SpeakerLTEquation extends ParallelCommandGroup {
 
     /** @return shooter pitch */
     private static double bestPitch(double distance) {
-        return 0.0440779 * Math.pow(distance, 2) - 0.434859 * distance + 1.55015;
+        return 0.0440779 * distance * distance - 0.434859 * distance + 1.55015;
     }
 
     public static boolean isInRange(Kinesthetics k) {
