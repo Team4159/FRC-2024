@@ -56,7 +56,7 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                 ) * 400/47 );
                 
                 return new Shooter.ShooterCommand(
-                    desiredPitch, // FIXME the pitch is too high
+                    desiredPitch - Units.degreesToRadians(10), // FIXME the pitch is too high
                     Constants.Shooter.shooterSpinFF.calculate(desiredNoteVel)
                 );
             }, false),
@@ -75,7 +75,7 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                 double n = relativex * rootg / roottwoh - relativexv;
 
                 double desiredYaw = -Math.atan(- ((rootg * relativey) / roottwoh + relativeyv) / n); // CCW+, facing speaker = 0
-                if (!speakerIsOnRight) desiredYaw += Math.PI; // flip it around
+                if (speakerIsOnRight) desiredYaw += Math.PI; // flip it around
 
                 SmartDashboard.putNumber("Speaker absolute theta", Units.radiansToDegrees(desiredYaw)); // CCW+, 0 = North
 

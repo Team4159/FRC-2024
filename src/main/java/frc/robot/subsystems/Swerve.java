@@ -108,7 +108,11 @@ public class Swerve extends SubsystemBase {
     }
 
     public void setAngleOffset() {
-        driverAngleOffset = Rotation2d.fromRadians(-kinesthetics.getPose().getRotation().getRadians());
+        driverAngleOffset = kinesthetics.getPose().getRotation().unaryMinus();
+    }
+
+    public void resetAngleOffset() {
+        driverAngleOffset = Rotation2d.fromDegrees(0);
     }
 
     @Override
@@ -139,8 +143,10 @@ public class Swerve extends SubsystemBase {
         @Override
         public void execute() {
             if (isFinished()) return;
+            double translationVal = MathUtil.applyDeadband(passthroughTranslation.getAsDouble(), Constants.stickDeadband);
+            double strafeVal = MathUtil.applyDeadband(passthroughStrafe.getAsDouble(), Constants.stickDeadband);
             drive(
-                new Translation2d(passthroughTranslation.getAsDouble(), passthroughStrafe.getAsDouble()).times(Constants.Swerve.maxSpeed),
+                new Translation2d(translationVal, strafeVal).times(Constants.Swerve.maxSpeed),
                 MathUtil.clamp(Constants.CommandConstants.swerveYawPID.calculate(
                     kinesthetics.getPose().getRotation().getRadians(),
                     desiredYaw.getAsDouble()

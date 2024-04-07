@@ -104,17 +104,17 @@ public class RobotContainer {
         NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
             new ParallelCommandGroup(
                 s_Neck.new ChangeState(SpinState.ST),
-                s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true).withTimeout(2)
+                s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true).withTimeout(1)
             ),
-            s_Neck.new ChangeState(kinesthetics, SpinState.FW),
+            s_Neck.new ChangeState(kinesthetics, SpinState.FW).andThen(new WaitCommand(0.1)),
             s_Shooter.stopShooter().withTimeout(0.1)
         ));
         NamedCommands.registerCommand("speakerPodium", new SequentialCommandGroup(
             new ParallelCommandGroup(
                 s_Neck.new ChangeState(SpinState.ST),
-                s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, true).withTimeout(2)
+                s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, true).withTimeout(1.5)
             ),
-            s_Neck.new ChangeState(kinesthetics, SpinState.FW),
+            s_Neck.new ChangeState(kinesthetics, SpinState.FW).andThen(new WaitCommand(0.3)),
             s_Shooter.stopShooter().withTimeout(0.1)
         ));
         // NamedCommands.registerCommand("speakerLookupTable", new SequentialCommandGroup(
@@ -146,7 +146,7 @@ public class RobotContainer {
         // Automatic Command Groups
         autoSpk.and(kinesthetics::shooterHasNote).and(() -> SpeakerLookupTable.isInRange(kinesthetics))
             .onTrue(s_Neck.new ChangeState(SpinState.ST))
-            .whileTrue(new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()))
+            .whileTrue(new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY() / 3, () -> -driver.getX() / 3))
             .onFalse(new ParallelCommandGroup(
                 s_Shooter.stopShooter(),
                 s_Neck.new ChangeState(SpinState.ST)

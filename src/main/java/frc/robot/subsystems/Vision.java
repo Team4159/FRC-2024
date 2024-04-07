@@ -20,7 +20,7 @@ public class Vision extends SubsystemBase {
     private static final NetworkTable rpiTable = NetworkTableInstance.getDefault().getTable("raspberrypi");
 
     private Kinesthetics kinesthetics;
-    private static boolean megatag2 = true;
+    private static boolean megatag2 = false;
     private static GenericEntry megatag2Entry;
 
     private static final Field2d field = new Field2d();
@@ -41,13 +41,13 @@ public class Vision extends SubsystemBase {
 
         limelightTable.putValue("camerapose_robotspace_set", NetworkTableValue.makeDoubleArray(new double[]{
             Units.inchesToMeters(12.947), 0, Units.inchesToMeters(8.03), 0, 26, 0
-        })); // forward+, right+, up+, yaw (ccw+), pitch, roll
+        })); // forward+, right+, up+, roll, pitch, yaw (ccw+)
     }
 
-    @Override
-    public void periodic() {
-        megatag2 = megatag2Entry.getBoolean(true);
-    }
+    // @Override
+    // public void periodic() {
+    //     megatag2 = megatag2Entry.getBoolean(false);
+    // }
 
     /** @param omega degrees / second */
     public static void setRobotYaw(double theta, double omega) {
@@ -60,10 +60,10 @@ public class Vision extends SubsystemBase {
         var entry = limelightTable.getEntry(megatag2 ? "botpose_orb_wpiblue" : "botpose_wpiblue");
         if (!entry.exists()) return null;
         double[] ntdata = entry.getDoubleArray(new double[7]);
-        if (ntdata[0] == ntdata[1] && ntdata[1] == ntdata[2] && ntdata[2] == 0) return null;
+        if (limelightTable.getEntry("tv").getDouble(0) != 1) return null;
         var o = new Pose3d(
             new Translation3d(ntdata[0], ntdata[1], ntdata[2]),
-            new Rotation3d(0, 0, Units.degreesToRadians(ntdata[5] + (megatag2 ? 180 : 0))) // note: offset because of mt2
+            new Rotation3d(0, 0, Units.degreesToRadians(ntdata[5]))
         );
         double area = limelightTable.getEntry("ta").getDouble(0.25);
         field.setRobotPose(o.toPose2d());

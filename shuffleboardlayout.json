@@ -309,7 +309,7 @@
               "_showGlyph": false,
               "Crosshair/Show crosshair": true,
               "Crosshair/Crosshair color": "#FFFFFFFF",
-              "Controls/Show controls": true,
+              "Controls/Show controls": false,
               "Controls/Rotation": "NONE",
               "compression": -1.0,
               "fps": -1,
@@ -358,7 +358,8 @@
               "_showGlyph": false,
               "Game/Game": "k2024Crescendo",
               "Visuals/Robot Icon Size": 50.0,
-              "Visuals/Show Outside Circles": false
+              "Visuals/Show Outside Circles": false,
+              "Colors/speaker": "#FFFFFFFF"
             }
           },
           "3,1": {

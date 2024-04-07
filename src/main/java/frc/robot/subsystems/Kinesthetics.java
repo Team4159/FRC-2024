@@ -41,7 +41,6 @@ public class Kinesthetics extends SubsystemBase {
 
     public Kinesthetics(Swerve s) {
         s_Swerve = s;
-        s_Swerve.setKinesthetics(this);
 
         gyro = new Pigeon2(Constants.Swerve.pigeonID);
         gyro.getConfigurator().apply(new Pigeon2Configuration());
@@ -57,13 +56,15 @@ public class Kinesthetics extends SubsystemBase {
 
         table.addBoolean("Shooter Note?", this::shooterHasNote);
         table.add("Pose Estimation", field);
+
+        s_Swerve.setKinesthetics(this);
     }
 
     @Override
     public void periodic() {
         double velocityOmega = gyro.getAngularVelocityZDevice().getValueAsDouble();
         poseEstimator.update(getGyroYaw(), s_Swerve.getModulePositions());
-        Vision.setRobotYaw(getGyroYaw().getDegrees(), velocityOmega);
+        Vision.setRobotYaw(getPose().getRotation().getDegrees(), velocityOmega);
         if (Math.abs(velocityOmega) <= Constants.Environment.visionAngularCutoff) {
             var visionPose = Vision.getLimelightData();
             if (visionPose != null) poseEstimator.addVisionMeasurement(
@@ -73,7 +74,7 @@ public class Kinesthetics extends SubsystemBase {
             );
         }
         swerveStates.set(s_Swerve.getModuleStates());
-        SmartDashboard.putNumber("Rotation", getPose().getRotation().getRadians());
+        SmartDashboard.putNumber("Rotation", getPose().getRotation().getDegrees());
         field.setRobotPose(getPose());
     }
 
@@ -97,7 +98,6 @@ public class Kinesthetics extends SubsystemBase {
 
     public void setPose(Pose2d pose) {
         poseEstimator.resetPosition(getGyroYaw(), s_Swerve.getModulePositions(), pose);
-        s_Swerve.setAngleOffset();
     }
 
     /** @return the rotation, inverted based on alliance (for driving) */
@@ -111,7 +111,7 @@ public class Kinesthetics extends SubsystemBase {
 
     public RobotState getRobotState() {
         var speeds = Constants.Swerve.swerveKinematics.toChassisSpeeds(s_Swerve.getModuleStates());
-        speeds = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getGyroYaw());
+        speeds = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getPose().getRotation());
         return RobotState.fromVelocity(getPose(),
             -speeds.vyMetersPerSecond,
             speeds.vxMetersPerSecond,
