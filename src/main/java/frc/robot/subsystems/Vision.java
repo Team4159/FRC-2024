@@ -38,6 +38,10 @@ public class Vision extends SubsystemBase {
         });
         table.addBoolean("Note Seen", () -> limelightTable.getEntry("notetrans").exists());
         table.add("Vision Field", field);
+
+        limelightTable.putValue("camerapose_robotspace_set", NetworkTableValue.makeDoubleArray(new double[]{
+            Units.inchesToMeters(12.947), 0, Units.inchesToMeters(8.03), 0, 26, 0
+        })); // forward+, right+, up+, yaw (ccw+), pitch, roll
     }
 
     @Override
