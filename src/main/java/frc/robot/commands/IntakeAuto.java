@@ -23,10 +23,10 @@ import frc.robot.subsystems.Vision;
 
 public class IntakeAuto extends SequentialCommandGroup {
     public IntakeAuto(Kinesthetics k, Swerve sw, Shooter sh, Neck n, Intake i) {
-        this(k, sw, sh, n, i, false);
+        this(k, sw, sh, n, i, null, false);
     }
 
-    public IntakeAuto(Kinesthetics k, Swerve sw, Shooter sh, Neck n, Intake i, boolean disableMovement) {
+    public IntakeAuto(Kinesthetics k, Swerve sw, Shooter sh, Neck n, Intake i, Vision v, boolean disableMovement) {
         var notetrans3d = Vision.getNoteTranslation();
         if (!disableMovement && notetrans3d != null) {
             Translation2d notetrans = notetrans3d.toTranslation2d();
@@ -42,7 +42,10 @@ public class IntakeAuto extends SequentialCommandGroup {
                 n.new ChangeState(SpinState.FW),
                 i.new ChangeState(IntakeState.DOWN),
                 sh.stopShooter()
-            ),
+            )
+        );
+        if (v != null) addCommands(v.new Flash());
+        addCommands(
             n.new ChangeState(SpinState.BW, true),
             new WaitCommand(0.02),
             n.new ChangeState(SpinState.ST)

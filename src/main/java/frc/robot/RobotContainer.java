@@ -106,7 +106,7 @@ public class RobotContainer {
                 s_Neck.new ChangeState(SpinState.ST),
                 s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true).withTimeout(1)
             ),
-            s_Neck.new ChangeState(kinesthetics, SpinState.FW).andThen(new WaitCommand(0.1)),
+            s_Neck.new ChangeState(kinesthetics, SpinState.FW).andThen(new WaitCommand(0.3)),
             s_Shooter.stopShooter().withTimeout(0.1)
         ));
         NamedCommands.registerCommand("speakerPodium", new SequentialCommandGroup(
@@ -223,7 +223,7 @@ public class RobotContainer {
                 s_Intake.new ChangeState(IntakeState.STOW) 
             ));
         manualIntakeDown
-            .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake, true))
+            .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake, s_Vision, true))
             .onFalse(new ParallelCommandGroup(
                 s_Neck.new ChangeState(SpinState.ST),
                 s_Intake.new ChangeState(IntakeState.STOW)

@@ -5,10 +5,12 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.Conversions;
 import frc.robot.Constants;
@@ -62,6 +64,19 @@ public class Vision extends SubsystemBase {
             1 - area * 0.7,
             ntdata[6]
         );
+    }
+
+    public class Flash extends InstantCommand {
+        private static final NetworkTableEntry ledMode = limelightTable.getEntry("ledMode");
+        public Flash() {
+            super(() -> new Thread(() -> {
+                ledMode.setBoolean(true);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {}
+                ledMode.setBoolean(false);
+            }).start(), Vision.this);
+        }
     }
 
     /** @param ping seconds since image taken (+) */
