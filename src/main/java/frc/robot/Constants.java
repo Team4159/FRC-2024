@@ -58,7 +58,7 @@ public final class Constants {
         /* Swerve Current Limiting */
         public static final int angleCurrentLimit = 20;
         public static final int angleCurrentThreshold = 40;
-        public static final double angleCurrentThresholdTime = 0.1;
+        public static final double angleCurrentThresholdTime = 0.05;
         public static final boolean angleEnableCurrentLimit = true;
 
         public static final int driveCurrentLimit = 35;
@@ -113,7 +113,7 @@ public final class Constants {
                 new PIDConstants(kPRotatController, 0, 0), // rotation PID constants
                 Constants.Swerve.maxSpeed,
                 Constants.Swerve.wheelBase / Math.sqrt(2), // drive base radius in m
-                new ReplanningConfig(true, true)
+                new ReplanningConfig(false, true)
             );
         }
 

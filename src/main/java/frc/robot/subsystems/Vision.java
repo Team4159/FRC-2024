@@ -70,12 +70,16 @@ public class Vision extends SubsystemBase {
         private static final NetworkTableEntry ledMode = limelightTable.getEntry("ledMode");
         public Flash() {
             super(() -> new Thread(() -> {
+                System.out.println("blink");
                 ledMode.setBoolean(true);
                 try {
                     Thread.sleep(1000);
-                } catch (InterruptedException e) {}
+                } catch (InterruptedException e) {
+                    System.out.println(e.toString());
+                }
                 ledMode.setBoolean(false);
             }).start(), Vision.this);
+            System.out.println("blink init");
         }
     }
 

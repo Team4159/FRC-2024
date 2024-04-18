@@ -25,9 +25,12 @@ public class Intake extends SubsystemBase {
 
     @Override
     public void periodic() {
+        var realPitch = MathUtil.angleModulus(getPitch());
+        if (realPitch < 0) realPitch += 2 * Math.PI;
+        assert(Math.abs(realPitch - desiredPitch) < Math.PI);
         angleMotorController.set(
-            Constants.Intake.anglePID.calculate(getPitch(), desiredPitch)
-            + Constants.Intake.kG * Math.cos(getPitch())
+            Constants.Intake.anglePID.calculate(realPitch, desiredPitch)
+            + Constants.Intake.kG * Math.cos(realPitch)
         );
     }
 

@@ -164,7 +164,9 @@ public class Swerve extends SubsystemBase {
 
         @Override
         public boolean isFinished() {
-            return MathUtil.isNear(desiredYaw.getAsDouble(), kinesthetics.getPose().getRotation().getRadians(), Constants.Swerve.yawTolerance);
+            return Math.abs(
+                MathUtil.angleModulus(desiredYaw.getAsDouble() - kinesthetics.getPose().getRotation().getRadians())
+            ) < Constants.Swerve.yawTolerance;
         }
     }
 }

@@ -6,6 +6,7 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -59,7 +60,7 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
             //     latestYaw = desiredYaw;
             //     return desiredYaw;
             // }),
-            sw.new ChangeYaw(translationSup, strafeSup, () -> latestYaw = getDifference(k).toTranslation2d().getAngle().getRadians()), // adding pi because back azimuth
+            sw.new ChangeYaw(translationSup, strafeSup, () -> latestYaw = getDifference(k).toTranslation2d().getAngle().getRadians()),
             sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 500d, 375d), true)
         );
     }
@@ -94,11 +95,13 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
             }
         }
         // the more equal the accuracy, the more even the interpolation
-        return MathUtil.interpolate(
+        var r = MathUtil.interpolate(
             shooterTable.get(closestMatch),
             shooterTable.get(secClosestMatch),
             closestAccuracy / (secClosestAccuracy + closestAccuracy)
         );
+        System.out.println("D: "+distance+"\t| R: "+Units.radiansToDegrees(r));
+        return r;
     }
 
     public static boolean isInRange(Kinesthetics k) {

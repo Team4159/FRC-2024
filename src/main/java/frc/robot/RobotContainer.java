@@ -9,6 +9,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -32,9 +33,9 @@ public class RobotContainer {
     private static final JoystickButton manualAmp = new JoystickButton(secondary, 3);
     private static final JoystickButton manualShootPodium = new JoystickButton(secondary, 5);
     private static final JoystickButton manualShootSubwoofer = new JoystickButton(secondary, 4);
-    private static final JoystickButton manualShootLob = new JoystickButton(secondary, 10);
+    private static final JoystickButton manualShootLob = new JoystickButton(secondary, 7);
     private static final JoystickButton manualShootSourceIn = new JoystickButton(secondary, 6);
-    private static final JoystickButton manualIntakeUp = new JoystickButton(secondary, 7);
+    private static final JoystickButton manualIntakeUp = new JoystickButton(secondary, 10);
     private static final JoystickButton manualIntakeDown = new JoystickButton(secondary, 2);
     private static final JoystickButton manualOuttakeUp = new JoystickButton(secondary, 11);
     private static final JoystickButton manualClimberUp = new JoystickButton(secondary, 8);
@@ -55,7 +56,6 @@ public class RobotContainer {
     private final Climber s_Climber = new Climber();
 
     private final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve);
-    @SuppressWarnings("unused")
     private final Vision s_Vision = new Vision(kinesthetics);
 
     private final SendableChooser<Command> autoChooser;
@@ -71,6 +71,9 @@ public class RobotContainer {
                 () -> false
             )
         );
+
+        RobotController.setEnabled6V(false);
+        RobotController.setEnabled3V3(false);
 
         configureAutoCommands();
 
@@ -117,14 +120,12 @@ public class RobotContainer {
             s_Neck.new ChangeState(kinesthetics, SpinState.FW).andThen(new WaitCommand(0.3)),
             s_Shooter.stopShooter().withTimeout(0.1)
         ));
-        // NamedCommands.registerCommand("speakerLookupTable", new SequentialCommandGroup(
-        //     new ParallelCommandGroup(
-        //         s_Neck.new ChangeState(SpinState.ST),
-        //         new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0).withTimeout(2)
-        //     ),
-        //     s_Neck.new ChangeState(kinesthetics, SpinState.FW),
-        //     s_Shooter.stopShooter().withTimeout(0.1)
-        // ));
+        NamedCommands.registerCommand("speakerLookupTable", new SequentialCommandGroup(
+            s_Neck.new ChangeState(SpinState.ST),
+            new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0).withTimeout(2),
+            s_Neck.new ChangeState(kinesthetics, SpinState.FW).andThen(new WaitCommand(0.3)),
+            s_Shooter.stopShooter().withTimeout(0.1)
+        ));
         NamedCommands.registerCommand("speakerAutoAim", new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0));
 
         NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake));
@@ -162,7 +163,7 @@ public class RobotContainer {
                 s_Neck.new ChangeState(SpinState.ST)
             ));
         autoIntake.and(() -> !kinesthetics.shooterHasNote()).and(() -> IntakeAuto.canRun(kinesthetics))
-            .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake))
+            .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake, s_Vision, false))
             .onFalse(new ParallelCommandGroup(
                 s_Neck.new ChangeState(SpinState.ST),
                 s_Intake.new ChangeState(IntakeState.STOW)
@@ -205,7 +206,7 @@ public class RobotContainer {
         manualShootLob
             .onTrue(s_Neck.new ChangeState(SpinState.ST))
             .whileTrue(s_Shooter.new ChangeState(new Shooter.ShooterCommand(
-                Units.degreesToRadians(45), 525d, 300d
+                Units.degreesToRadians(50), 525d, 300d
             )))
             .onFalse(new ParallelCommandGroup(
                 s_Neck.new ChangeState(SpinState.ST),

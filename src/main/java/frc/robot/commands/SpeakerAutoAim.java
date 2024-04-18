@@ -56,7 +56,7 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
                 ) * 400/47 );
                 
                 return new Shooter.ShooterCommand(
-                    desiredPitch - Units.degreesToRadians(10), // FIXME the pitch is too high
+                    desiredPitch, // FIXME the pitch is too high
                     Constants.Shooter.shooterSpinFF.calculate(desiredNoteVel)
                 );
             }, false),

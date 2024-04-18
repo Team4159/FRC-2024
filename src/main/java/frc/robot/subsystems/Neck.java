@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -44,12 +45,15 @@ public class Neck extends SubsystemBase {
         public ChangeState(Kinesthetics k, SpinState ss) {
             kinesthetics = k;
             desiredNeck = ss;
-            beamBreakMode = kinesthetics.shooterHasNote();
             addRequirements(Neck.this);
         }
 
         @Override
         public void initialize() {
+            if (kinesthetics != null) {
+                beamBreakMode = kinesthetics.shooterHasNote();
+                if (!beamBreakMode) DriverStation.reportWarning("Smart Neck Command initialized without note", false);
+            }
             setNeck(desiredNeck, desiredSlow ? 0.3 : 1);
         }
 
