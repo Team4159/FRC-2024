@@ -21,7 +21,7 @@ import frc.lib.util.SwerveModuleConstants;
 import frc.robot.subsystems.Shooter.ShooterCommand;
 
 public final class Constants {
-    public static final double stickDeadband = 0.15;
+    public static final double stickDeadband = 0.1;
 
     public static final class Swerve {
         public static final String canBus = "Drivetrain";
@@ -31,18 +31,17 @@ public final class Constants {
             COTSTalonFXSwerveConstants.SDS.MK4i.KrakenX60(COTSTalonFXSwerveConstants.SDS.MK4i.driveRatios.L3ANDAHALF);
 
         /* Drivetrain Constants */
-        public static final double trackWidth = Units.inchesToMeters(21.75);
         public static final double wheelBase = Units.inchesToMeters(21.75);
         public static final double wheelCircumference = chosenModule.wheelCircumference;
 
         /* Swerve Kinematics 
          * No need to ever change this unless you are not doing a traditional rectangular/square 4 module swerve */
         public static final SwerveDriveKinematics swerveKinematics = new SwerveDriveKinematics(
-            new Translation2d(wheelBase / 2.0, trackWidth / 2.0),
-            new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
-            new Translation2d(-wheelBase / 2.0, trackWidth / 2.0),
-            new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0));
-        public static final double yawTolerance = Math.PI/4; // Radians
+            new Translation2d(wheelBase / 2.0, wheelBase / 2.0),
+            new Translation2d(wheelBase / 2.0, -wheelBase / 2.0),
+            new Translation2d(-wheelBase / 2.0, wheelBase / 2.0),
+            new Translation2d(-wheelBase / 2.0, -wheelBase / 2.0));
+        public static final double yawTolerance = Math.PI/8; // Radians
 
         /* Module Gear Ratios */
         public static final double driveGearRatio = chosenModule.driveGearRatio;
@@ -69,7 +68,7 @@ public final class Constants {
 
         /* These values are used by the drive falcon to ramp in open loop and closed loop driving.
          * We found a small open loop ramp (0.25) helps with tread wear, tipping, etc */
-        public static final double openLoopRamp = 0.4;
+        public static final double openLoopRamp = 0.3;
         public static final double closedLoopRamp = 0.0;
 
         /* Angle Motor PID Values */
@@ -90,9 +89,9 @@ public final class Constants {
 
         /* Swerve Profiling Values */
         /** Meters per Second */
-        public static final double maxSpeed = 4.5; //TODO: This must be tuned to specific robot
+        public static final double maxSpeed = 4;
         /** Radians per Second */
-        public static final double maxAngularVelocity = 3.0;
+        public static final double maxAngularVelocity = 3;
 
         public static final class AutoConfig { //TODO: must be tuned to specific robot
             public static final double kMaxAccelerationMetersPerSecondSquared = 3;
@@ -175,7 +174,7 @@ public final class Constants {
         public static final double pitchTolerance = Math.PI/32; // radians
         public static final double spinTolerance = Math.PI/4; // radians
 
-        public static final double intakeSpin = 0.7; // -1 to 1
+        public static final double intakeSpin = 1.0; // -1 to 1
         public static final double feederSpin = 0.45; // -1 to 1
 
         public static final PIDController anglePID = new PIDController(0.2, 0.0, 0.0);
@@ -220,7 +219,7 @@ public final class Constants {
         public static final double minimumPitch = Units.degreesToRadians(14);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
         public static final double neckSpeed = 0.60; // -1 to 1
-        public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 200d);
+        public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 400d, 200d);
         
         /** @param shooterSpinFF kS radians / second, kV radians / second per meter / second */
         public static final SimpleMotorFeedforward shooterSpinFF = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
@@ -253,18 +252,20 @@ public final class Constants {
             setTolerance(Constants.Swerve.yawTolerance);
         }};
 
+        public static final ShooterCommand ampShooterCommand = new ShooterCommand(
+            Units.degreesToRadians(55), 130d);
         public static final ShooterCommand speakerPodiumShooterCommand = new ShooterCommand(
             0.7, 500d, 275d);
         public static final ShooterCommand speakerSubwooferShooterCommand = new ShooterCommand(
             1.1, 450d, 250d);
-
-        public static final double ampAutoDistanceMax = 3.0; // meters
-        public static final ShooterCommand ampShooterCommand = new ShooterCommand(
-            Units.degreesToRadians(55), 130d);
-        public static final double ampAutoDistanceToStartSpinning = 0.5; // meters
-
         public static final ShooterCommand sourceInShooterCommand = new ShooterCommand(
             Units.degreesToRadians(75), -90d);
+        public static final ShooterCommand lobCommand = new ShooterCommand(
+            Units.degreesToRadians(50), 525d, 300d);
+
+        public static final double ampAutoDistanceMax = 3.0; // meters
+        public static final double ampAutoDistanceToStartSpinning = 0.5; // meters
+
     }
 
     public static final class Environment {

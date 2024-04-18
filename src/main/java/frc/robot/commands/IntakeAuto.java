@@ -32,7 +32,7 @@ public class IntakeAuto extends SequentialCommandGroup {
             Translation2d notetrans = notetrans3d.toTranslation2d();
             if (notetrans.getNorm() > Constants.Intake.intakeRange || Math.abs(MathUtil.inputModulus(notetrans.getAngle().getRadians(), -Math.PI/2, Math.PI)) > Constants.Intake.intakeAngleRange) {
                 Rotation2d noteAngle = k.getPose().getRotation().plus(notetrans.getAngle());
-                addCommands(new SwerveAuto(k, sw, new RobotState(new Translation2d(notetrans.getNorm()-Constants.Swerve.trackWidth/2, noteAngle), noteAngle, new Vector<N3>(Nat.N3()))));
+                addCommands(new SwerveAuto(k, sw, new RobotState(new Translation2d(notetrans.getNorm()-Constants.Swerve.wheelBase/2, noteAngle), noteAngle, new Vector<N3>(Nat.N3()))));
             }
         }
         addCommands(

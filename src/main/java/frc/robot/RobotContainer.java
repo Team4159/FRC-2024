@@ -5,12 +5,11 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
@@ -74,6 +73,7 @@ public class RobotContainer {
 
         RobotController.setEnabled6V(false);
         RobotController.setEnabled3V3(false);
+        DataLogManager.start();
 
         configureAutoCommands();
 
@@ -109,7 +109,7 @@ public class RobotContainer {
                 s_Neck.new ChangeState(SpinState.ST),
                 s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true).withTimeout(1)
             ),
-            s_Neck.new ChangeState(kinesthetics, SpinState.FW).andThen(new WaitCommand(0.3)),
+            s_Neck.new ChangeState(kinesthetics, SpinState.FW),
             s_Shooter.stopShooter().withTimeout(0.1)
         ));
         NamedCommands.registerCommand("speakerPodium", new SequentialCommandGroup(
@@ -117,13 +117,13 @@ public class RobotContainer {
                 s_Neck.new ChangeState(SpinState.ST),
                 s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, true).withTimeout(1.5)
             ),
-            s_Neck.new ChangeState(kinesthetics, SpinState.FW).andThen(new WaitCommand(0.3)),
+            s_Neck.new ChangeState(kinesthetics, SpinState.FW),
             s_Shooter.stopShooter().withTimeout(0.1)
         ));
         NamedCommands.registerCommand("speakerLookupTable", new SequentialCommandGroup(
             s_Neck.new ChangeState(SpinState.ST),
             new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0).withTimeout(2),
-            s_Neck.new ChangeState(kinesthetics, SpinState.FW).andThen(new WaitCommand(0.3)),
+            s_Neck.new ChangeState(kinesthetics, SpinState.FW),
             s_Shooter.stopShooter().withTimeout(0.1)
         ));
         NamedCommands.registerCommand("speakerAutoAim", new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0));
@@ -147,7 +147,7 @@ public class RobotContainer {
         // Automatic Command Groups
         autoSpk.and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
             .onTrue(s_Neck.new ChangeState(SpinState.ST))
-            .whileTrue(new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()))
+            .whileTrue(new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> -driver.getY(), () -> -driver.getX()))
             .onFalse(new ParallelCommandGroup(
                 s_Shooter.stopShooter(),
                 s_Neck.new ChangeState(SpinState.ST)
@@ -205,9 +205,7 @@ public class RobotContainer {
             ));
         manualShootLob
             .onTrue(s_Neck.new ChangeState(SpinState.ST))
-            .whileTrue(s_Shooter.new ChangeState(new Shooter.ShooterCommand(
-                Units.degreesToRadians(50), 525d, 300d
-            )))
+            .whileTrue(s_Shooter.new ChangeState(Constants.CommandConstants.lobCommand))
             .onFalse(new ParallelCommandGroup(
                 s_Neck.new ChangeState(SpinState.ST),
                 s_Shooter.stopShooter()

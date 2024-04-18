@@ -4,7 +4,6 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -84,7 +83,7 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
     }
 
     /** @return x right+, y forward+, z up+ */
-    private static Translation3d getDifference(Kinesthetics k) {
+    public static Translation3d getDifference(Kinesthetics k) {
         var all = DriverStation.getAlliance();
         if (all.isEmpty()) return null;
         var t2 = k.getPose().getTranslation();

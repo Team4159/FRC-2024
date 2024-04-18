@@ -26,7 +26,7 @@ public class AmpAuto extends ParallelCommandGroup {
         if (all.isEmpty()) return;
         var desiredPose = Constants.Environment.amps.get(all.get());
         // offset the desired pose so the front of the robot touches the amp, not the center (which would be bad)
-        desiredPose.plus(new Transform2d(-Constants.Swerve.trackWidth/2 - Constants.CommandConstants.bumperWidth, 0, new Rotation2d()));
+        desiredPose.plus(new Transform2d(-Constants.Swerve.wheelBase/2 - Constants.CommandConstants.bumperWidth, 0, new Rotation2d()));
         addCommands(
             new SwerveAuto(k, sw, new RobotState(desiredPose)),
             new SequentialCommandGroup(

@@ -5,9 +5,7 @@ import java.util.Map;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants;
@@ -40,37 +38,28 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
 
     public SpeakerLookupTable(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
         addCommands(
-            // sw.new ChangeYaw(translationSup, strafeSup, () -> {
-            //     var transform = getDifference(k);
-            //     var state = k.getRobotState();
+            sw.new ChangeYaw(translationSup, strafeSup, () -> {
+                var transform = SpeakerAutoAim.getDifference(k);
+                var state = k.getRobotState();
 
-            //     double roottwoh = Math.sqrt(2*transform.getZ()); // Z, up +
-            //     boolean speakerIsOnRight = transform.getX() > 0;
+                double roottwoh = Math.sqrt(2*transform.getZ()); // Z, up +
+                boolean speakerIsOnRight = transform.getX() > 0;
 
-            //     double relativex  = Math.abs(transform.getX()); // left+ right+
-            //     double relativey  = (speakerIsOnRight ? -1 : 1) * transform.getY(); // forward backward
-            //     double relativexv = (speakerIsOnRight ? 1 : -1) * state.getvx(); // speaker relative towards+ away-
-            //     double relativeyv = (speakerIsOnRight ? -1 : 1) * state.getvy(); // speaker relative left- right+
+                double relativex  = Math.abs(transform.getX()); // left+ right+
+                double relativey  = (speakerIsOnRight ? -1 : 1) * transform.getY(); // forward backward
+                double relativexv = (speakerIsOnRight ? 1 : -1) * state.getvx(); // speaker relative towards+ away-
+                double relativeyv = (speakerIsOnRight ? -1 : 1) * state.getvy(); // speaker relative left- right+
                 
-            //     double n = relativex * rootg / roottwoh - relativexv;
+                double n = relativex * rootg / roottwoh - relativexv;
 
-            //     double desiredYaw = Math.atan(- ((rootg * relativey) / roottwoh + relativeyv) / n); // CCW+, facing speaker = 0
-            //     if (speakerIsOnRight) desiredYaw += Math.PI; // flip it around
+                double desiredYaw = Math.atan(- ((rootg * relativey) / roottwoh + relativeyv) / n); // CCW+, facing speaker = 0
+                if (speakerIsOnRight) desiredYaw += Math.PI; // flip it around
 
-            //     latestYaw = desiredYaw;
-            //     return desiredYaw;
-            // }),
-            sw.new ChangeYaw(translationSup, strafeSup, () -> latestYaw = getDifference(k).toTranslation2d().getAngle().getRadians()),
-            sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 500d, 375d), true)
+                latestYaw = desiredYaw;
+                return desiredYaw;
+            }),
+            sh.new ChangeState(() -> new ShooterCommand(bestPitch(SpeakerAutoAim.getDifference(k).toTranslation2d().getNorm()), 500d, 375d), true)
         );
-    }
-
-    /** @return x right+, y forward+, z up+ */
-    private static Translation3d getDifference(Kinesthetics k) {
-        var all = DriverStation.getAlliance();
-        if (all.isEmpty()) return null;
-        var t2 = k.getPose().getTranslation();
-        return Constants.Environment.speakers.get(all.get()).minus(new Translation3d(t2.getX(), t2.getY(), 0));
     }
 
     /** @return shooter pitch */
@@ -105,7 +94,7 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
     }
 
     public static boolean isInRange(Kinesthetics k) {
-        var isValid = Math.abs(getDifference(k).toTranslation2d().getNorm()) < 5;
+        var isValid = Math.abs(SpeakerAutoAim.getDifference(k).toTranslation2d().getNorm()) < 5;
         SmartDashboard.putBoolean("Can AutoAim", isValid);
         return isValid;
     }
