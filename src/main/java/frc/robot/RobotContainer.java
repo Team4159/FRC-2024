@@ -102,12 +102,12 @@ public class RobotContainer {
             s_Neck.new ChangeState(SpinState.BW, true),
             new WaitCommand(0.01),
             s_Neck.new ChangeState(SpinState.ST)
-        ).withTimeout(5));
+        ).withTimeout(3));
 
         NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
             new ParallelCommandGroup(
                 s_Neck.new ChangeState(SpinState.ST),
-                s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true).withTimeout(1)
+                s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true).withTimeout(1.25)
             ),
             s_Neck.new ChangeState(kinesthetics, SpinState.FW),
             s_Shooter.stopShooter().withTimeout(0.1)

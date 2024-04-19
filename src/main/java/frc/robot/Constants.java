@@ -68,7 +68,7 @@ public final class Constants {
 
         /* These values are used by the drive falcon to ramp in open loop and closed loop driving.
          * We found a small open loop ramp (0.25) helps with tread wear, tipping, etc */
-        public static final double openLoopRamp = 0.3;
+        public static final double openLoopRamp = 0.25;
         public static final double closedLoopRamp = 0.0;
 
         /* Angle Motor PID Values */
@@ -112,7 +112,7 @@ public final class Constants {
                 new PIDConstants(kPRotatController, 0, 0), // rotation PID constants
                 Constants.Swerve.maxSpeed,
                 Constants.Swerve.wheelBase / Math.sqrt(2), // drive base radius in m
-                new ReplanningConfig(false, true)
+                new ReplanningConfig(true, true)
             );
         }
 
@@ -174,7 +174,7 @@ public final class Constants {
         public static final double pitchTolerance = Math.PI/32; // radians
         public static final double spinTolerance = Math.PI/4; // radians
 
-        public static final double intakeSpin = 1.0; // -1 to 1
+        public static final double intakeSpin = 0.9; // -1 to 1 // PREV 0.8 // 1.0 brownout?
         public static final double feederSpin = 0.45; // -1 to 1
 
         public static final PIDController anglePID = new PIDController(0.2, 0.0, 0.0);
@@ -261,7 +261,7 @@ public final class Constants {
         public static final ShooterCommand sourceInShooterCommand = new ShooterCommand(
             Units.degreesToRadians(75), -90d);
         public static final ShooterCommand lobCommand = new ShooterCommand(
-            Units.degreesToRadians(50), 525d, 300d);
+            Units.degreesToRadians(50), 300d, 300d);
 
         public static final double ampAutoDistanceMax = 3.0; // meters
         public static final double ampAutoDistanceToStartSpinning = 0.5; // meters

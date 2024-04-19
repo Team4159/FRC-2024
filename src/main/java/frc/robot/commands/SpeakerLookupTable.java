@@ -6,7 +6,6 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import frc.robot.Constants;
 import frc.robot.subsystems.Kinesthetics;
@@ -18,22 +17,37 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
     private static double rootg = Math.sqrt(Constants.Environment.G);
     private static final Map<Double, Double> shooterTable = new HashMap<>() {{
         put(1.29, 1.1);
-        put(1.5, 0.95);
-        put(2.0, 0.85);
-        put(2.5, 0.77);
-        put(2.7, 0.69);
-        put(2.8, 0.68);
-        put(3.0, 0.63);
-        put(3.25,0.60);
-        put(3.5, 0.54);
-        put(4.0, 0.53);
-        put(4.25,0.495);
-        put(4.5, 0.48);
-        put(4.6, 0.475);
-        put(4.8, 0.47);
-        put(4.9, 0.465);
-        put(5.0, 0.46);
-    }}; // distance: pitch
+        // put(1.5, 0.95);
+        // put(2.0, 0.85);
+        // put(2.5, 0.77);
+        // put(2.7, 0.69);
+        // put(2.8, 0.68);
+        // put(3.0, 0.63);
+        // put(3.25,0.60);
+        // put(3.5, 0.54);
+        // put(4.0, 0.53);
+        // put(4.25,0.495);
+        // put(4.5, 0.48);
+        // put(4.6, 0.475);
+        // put(4.8, 0.47);
+        // put(4.9, 0.465);
+        // put(5.0, 0.46);
+        put(1.5, 0.975);
+        put(2.0, 0.875);
+        put(2.5, 0.775);
+        put(2.7, 0.715);
+        put(2.8, 0.705);
+        put(3.0, 0.655);
+        put(3.25,0.625);
+        put(3.5, 0.565);
+        put(4.0, 0.555);
+        put(4.25,0.52);
+        put(4.5, 0.505);
+        put(4.6, 0.5);
+        put(4.8, 0.495);
+        put(4.9, 0.49);
+        put(5.0, 0.485);
+    }}; //distance: pitch
     public Double latestYaw;
 
     public SpeakerLookupTable(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
@@ -94,8 +108,6 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
     }
 
     public static boolean isInRange(Kinesthetics k) {
-        var isValid = Math.abs(SpeakerAutoAim.getDifference(k).toTranslation2d().getNorm()) < 5;
-        SmartDashboard.putBoolean("Can AutoAim", isValid);
-        return isValid;
+        return Math.abs(SpeakerAutoAim.getDifference(k).toTranslation2d().getNorm()) < 5;
     }
 }

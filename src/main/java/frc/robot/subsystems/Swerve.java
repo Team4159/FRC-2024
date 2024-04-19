@@ -44,10 +44,8 @@ public class Swerve extends SubsystemBase {
             () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(this.getModuleStates()), // a supplier for robot relative ChassisSpeeds
             (ChassisSpeeds chassisSpeeds) -> { // the drive method, accepts robot relative ChassisSpeeds
                 chassisSpeeds = chassisSpeeds.times(-1); // invert the chassispeeds to account for "FIX ME WHY IS THIS NEGATIVE"
-                SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(chassisSpeeds);
-                SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
-                for(SwerveModule mod : mSwerveMods) mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false);
-            }, 
+                setModuleStates(Constants.Swerve.swerveKinematics.toSwerveModuleStates(chassisSpeeds));
+            },
             Constants.Swerve.AutoConfig.pathFollower, // config, includes PID values
             () -> DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue).equals(DriverStation.Alliance.Red), // determines if autos should be flipped (i.e. if on Red Alliance)
             this // reference to this subsystem to set requirements
@@ -117,6 +115,7 @@ public class Swerve extends SubsystemBase {
 
     @Override
     public void periodic(){
+        if (DriverStation.isFMSAttached()) return;
         double[] drive = new double[mSwerveMods.length];
         double[] angle = new double[mSwerveMods.length];
         for(SwerveModule mod : mSwerveMods) {

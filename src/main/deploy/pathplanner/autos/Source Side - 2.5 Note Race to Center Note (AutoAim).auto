@@ -1,0 +1,75 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.6744662599645491,
+      "y": 4.421139470985942
+    },
+    "rotation": 121.52217724675872
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeStatic"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "speakerSubwoofer"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Source Side to 7 Static Intake"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "shooterIntaking"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "7 to Source Score"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "speakerLookupTable"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Source Score to 6 Static Intaking"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Testing",
+  "choreoAuto": false
+}
