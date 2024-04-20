@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.6924444618120005,
-        "y": 6.689056341075646
+        "x": 0.6924444618056841,
+        "y": 6.6188914144156605
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.3182315196539223,
-        "y": 7.367317298737161
+        "x": 1.45256450056428,
+        "y": 6.864468657706899
       },
       "isLocked": false,
       "linkedName": "Amp Side"
@@ -20,8 +20,8 @@
         "y": 6.735832958845405
       },
       "prevControl": {
-        "x": 1.8324747247785091,
-        "y": 6.735832958845405
+        "x": 1.932024832710634,
+        "y": 6.922939429924444
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,7 +30,7 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.55,
+      "waypointRelativePos": 0.5,
       "rotationDegrees": 180.0,
       "rotateFast": false
     }
@@ -39,7 +39,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 0.35,
+      "waypointRelativePos": 0.3,
       "command": {
         "type": "parallel",
         "data": {
@@ -63,7 +63,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0,
+    "rotation": -154.79887635452494,
     "rotateFast": false
   },
   "reversed": false,

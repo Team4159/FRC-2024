@@ -122,7 +122,13 @@ public class RobotContainer {
         ));
         NamedCommands.registerCommand("speakerLookupTable", new SequentialCommandGroup(
             s_Neck.new ChangeState(SpinState.ST),
-            new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0).withTimeout(2),
+            new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0).withTimeout(1.75),
+            s_Neck.new ChangeState(kinesthetics, SpinState.FW),
+            s_Shooter.stopShooter().withTimeout(0.1)
+        ));
+        NamedCommands.registerCommand("speakerLookupTableFast", new SequentialCommandGroup(
+            s_Neck.new ChangeState(SpinState.ST),
+            new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0).withTimeout(1),
             s_Neck.new ChangeState(kinesthetics, SpinState.FW),
             s_Shooter.stopShooter().withTimeout(0.1)
         ));

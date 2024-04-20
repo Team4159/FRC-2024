@@ -63,9 +63,9 @@
                 "data": {
                   "commands": [
                     {
-                      "type": "wait",
+                      "type": "named",
                       "data": {
-                        "waitTime": 1.0
+                        "name": "shooterIntaking"
                       }
                     },
                     {
@@ -107,9 +107,9 @@
                 "data": {
                   "commands": [
                     {
-                      "type": "wait",
+                      "type": "named",
                       "data": {
-                        "waitTime": 0.75
+                        "name": "shooterIntaking"
                       }
                     },
                     {

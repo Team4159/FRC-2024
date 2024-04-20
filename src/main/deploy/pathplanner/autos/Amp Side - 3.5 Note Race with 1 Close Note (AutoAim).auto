@@ -1,0 +1,118 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.6924444618120005,
+      "y": 6.689056341075646
+    },
+    "rotation": -120.30268072048806
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "speakerSubwoofer"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeStatic"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Side to 1 Static Intake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shooterIntaking"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "speakerLookupTable"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "1 to 5 Static Intaking"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "shooterIntaking"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "5 to Amp Score"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "speakerLookupTable"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Score to 4 Static Intaking"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "shooterIntaking"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "4 to Amp Score"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "speakerLookupTable"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}

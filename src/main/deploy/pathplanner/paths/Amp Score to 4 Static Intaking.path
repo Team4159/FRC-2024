@@ -3,45 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.645368253695189,
-        "y": 2.631184749544661
+        "x": 3.9434193968103033,
+        "y": 6.034183692299009
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.651065535749305,
-        "y": 2.7832087573007067
+        "x": 5.112834841054298,
+        "y": 6.560420642208806
       },
       "isLocked": false,
-      "linkedName": "Source Score"
+      "linkedName": "Amp Score"
     },
     {
       "anchor": {
-        "x": 4.995893296629898,
-        "y": 3.7772118849081013
+        "x": 8.02467929722184,
+        "y": 7.449176379834242
       },
       "prevControl": {
-        "x": 4.434573883392781,
-        "y": 3.438081406077343
-      },
-      "nextControl": {
-        "x": 5.626459780891059,
-        "y": 4.158179135815886
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 7.9779026794520815,
-        "y": 3.98770666487202
-      },
-      "prevControl": {
-        "x": 6.8786521618627265,
-        "y": 4.04617743708422
+        "x": 6.656463227456368,
+        "y": 7.425788070949362
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "6"
+      "linkedName": "4"
     }
   ],
   "rotationTargets": [],
@@ -49,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "New Event Marker",
-      "waypointRelativePos": 1.55,
+      "waypointRelativePos": 0.6,
       "command": {
         "type": "parallel",
         "data": {
@@ -79,7 +63,7 @@
   "reversed": false,
   "folder": null,
   "previewStartingState": {
-    "rotation": 132.63049193567213,
+    "rotation": 180.0,
     "velocity": 0
   },
   "useDefaultConstraints": true
