@@ -5,12 +5,15 @@ import java.util.Map;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -43,7 +46,7 @@ public final class Constants {
             new Translation2d(wheelBase / 2.0, -trackWidth / 2.0),
             new Translation2d(-wheelBase / 2.0, trackWidth / 2.0),
             new Translation2d(-wheelBase / 2.0, -trackWidth / 2.0));
-        public static final double yawTolerance = Math.PI/16; // Radians
+        public static final double yawTolerance = Math.PI/256; // Radians
 
         /* Module Gear Ratios */
         public static final double driveGearRatio = chosenModule.driveGearRatio;
@@ -84,9 +87,9 @@ public final class Constants {
         public static final double driveKF = 0.0;
 
         /* Drive Motor Characterization Values From SYSID */
-        public static final double driveKS = 0.32;
-        public static final double driveKV = 1.51;
-        public static final double driveKA = 0.27;
+        public static final double driveKS = 0.10;//0.06;//0.32;
+        public static final double driveKV = 2.2896;//1.51;
+        public static final double driveKA = 0.75362;//0.27;
 
         /* Swerve Profiling Values */
         /** Meters per Second */
@@ -99,6 +102,12 @@ public final class Constants {
             public static final double kMaxAccelerationMetersPerSecondSquared = 3;
             public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
             public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
+
+            public static PathConstraints pathConstraints = new PathConstraints(
+                kMaxSpeedMetersPerSecond,
+                kMaxAccelerationMetersPerSecondSquared,
+                kMaxAngularSpeedRadiansPerSecond,
+                kMaxAngularSpeedRadiansPerSecondSquared);
         
             public static final double kPXController = 1;
             public static final double kPYController = 1;
@@ -219,7 +228,7 @@ public final class Constants {
         public static final double minimumPitch = Units.degreesToRadians(14);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
         public static final double neckSpeed = 0.25; // -1 to 1
-        public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 150d);
+        public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 0d);//spin 150d
         
         public static final ArmFeedforward shooterAngleFF = new ArmFeedforward(0, 1, 0, 0); // TODO tune
         /** @param shooterSpinFF kS radians / second, kV radians / second per meter / second */
@@ -248,7 +257,9 @@ public final class Constants {
     public static final class CommandConstants {
         public static final double bumperWidth = Units.inchesToMeters(2.75);
 
-        public static final PIDController swerveYawPID = new PIDController(0.1, 0, 0.001);
+        public static final PIDController swerveYawPID = new PIDController(5, 0.1, 0.1){{
+            enableContinuousInput(-Math.PI, Math.PI);
+        }};
 
         public static final ShooterCommand speakerPodiumShooterCommand = new ShooterCommand(
             0.7, 500d, 275d);

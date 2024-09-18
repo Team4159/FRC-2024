@@ -136,7 +136,7 @@ public class Swerve extends SubsystemBase {
         public void execute() {
             drive(
                 new Translation2d(passthroughTranslation.getAsDouble(), passthroughStrafe.getAsDouble()).times(Constants.Swerve.maxSpeed),
-                Constants.CommandConstants.swerveYawPID.calculate(kinesthetics.getHeading().getRadians(), desiredYaw.getAsDouble()), true, false
+                Constants.CommandConstants.swerveYawPID.calculate(MathUtil.angleModulus(kinesthetics.getPose().getRotation().getRadians()), MathUtil.angleModulus(desiredYaw.getAsDouble())), true, false
             );
         }
 

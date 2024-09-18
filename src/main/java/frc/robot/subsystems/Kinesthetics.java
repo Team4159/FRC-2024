@@ -13,10 +13,12 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.math.RobotState;
 import frc.robot.Constants;
@@ -69,6 +71,7 @@ public class Kinesthetics extends SubsystemBase {
             );
         swerveStates.set(s_Swerve.getModuleStates());
         field.setRobotPose(getPose());
+        field.getObject("speaker").setPose(new Pose2d(Constants.Environment.speakers.get(DriverStation.getAlliance().get()).toTranslation2d(), new Rotation2d()));
     }
 
     public void forceVision() {

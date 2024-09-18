@@ -19,46 +19,46 @@ public class SpeakerAutoAim extends ParallelCommandGroup {
     public SpeakerAutoAim(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup) {
         double rootg = Math.sqrt(Constants.Environment.G);
         addCommands(
-            sh.new ChangeState(() -> {
-                var transform = getDifference(k);
-                var state = k.getRobotState();
+            // sh.new ChangeState(() -> {
+            //     var transform = getDifference(k);
+            //     var state = k.getRobotState();
 
-                double roottwoh = Math.sqrt(2*transform.getZ()); // Z, up +
-                boolean speakerIsOnRight = transform.getX() > 0;
+            //     double roottwoh = Math.sqrt(2*transform.getZ()); // Z, up +
+            //     boolean speakerIsOnRight = transform.getX() > 0;
 
-                double relativex  = Math.abs(transform.getX()); // left+ right+
-                double relativey  = (speakerIsOnRight ? -1 : 1) * transform.getY(); // forward backward
-                double relativexv = (speakerIsOnRight ? 1 : -1) * state.getvx(); // speaker relative towards+ away-
-                double relativeyv = (speakerIsOnRight ? -1 : 1) * state.getvy(); // speaker relative left- right+
+            //     double relativex  = Math.abs(transform.getX()); // left+ right+
+            //     double relativey  = (speakerIsOnRight ? -1 : 1) * transform.getY(); // forward backward
+            //     double relativexv = (speakerIsOnRight ? 1 : -1) * state.getvx(); // speaker relative towards+ away-
+            //     double relativeyv = (speakerIsOnRight ? -1 : 1) * state.getvy(); // speaker relative left- right+
                 
-                SmartDashboard.putNumber("Speaker x", relativex);
-                SmartDashboard.putNumber("Speaker y", relativey);
-                SmartDashboard.putNumber("Speaker x'", relativexv);
-                SmartDashboard.putNumber("Speaker y'", relativeyv);
+            //     SmartDashboard.putNumber("Speaker x", relativex);
+            //     SmartDashboard.putNumber("Speaker y", relativey);
+            //     SmartDashboard.putNumber("Speaker x'", relativexv);
+            //     SmartDashboard.putNumber("Speaker y'", relativeyv);
 
-                double n = relativex * rootg / roottwoh - relativexv; // airtine
-                double m = relativey * rootg / roottwoh + relativeyv;
+            //     double n = relativex * rootg / roottwoh - relativexv; // airtine
+            //     double m = relativey * rootg / roottwoh + relativeyv;
 
-                SmartDashboard.putNumber("Speaker airtime", n);
+            //     SmartDashboard.putNumber("Speaker airtime", n);
 
-                double desiredPitch = Math.atan2(roottwoh * rootg, n);
-                double desiredNoteVel = Math.sqrt(
-                    2*Constants.Environment.G*transform.getZ()
-                    + n*n + m*m
-                ) + Math.sqrt(Math.sqrt(
-                    Constants.Environment.B * 54481/300000
-                    * (
-                        2 * Constants.Environment.G * transform.getZ()
-                        + n*n + m*m
-                    ) *
-                    Math.sqrt(transform.getZ()*transform.getZ() + relativex * relativex + relativey * relativey)
-                ) * 400/47 );
+            //     double desiredPitch = Math.atan2(roottwoh * rootg, n);
+            //     double desiredNoteVel = Math.sqrt(
+            //         2*Constants.Environment.G*transform.getZ()
+            //         + n*n + m*m
+            //     ) + Math.sqrt(Math.sqrt(
+            //         Constants.Environment.B * 54481/300000
+            //         * (
+            //             2 * Constants.Environment.G * transform.getZ()
+            //             + n*n + m*m
+            //         ) *
+            //         Math.sqrt(transform.getZ()*transform.getZ() + relativex * relativex + relativey * relativey)
+            //     ) * 400/47 );
                 
-                return new Shooter.ShooterCommand(
-                    desiredPitch, // FIXME the pitch is too high
-                    Constants.Shooter.shooterSpinFF.calculate(desiredNoteVel)
-                );
-            }, false),
+            //     return new Shooter.ShooterCommand(
+            //         desiredPitch, // FIXME the pitch is too high
+            //         Constants.Shooter.shooterSpinFF.calculate(desiredNoteVel)
+            //     );
+            // }, false),
             sw.new ChangeYaw(translationSup, strafeSup, () -> {
                 var transform = getDifference(k);
                 var state = k.getRobotState();

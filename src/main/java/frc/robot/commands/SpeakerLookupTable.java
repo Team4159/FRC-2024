@@ -5,10 +5,15 @@ import java.util.Map;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import frc.lib.math.RobotState;
 import frc.robot.Constants;
 import frc.robot.subsystems.Kinesthetics;
 import frc.robot.subsystems.Shooter;
@@ -16,13 +21,50 @@ import frc.robot.subsystems.Shooter.ShooterCommand;
 import frc.robot.subsystems.Swerve;
 
 public class SpeakerLookupTable extends ParallelCommandGroup {
+    public Double latestYaw;
     private static final Map<Double, Double> shooterTable = new HashMap<>() {{
-        put(Units.inchesToMeters(51), 1.0);
+        put(1.29, 1.1);
+        put(1.5, 0.95);
+        put(2.0, 0.85);
+        put(2.5, 0.77);
+        put(2.7, 0.69);
+        put(2.8, 0.68);
+        put(3.0, 0.63);
+        put(3.25, 0.60);
+        put(3.5, 0.54);
+        put(4.0, 0.53);
+        put(4.25, 0.495);
+        put(4.5, 0.48);
     }}; // distance: pitch
 
-    public SpeakerLookupTable(Kinesthetics k, Shooter sh, Swerve sw, DoubleSupplier translationSup, DoubleSupplier strafeSup){
-        super(
+    public SpeakerLookupTable(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup){
+        double rootg = Math.sqrt(Constants.Environment.G);
+        addCommands(
             sw.new ChangeYaw(translationSup, strafeSup, () -> getDifference(k).toTranslation2d().getAngle().getRadians()),
+            // sw.new ChangeYaw(translationSup, strafeSup, () -> {
+            //     var transform = getDifference(k);
+            //     var state = k.getRobotState();
+
+            //     double roottwoh = Math.sqrt(2*transform.getZ()); // Z, up +
+            //     boolean speakerIsOnRight = transform.getX() > 0;
+
+            //     double relativex  = Math.abs(transform.getX()); // left+ right+
+            //     double relativey  = (speakerIsOnRight ? -1 : 1) * transform.getY(); // forward backward
+            //     double relativexv = (speakerIsOnRight ? 1 : -1) * state.getvx(); // speaker relative towards+ away-
+            //     double relativeyv = (speakerIsOnRight ? -1 : 1) * state.getvy(); // speaker relative left- right+
+                
+            //     double n = relativex * rootg / roottwoh - relativexv;
+
+            //     double desiredYaw = -Math.atan(- ((rootg * relativey) / roottwoh + relativeyv) / n); // CCW+, facing speaker = 0
+            //     if (!speakerIsOnRight) desiredYaw += Math.PI; // flip it around
+
+            //     SmartDashboard.putNumber("Kinesthetics yaw", k.getPose().getRotation().getDegrees());
+            //     SmartDashboard.putNumber("Speaker absolute theta", Units.radiansToDegrees(desiredYaw)); // CCW+, 0 = North
+
+            //     latestYaw = desiredYaw;
+            //     return desiredYaw;
+            // }),
+
             sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 450d, 350d), true)
         );
     }
@@ -37,6 +79,8 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
 
     /** @return shooter pitch */
     private static double bestPitch(double distance) {
+        //Lookuptable best fit quadratic equation
+        //return 0.0440779 * distance * distance - 0.434859 * distance + 1.55015;
         double closestMatch = 0;
         double secClosestMatch = 0;
 

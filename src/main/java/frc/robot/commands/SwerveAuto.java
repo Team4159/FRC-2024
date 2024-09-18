@@ -1,10 +1,16 @@
 package frc.robot.commands;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
@@ -26,6 +32,7 @@ public class SwerveAuto extends Command {
     private Kinesthetics kinesthetics;
     private Swerve swerve;
     private Trajectory trajectory;
+    private Supplier<Pose2d> endState;
 
     private final Timer timer = new Timer();
 
@@ -33,6 +40,19 @@ public class SwerveAuto extends Command {
         kinesthetics = k;
         swerve = s;
         trajectory = TrajectoryGenerator.generateTrajectory(kinesthetics.getPose(), new ArrayList<>(), end, new TrajectoryConfig(AutoConfig.kMaxAccelerationMetersPerSecondSquared, AutoConfig.kMaxAccelerationMetersPerSecondSquared));
+        addRequirements(swerve);
+    }
+
+    public SwerveAuto(Kinesthetics k, Swerve s, Supplier<Pose2d> end) {
+        kinesthetics = k;
+        swerve = s;
+        endState = end;
+        //trajectory = TrajectoryGenerator.generateTrajectory(kinesthetics.getPose(), List.of(), end.get(), new TrajectoryConfig(AutoConfig.kMaxAccelerationMetersPerSecondSquared, AutoConfig.kMaxAccelerationMetersPerSecondSquared).setKinematics(Constants.Swerve.swerveKinematics));
+        // trajectory = TrajectoryGenerator.generateTrajectory(new Pose2d(0, 0, new Rotation2d(0)),
+        // // Pass through these two interior waypoints, making an 's' curve path
+        // List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+        // // End 3 meters straight ahead of where we started, facing forward
+        // new Pose2d(3, 0, new Rotation2d(0)), new TrajectoryConfig(AutoConfig.kMaxSpeedMetersPerSecond, AutoConfig.kMaxAccelerationMetersPerSecondSquared).setKinematics(Constants.Swerve.swerveKinematics));
         addRequirements(swerve);
     }
 
@@ -46,11 +66,23 @@ public class SwerveAuto extends Command {
     @Override
     public void initialize() {
         timer.restart();
+        trajectory = TrajectoryGenerator.generateTrajectory(
+            new Pose2d(), 
+            new ArrayList<>(), 
+            new Pose2d(new Translation2d(1, 0), new Rotation2d(0)),
+            new TrajectoryConfig(AutoConfig.kMaxAccelerationMetersPerSecondSquared, AutoConfig.kMaxAccelerationMetersPerSecondSquared).setKinematics(Constants.Swerve.swerveKinematics));
         super.initialize();
     }
 
     @Override
     public void execute() {
+        if(endState != null && timer.get() % 1.0 == 0){
+            // trajectory = TrajectoryGenerator.generateTrajectory(
+            // kinesthetics.getPose(), 
+            // new ArrayList<>(), 
+            // endState.get(),
+            // new TrajectoryConfig(AutoConfig.kMaxAccelerationMetersPerSecondSquared, AutoConfig.kMaxAccelerationMetersPerSecondSquared).setKinematics(Constants.Swerve.swerveKinematics));
+        }
         var state = trajectory.sample(timer.get());
         swerve.setModuleStates(Constants.Swerve.swerveKinematics.toSwerveModuleStates(
             controller.calculate(kinesthetics.getPose(), state, state.poseMeters.getRotation())
