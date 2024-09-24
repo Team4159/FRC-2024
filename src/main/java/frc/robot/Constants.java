@@ -24,7 +24,7 @@ import frc.robot.subsystems.Shooter.ShooterCommand;
 public final class Constants {
     public static final double stickDeadband = 0.15;
 
-    public static final boolean simulation = true;
+    public static final boolean simulation = false;
 
     public static final class Swerve {
         public static final String canBus = "Drivetrain";
