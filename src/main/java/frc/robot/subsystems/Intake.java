@@ -45,9 +45,16 @@ public class Intake extends SubsystemBase {
 
     public class ChangeState extends Command {
         private final Constants.Intake.IntakeState desiredState;
+        private boolean continuous;
+
+        public ChangeState(Constants.Intake.IntakeState ds, boolean cont) {
+            desiredState = ds;
+            continuous = cont;
+            addRequirements(Intake.this);
+        }
 
         public ChangeState(Constants.Intake.IntakeState ds) {
-            desiredState = ds;
+            this(ds, false);
             addRequirements(Intake.this);
         }
 
@@ -66,7 +73,7 @@ public class Intake extends SubsystemBase {
 
         @Override
         public void end(boolean interrupted) {
-            if (interrupted) {
+            if (interrupted && !continuous) {
                 setGoalPitch(Constants.Intake.IntakeState.STOW.pitch);
                 setSpin(Constants.Intake.IntakeState.STOW.spin);
             }

@@ -7,6 +7,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -89,5 +90,12 @@ public class Vision extends SubsystemBase {
 
     public static double getRpiPing() {
         return rpiTable.getEntry("cl").getDouble(-1);
+    }
+
+        /** @param omega degrees / second */
+    public static void setRobotYaw(double theta, double omega) {
+        limelightTable.putValue("robot_orientation_set", NetworkTableValue.makeDoubleArray(new double[]{
+            theta,omega, 0,0, 0,0
+        }));
     }
 }

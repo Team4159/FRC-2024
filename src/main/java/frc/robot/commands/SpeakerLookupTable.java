@@ -5,15 +5,9 @@ import java.util.Map;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import frc.lib.math.RobotState;
 import frc.robot.Constants;
 import frc.robot.subsystems.Kinesthetics;
 import frc.robot.subsystems.Shooter;
@@ -21,7 +15,9 @@ import frc.robot.subsystems.Shooter.ShooterCommand;
 import frc.robot.subsystems.Swerve;
 
 public class SpeakerLookupTable extends ParallelCommandGroup {
-    public Double latestYaw;
+    public Double latestYaw = null;
+
+    /** @see (distance (meters), pitch (radians)) */
     private static final Map<Double, Double> shooterTable = new HashMap<>() {{
         put(1.29, 1.1);
         put(1.5, 0.95);
@@ -31,16 +27,20 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
         put(2.8, 0.68);
         put(3.0, 0.63);
         put(3.25, 0.60);
-        put(3.5, 0.54);
+        put(3.5, 0.56);
         put(4.0, 0.53);
         put(4.25, 0.495);
         put(4.5, 0.48);
+        put(4.6, 0.475);
+        put(4.8, 0.47);
+        put(4.9, 0.465);
+        put(5.0, 0.46);
     }}; // distance: pitch
 
     public SpeakerLookupTable(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup){
         double rootg = Math.sqrt(Constants.Environment.G);
         addCommands(
-            sw.new ChangeYaw(translationSup, strafeSup, () -> getDifference(k).toTranslation2d().getAngle().getRadians()),
+            sw.new ChangeYaw(translationSup, strafeSup, () -> -getDifference(k).toTranslation2d().getAngle().getRadians()),
             // sw.new ChangeYaw(translationSup, strafeSup, () -> {
             //     var transform = getDifference(k);
             //     var state = k.getRobotState();
@@ -89,7 +89,7 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
 
         // Locate closest and second closest match
         for (double key : shooterTable.keySet()) {
-            double accuracy = Math.abs( key - distance );
+            double accuracy = Math.abs(key - distance);
             if(accuracy < closestAccuracy) {
                 secClosestMatch = closestMatch;
                 closestMatch = key;
@@ -104,7 +104,7 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
         return MathUtil.interpolate(
             shooterTable.get(closestMatch),
             shooterTable.get(secClosestMatch),
-            secClosestAccuracy / (secClosestAccuracy + closestAccuracy)
+            closestAccuracy / (secClosestAccuracy + closestAccuracy)
         );
     }
 }

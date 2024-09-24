@@ -16,33 +16,35 @@ import frc.robot.Constants.Intake.IntakeState;
 import frc.robot.Constants.SpinState;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Kinesthetics;
+import frc.robot.subsystems.Neck;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 
 public class IntakeAuto extends SequentialCommandGroup {
-    public IntakeAuto(Kinesthetics k, Swerve sw, Shooter sh, Intake i) {
-        this(k, sw, sh, i, false);
+    public IntakeAuto(Kinesthetics k, Swerve sw, Shooter sh, Neck n, Intake i) {
+        this(k, sw, sh, n, i, false);
     }
 
-    public IntakeAuto(Kinesthetics k, Swerve sw, Shooter sh, Intake i, boolean disableMovement) {
-        if (!disableMovement && Vision.getNoteTranslation() != null) {
-            Translation2d notetrans = Vision.getNoteTranslation().toTranslation2d();
+    public IntakeAuto(Kinesthetics k, Swerve sw, Shooter sh, Neck n, Intake i, boolean disableMovement) {
+        var notetrans3d = Vision.getNoteTranslation();
+        if (!disableMovement && notetrans3d != null) {
+            Translation2d notetrans = notetrans3d.toTranslation2d();
             if (notetrans.getNorm() > Constants.Intake.intakeRange || Math.abs(MathUtil.inputModulus(notetrans.getAngle().getRadians(), -Math.PI/2, Math.PI)) > Constants.Intake.intakeAngleRange) {
-                Rotation2d noteAngle = k.getHeading().plus(notetrans.getAngle());
+                Rotation2d noteAngle = k.getPose().getRotation().plus(notetrans.getAngle());
                 addCommands(new SwerveAuto(k, sw, new RobotState(new Translation2d(notetrans.getNorm()-Constants.Swerve.trackWidth/2, noteAngle), noteAngle, new Vector<N3>(Nat.N3()))));
             }
         }
         addCommands(
-            sh.toPitch(Constants.Shooter.minimumPitch),
+            sh.stopShooter(), // return to initial angle
             new ParallelDeadlineGroup(
                 new WaitUntilCommand(k::shooterHasNote),
-                sh.new ChangeNeck(SpinState.FW),
+                n.new ChangeNeck(SpinState.FW),
                 i.new ChangeState(IntakeState.DOWN)
             ),
-            sh.new ChangeNeck(SpinState.BW, true),
+            n.new ChangeNeck(SpinState.BW, true),
             new WaitCommand(0.02),
-            sh.new ChangeNeck(SpinState.ST)
+            n.new ChangeNeck(SpinState.ST)
         );
     }
 

@@ -1,0 +1,86 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.6924444618120005,
+      "y": 6.689056341075646
+    },
+    "rotation": -117.21611155730747
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeStatic"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "speakerSubwoofer"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Side to 4 Static Intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4 to Amp Score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shooterIntaking"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "speakerLookupTable"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Amp Score to 5 Static Intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "5 to Amp Score"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shooterIntaking"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "speakerLookupTable"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Testing",
+  "choreoAuto": false
+}

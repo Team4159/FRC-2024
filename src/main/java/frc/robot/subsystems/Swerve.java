@@ -20,16 +20,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.SwerveModule;
-import frc.robot.commands.SpeakerAutoAim;
+import frc.robot.commands.SpeakerLookupTable;
 
 public class Swerve extends SubsystemBase {
     private Kinesthetics kinesthetics;
 
     private final SwerveModule[] mSwerveMods = new SwerveModule[] {
-        new SwerveModule(0, Constants.Swerve.Mod0.constants),
-        new SwerveModule(1, Constants.Swerve.Mod1.constants),
-        new SwerveModule(2, Constants.Swerve.Mod2.constants),
-        new SwerveModule(3, Constants.Swerve.Mod3.constants)
+        new SwerveModule(0, Constants.Swerve.Mod0.constants, Constants.simulation),
+        new SwerveModule(1, Constants.Swerve.Mod1.constants, Constants.simulation),
+        new SwerveModule(2, Constants.Swerve.Mod2.constants, Constants.simulation),
+        new SwerveModule(3, Constants.Swerve.Mod3.constants, Constants.simulation)
     };
 
     private Rotation2d driverAngleOffset = new Rotation2d(0);
@@ -41,18 +41,20 @@ public class Swerve extends SubsystemBase {
             this.kinesthetics::getPose, // a supplier for the robot pose
             this.kinesthetics::setPose, // a consumer for the robot pose, accepts Pose2d
             () -> Constants.Swerve.swerveKinematics.toChassisSpeeds(this.getModuleStates()), // a supplier for robot relative ChassisSpeeds
-            (ChassisSpeeds chassisSpeeds) -> { // the drive method, accepts robot relative ChassisSpeeds
-                SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(chassisSpeeds);
+            (ChassisSpeeds chassisSpeeds) -> { // the drive method, accepts ROBOT relative ChassisSpeeds
+                // why reversed? no clue but it works
+                ChassisSpeeds reversedChassisSpeeds = new ChassisSpeeds(-chassisSpeeds.vxMetersPerSecond, -chassisSpeeds.vyMetersPerSecond, -chassisSpeeds.omegaRadiansPerSecond);
+                SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(reversedChassisSpeeds);
                 SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
-                for(SwerveModule mod : mSwerveMods) mod.setDesiredState(swerveModuleStates[mod.moduleNumber], false);
+                for(SwerveModule mod : mSwerveMods) mod.setDesiredState(swerveModuleStates[mod.moduleNumber], true);
             }, 
-            Constants.Swerve.AutoConfig.pathFollower, // config, includes PID values
+            Constants.Swerve.AutoConfig.autoPathFollowerConfig, // config, includes PID values
             () -> DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue).equals(DriverStation.Alliance.Red), // determines if autos should be flipped (i.e. if on Red Alliance)
             this // reference to this subsystem to set requirements
         );
         PPHolonomicDriveController.setRotationTargetOverride(() -> {
             var cmd = this.getCurrentCommand();
-            if (cmd == null || !(cmd instanceof SpeakerAutoAim a) || a.latestYaw == null) return Optional.empty();
+            if (cmd == null || !(cmd instanceof SpeakerLookupTable a) || a.latestYaw == null) return Optional.empty();
             return Optional.of(Rotation2d.fromRadians(a.latestYaw));
         });
         
@@ -104,7 +106,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public void setAngleOffset() {
-        driverAngleOffset = Rotation2d.fromRadians(-kinesthetics.getHeading().getRadians());
+        driverAngleOffset = Rotation2d.fromRadians(-kinesthetics.getRelativeHeading().getRadians());
     }
 
     @Override
@@ -136,7 +138,7 @@ public class Swerve extends SubsystemBase {
         public void execute() {
             drive(
                 new Translation2d(passthroughTranslation.getAsDouble(), passthroughStrafe.getAsDouble()).times(Constants.Swerve.maxSpeed),
-                Constants.CommandConstants.swerveYawPID.calculate(MathUtil.angleModulus(kinesthetics.getPose().getRotation().getRadians()), MathUtil.angleModulus(desiredYaw.getAsDouble())), true, false
+                Constants.CommandConstants.swerveYawPID.calculate(MathUtil.angleModulus(-kinesthetics.getPose().getRotation().getRadians()), MathUtil.angleModulus(desiredYaw.getAsDouble())), true, false
             );
         }
 
@@ -150,7 +152,7 @@ public class Swerve extends SubsystemBase {
 
         @Override
         public boolean isFinished() {
-            return MathUtil.isNear(desiredYaw.getAsDouble(), kinesthetics.getHeading().getRadians(), Constants.Swerve.yawTolerance);
+            return MathUtil.isNear(desiredYaw.getAsDouble(), kinesthetics.getPose().getRotation().getRadians(), Constants.Swerve.yawTolerance);
         }
     }
 }
