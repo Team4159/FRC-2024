@@ -1,12 +1,12 @@
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import choreo.Choreo;
+import choreo.auto.AutoFactory;
+import choreo.auto.AutoFactory.ChoreoAutoBindings;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -16,13 +16,9 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Intake.IntakeState;
-import frc.robot.auto.IntakeStatic;
-import frc.robot.auto.ShooterIntaking;
 import frc.robot.Constants.SpinState;
-import frc.robot.Constants.Swerve.AutoConfig;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.Shooter.ShooterCommand;
 
 public class RobotContainer {
     /* Controllers */
@@ -63,7 +59,21 @@ public class RobotContainer {
     @SuppressWarnings("unused")
     private final Vision s_Vision = new Vision(kinesthetics);
 
-    private final SendableChooser<Command> autoChooser;
+
+    private final SendableChooser<String> autoChooser;
+
+    private AutoFactory factory = Choreo.createAutoFactory(
+        s_Swerve,
+        kinesthetics::getPose,
+        Constants.Swerve.AutoConfig.choreoController,
+        (ChassisSpeeds speeds) -> { // needs to be robot-relative
+            ChassisSpeeds reversedChassisSpeeds = new ChassisSpeeds(-speeds.vxMetersPerSecond, -speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
+            SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(reversedChassisSpeeds);
+            s_Swerve.setModuleStates(swerveModuleStates, false);
+        },
+        ()->{var ally = DriverStation.getAlliance(); return ally.isPresent() && ally.get().equals(Alliance.Red);},
+        new ChoreoAutoBindings() // not useful until event markers
+    );
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
@@ -77,53 +87,19 @@ public class RobotContainer {
             )
         );
 
-        configureAutoCommands();
-
         // Configure the button bindings
         configureButtonBindings();
 
-        autoChooser = AutoBuilder.buildAutoChooser();
+        autoChooser = getCommandChooser();
         SmartDashboard.putData("Autonomous Routine", autoChooser);
     }
 
-    // register PathPlanner Commands, must be done before building autos (AutoBuilder.buildAutoChooser)
-    private void configureAutoCommands() {
-        NamedCommands.registerCommand("intakeStatic",
-            new IntakeStatic(kinesthetics, s_Intake).withTimeout(0.5)
-        );
-        NamedCommands.registerCommand("shooterSpinUp", 
-            s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 450d, 325d), false, true)
-        );
-        NamedCommands.registerCommand("shooterIntaking", new ParallelRaceGroup(
-            new ShooterIntaking(kinesthetics, s_Shooter, s_Neck), 
-            new WaitCommand(5)
-        ));
-        NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
-            new ParallelCommandGroup(
-                s_Neck.new ChangeNeck(SpinState.ST),
-                s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerSubwooferShooterCommand, true)
-                    .withTimeout(1)
-            ),
-            s_Neck.new ChangeNeck(kinesthetics, SpinState.FW).raceWith(new WaitCommand(4)),
-            s_Shooter.stopShooter()
-        ));
-        NamedCommands.registerCommand("speakerPodium", new SequentialCommandGroup(
-            s_Neck.new ChangeNeck(SpinState.ST),
-            s_Shooter.new ChangeState(() -> Constants.CommandConstants.speakerPodiumShooterCommand, true)
-                .withTimeout(1.25),
-            s_Neck.new ChangeNeck(kinesthetics, SpinState.FW).raceWith(new WaitCommand(4)),
-            s_Shooter.stopShooter()
-        ));
-        NamedCommands.registerCommand("speakerLookupTable", new SequentialCommandGroup(
-            s_Neck.new ChangeNeck(SpinState.ST),
-            new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0)
-                .withTimeout(2), //SpeakerLookupTable does not end without a timeout
-            s_Neck.new ChangeNeck(kinesthetics, SpinState.FW).raceWith(new WaitCommand(4)),
-            s_Shooter.stopShooter()
-        ));
-        NamedCommands.registerCommand("ampAuto", new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Deflector));
-        NamedCommands.registerCommand("speakerAutoAim", new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0));
-        NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake));
+    private SendableChooser<String> getCommandChooser(){
+        SendableChooser<String> chooser = new SendableChooser<>();
+        for(String name : AutoPaths.autoMap.keySet()){
+            chooser.addOption(name, name);
+        }
+        return chooser;
     }
 
     /**
@@ -245,10 +221,6 @@ public class RobotContainer {
         );
     }
     public Command getAutonomousCommand() {
-        //return autoChooser.getSelected();
-        return new SequentialCommandGroup(
-            new InstantCommand(() -> kinesthetics.setPose(new Pose2d(new Translation2d(4, 4), new Rotation2d(0)))),
-            new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0));
-        //return s_Swerve.new ChangeYaw(() -> 0, () -> 0, () -> Math.PI);
+        return AutoPaths.autoMap.get(autoChooser.getSelected()).getCommand(factory, kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake);
     }
 }

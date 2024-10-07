@@ -13,13 +13,15 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.lib.math.Conversions;
 import frc.lib.util.SwerveModuleConstants;
 
 public class SwerveModule {
     public int moduleNumber;
+    private double angleSimPosition = 0;
     private Rotation2d angleOffset;
 
     private TalonFX mAngleMotor;
@@ -35,10 +37,14 @@ public class SwerveModule {
 
     private TalonFXSimState driveSimState;
 
+    private final FlywheelSim driveSim = new FlywheelSim(DCMotor.getKrakenX60(1), Constants.Swerve.driveGearRatio, 0.025);
+
     /* angle motor control requests */
     private final PositionVoltage anglePosition = new PositionVoltage(0);
 
     private TalonFXSimState angleSimState;
+
+    private FlywheelSim angleSim = new FlywheelSim(DCMotor.getKrakenX60(1), Constants.Swerve.angleGearRatio, 0.004);
 
     private boolean simulation;
 
@@ -49,11 +55,7 @@ public class SwerveModule {
     new DCMotorSim(DCMotor.getKrakenX60Foc(1), Constants.Swerve.angleGearRatio, 0.001);
 
     public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants){
-        this(moduleNumber, moduleConstants, false);
-    }
-
-    public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants, boolean s){
-        simulation = s;
+        simulation = RobotBase.isSimulation();
         this.moduleNumber = moduleNumber;
         this.angleOffset = moduleConstants.angleOffset;
         
@@ -110,6 +112,14 @@ public class SwerveModule {
 
     public SwerveModuleState getState(){
         if(simulation){
+            double updateTime = 0.020;
+            driveSim.update(updateTime);
+            angleSim.update(updateTime);
+            driveSim.setInputVoltage(mDriveMotor.getMotorVoltage().getValueAsDouble());
+            angleSim.setInputVoltage(mAngleMotor.getMotorVoltage().getValueAsDouble());
+            angleSimPosition = angleSim.getAngularVelocityRPM()*updateTime/60;
+
+
             var dMotorVoltage = driveSimState.getMotorVoltage();
 
             // use the motor voltage to calculate new position and velocity
@@ -144,8 +154,8 @@ public class SwerveModule {
             );
         }
         return new SwerveModuleState(
-            Conversions.RPSToMPS(mDriveMotor.getVelocity().getValue(), Constants.Swerve.wheelCircumference), 
-            Rotation2d.fromRotations(mAngleMotor.getPosition().getValue())
+            Conversions.RPSToMPS(driveSim.getAngularVelocityRPM()/60, Constants.Swerve.wheelCircumference), 
+            Rotation2d.fromRotations(angleSimPosition)
         );
     }
 

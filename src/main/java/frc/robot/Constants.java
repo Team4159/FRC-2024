@@ -5,14 +5,13 @@ import java.util.Map;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.PIDConstants;
-import com.pathplanner.lib.util.ReplanningConfig;
-
+import choreo.Choreo.ControlFunction;
+import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -23,8 +22,6 @@ import frc.robot.subsystems.Shooter.ShooterCommand;
 
 public final class Constants {
     public static final double stickDeadband = 0.15;
-
-    public static final boolean simulation = false;
 
     public static final class Swerve {
         public static final String canBus = "Drivetrain";
@@ -101,12 +98,6 @@ public final class Constants {
             public static final double kMaxAccelerationMetersPerSecondSquared = 4;
             public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
             public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
-
-            public static PathConstraints pathConstraints = new PathConstraints(
-                kMaxSpeedMetersPerSecond,
-                kMaxAccelerationMetersPerSecondSquared,
-                kMaxAngularSpeedRadiansPerSecond,
-                kMaxAngularSpeedRadiansPerSecondSquared);
         
             public static final double kPXController = 1;
             public static final double kPYController = 1;
@@ -117,14 +108,23 @@ public final class Constants {
                 new TrapezoidProfile.Constraints(
                     kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
 
-            // used by PathPlanner during setup
-            public static final HolonomicPathFollowerConfig autoPathFollowerConfig = new HolonomicPathFollowerConfig(
-                new PIDConstants(2.5, 0, 0), // translation PID constants
-                new PIDConstants(1, 0, 0), // rotation PID constants
-                Constants.Swerve.AutoConfig.kMaxSpeedMetersPerSecond, 
-                wheelBase / Math.sqrt(2), // drive base radius in m
-                new ReplanningConfig(true, true)
-            );
+            //Choreo PID controllers
+            public static final PIDController xController = new PIDController(5, 0, 0);
+            public static final PIDController yController = new PIDController(5, 0, 0);
+            public static final PIDController thetaController = new PIDController(5, 0, 0){{
+                enableContinuousInput(-Math.PI, Math.PI);
+            }};
+
+            public static ControlFunction<SwerveSample> choreoController = 
+                (curPose, sample)-> {
+                    //return new ChassisSpeeds(sample.vx, sample.vy, sample.omega);
+                    double xFeedback = xController.calculate(curPose.getX(), sample.x);
+                    double yFeedback = yController.calculate(curPose.getY(), sample.y);
+                    double omegaFeedback = thetaController.calculate(
+                        MathUtil.angleModulus(-curPose.getRotation().getRadians()),
+                        MathUtil.angleModulus(sample.heading));
+                    return ChassisSpeeds.fromFieldRelativeSpeeds(sample.vx + xFeedback, sample.vy + yFeedback, sample.omega + omegaFeedback, curPose.getRotation());
+                };
         }
 
         /* Neutral Modes */

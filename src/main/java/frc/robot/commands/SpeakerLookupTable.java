@@ -39,6 +39,7 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
 
     public SpeakerLookupTable(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup){
         double rootg = Math.sqrt(Constants.Environment.G);
+        System.out.println("lookuptable");
         addCommands(
             sw.new ChangeYaw(translationSup, strafeSup, () -> -getDifference(k).toTranslation2d().getAngle().getRadians()),
             // sw.new ChangeYaw(translationSup, strafeSup, () -> {
@@ -65,6 +66,13 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
             //     return desiredYaw;
             // }),
 
+            sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 450d, 350d), true)
+        );
+    }
+    public SpeakerLookupTable(Kinesthetics k, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup){
+        double rootg = Math.sqrt(Constants.Environment.G);
+        System.out.println("lookuptable");
+        addCommands(
             sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 450d, 350d), true)
         );
     }
