@@ -10,7 +10,6 @@ import frc.robot.subsystems.Kinesthetics;
 // this exists because IntakeAuto might require Swerve, which could mess up ParallelCommandGroups during auto paths
 public class IntakeStatic extends SequentialCommandGroup {
     public IntakeStatic(Kinesthetics k, Intake i) {
-        System.out.println("intakeStatic");
         addCommands(
             new ParallelDeadlineGroup(
                 new WaitUntilCommand(k::shooterHasNote), // deadline
