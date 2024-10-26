@@ -25,31 +25,40 @@ import frc.robot.subsystems.*;
 import frc.robot.subsystems.Shooter.ShooterCommand;
 
 public class RobotContainer {
-    /* Controllers */
-    private static final Joystick driver = new Joystick(0);
-    private static final Joystick secondary = new Joystick(1);
-
-    /* Driver Buttons */
-    private static final JoystickButton lookupTableShoot = new JoystickButton(driver, 5);
-    private static final JoystickButton resetGyro = new JoystickButton(driver, 4);
-    private static final JoystickButton forceVision = new JoystickButton(driver, 9);
-
-    private static final JoystickButton manualAmp = new JoystickButton(secondary, 3);
-    private static final JoystickButton manualShootSubwoofer = new JoystickButton(secondary, 4);
-    private static final JoystickButton manualShootPodium = new JoystickButton(secondary, 5);
-    private static final JoystickButton manualShootSourceIn = new JoystickButton(secondary, 6);
-    private static final JoystickButton manualIntakeUp = new JoystickButton(secondary, 7);
-    private static final JoystickButton manualIntakeDown = new JoystickButton(secondary, 2);
-    private static final JoystickButton manualOuttakeUp = new JoystickButton(secondary, 11);
-    private static final JoystickButton manualOuttakeDown = new JoystickButton(secondary, 10);
-    private static final JoystickButton manualClimberUp = new JoystickButton(secondary, 8);
-    private static final JoystickButton manualClimberDown = new JoystickButton(secondary, 9);
-    private static final Trigger manualFeed = new JoystickButton(driver, 1)
-                                          .or(new JoystickButton(secondary, 1));
-
-    //private static final JoystickButton autoAmp = new JoystickButton(driver, 4);
-    //private static final JoystickButton autoSpk = new JoystickButton(driver, 3);
-    private static final JoystickButton autoIntake = new JoystickButton(driver, 2);
+        /* Controllers */
+        private static final Joystick driver = new Joystick(0);
+        private static final Joystick secondary = new Joystick(1);
+        private static final XboxController backupController = new XboxController(2);
+    
+        /* Driver Buttons */
+        private static final JoystickButton lookupTableShoot = new JoystickButton(driver, 2);
+        private static final Trigger manualIntakeDown = new JoystickButton(driver, 3)
+                                                    .or(new JoystickButton(secondary, 2))
+                                                    .or(new JoystickButton(backupController, 6));
+        private static final JoystickButton forceVision = new JoystickButton(driver, 9);
+        private static final JoystickButton resetGyro = new JoystickButton(driver, 4);
+    
+        private static final Trigger manualAmp = new JoystickButton(secondary, 3)
+                                                    .or(new JoystickButton(backupController, 2));
+        private static final JoystickButton manualShootSubwoofer = new JoystickButton(secondary, 4);
+        private static final Trigger manualShootPodium = new JoystickButton(secondary, 5)
+                                                     .or(new JoystickButton(backupController, 1));
+        private static final JoystickButton manualShootSourceIn = new JoystickButton(secondary, 6);
+        private static final JoystickButton manualIntakeUp = new JoystickButton(secondary, 7);
+        //private static final JoystickButton manualIntakeDown = new JoystickButton(secondary, 2);
+        private static final JoystickButton manualOuttakeUp = new JoystickButton(secondary, 11);
+        private static final JoystickButton manualOuttakeDown = new JoystickButton(secondary, 10);
+        private static final Trigger manualClimberUp = new JoystickButton(secondary, 8)
+                                                   .or(new JoystickButton(backupController, 4));
+        private static final Trigger manualClimberDown = new JoystickButton(secondary, 9)
+                                                     .or(new JoystickButton(backupController, 3));
+        private static final Trigger manualFeed = new JoystickButton(driver, 1)
+                                              .or(new JoystickButton(secondary, 1))
+                                              .or(new JoystickButton(backupController, 5));
+    
+        //private static final JoystickButton autoAmp = new JoystickButton(driver, 4);
+        //private static final JoystickButton autoSpk = new JoystickButton(driver, 3);
+        private static final JoystickButton autoIntake = new JoystickButton(driver, 2);
     
     /* Subsystems */
     private final Swerve s_Swerve = new Swerve();
@@ -95,7 +104,7 @@ public class RobotContainer {
             s_Shooter.new ChangeState(() -> new ShooterCommand(Constants.Shooter.minimumPitch, 450d, 325d), false, true)
         );
         NamedCommands.registerCommand("shooterIntaking", new ParallelRaceGroup(
-            new ShooterIntaking(kinesthetics, s_Shooter, s_Neck), 
+            new ShooterIntaking(kinesthetics, s_Shooter, s_Neck, s_Intake), 
             new WaitCommand(5)
         ));
         NamedCommands.registerCommand("speakerSubwoofer", new SequentialCommandGroup(
@@ -116,15 +125,15 @@ public class RobotContainer {
         ));
         NamedCommands.registerCommand("speakerLookupTable", new SequentialCommandGroup(
             s_Neck.new ChangeNeck(SpinState.ST),
-            new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0)
+            new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, s_Neck, () -> 0, () -> 0)
                 .withTimeout(2), //SpeakerLookupTable does not end without a timeout
             s_Neck.new ChangeNeck(kinesthetics, SpinState.FW).raceWith(new WaitCommand(4)),
             s_Shooter.stopShooter()
         ));
         NamedCommands.registerCommand("ampAuto", new AmpAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Deflector));
         NamedCommands.registerCommand("speakerAutoAim", new SpeakerAutoAim(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0));
-        NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake));
-    }
+        //NamedCommands.registerCommand("intakeAuto", new IntakeAuto(kinesthetics, s_Shooter, s_Neck, s_Intake));
+    }   
 
     /**
      * Use this method to define your button->command mappings. Buttons can be created by
@@ -185,7 +194,7 @@ public class RobotContainer {
             ));
         lookupTableShoot 
             .onTrue(s_Neck.new ChangeNeck(SpinState.ST))
-            .whileTrue(new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0))
+            .whileTrue(new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, s_Neck, () -> 0, () -> 0))
             .onFalse(new SequentialCommandGroup(
                 s_Neck.new ChangeNeck(SpinState.ST),
                 s_Shooter.stopShooter()
@@ -245,10 +254,6 @@ public class RobotContainer {
         );
     }
     public Command getAutonomousCommand() {
-        //return autoChooser.getSelected();
-        return new SequentialCommandGroup(
-            new InstantCommand(() -> kinesthetics.setPose(new Pose2d(new Translation2d(4, 4), new Rotation2d(0)))),
-            new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0));
-        //return s_Swerve.new ChangeYaw(() -> 0, () -> 0, () -> Math.PI);
+        return autoChooser.getSelected();
     }
 }

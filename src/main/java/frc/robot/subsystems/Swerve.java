@@ -26,10 +26,10 @@ public class Swerve extends SubsystemBase {
     private Kinesthetics kinesthetics;
 
     private final SwerveModule[] mSwerveMods = new SwerveModule[] {
-        new SwerveModule(0, Constants.Swerve.Mod0.constants, Constants.simulation),
-        new SwerveModule(1, Constants.Swerve.Mod1.constants, Constants.simulation),
-        new SwerveModule(2, Constants.Swerve.Mod2.constants, Constants.simulation),
-        new SwerveModule(3, Constants.Swerve.Mod3.constants, Constants.simulation)
+        new SwerveModule(0, Constants.Swerve.Mod0.constants),
+        new SwerveModule(1, Constants.Swerve.Mod1.constants),
+        new SwerveModule(2, Constants.Swerve.Mod2.constants),
+        new SwerveModule(3, Constants.Swerve.Mod3.constants)
     };
 
     private Rotation2d driverAngleOffset = new Rotation2d(0);

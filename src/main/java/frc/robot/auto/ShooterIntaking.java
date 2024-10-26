@@ -5,18 +5,22 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants.SpinState;
+import frc.robot.Constants.Intake.IntakeState;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Kinesthetics;
 import frc.robot.subsystems.Neck;
 import frc.robot.subsystems.Shooter;
 
 public class ShooterIntaking extends SequentialCommandGroup {
-    public ShooterIntaking(Kinesthetics k, Shooter sh, Neck n) {
+    public ShooterIntaking(Kinesthetics k, Shooter sh, Neck n, Intake i) {
         addCommands(
             sh.stopShooter(),
             new ParallelDeadlineGroup(
                 new WaitUntilCommand(k::shooterHasNote), //deadline
+                i.new ChangeState(IntakeState.DOWN),
                 n.new ChangeNeck(SpinState.FW)
             ),
+            i.new ChangeState(IntakeState.STOW),
             n.new ChangeNeck(SpinState.BW, true),
             new WaitCommand(0.01),
             n.new ChangeNeck(SpinState.ST)

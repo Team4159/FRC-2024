@@ -7,9 +7,16 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
+import frc.robot.Constants.SpinState;
 import frc.robot.subsystems.Kinesthetics;
+import frc.robot.subsystems.Neck;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShooterCommand;
 import frc.robot.subsystems.Swerve;
@@ -37,7 +44,10 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
         put(5.0, 0.46);
     }}; // distance: pitch
 
-    public SpeakerLookupTable(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup){
+    public SpeakerLookupTable(Kinesthetics k, Swerve sw, Shooter sh, Neck n, DoubleSupplier translationSup, DoubleSupplier strafeSup){
+        this(k, sw, sh, n, translationSup, strafeSup, false);
+    }
+    public SpeakerLookupTable(Kinesthetics k, Swerve sw, Shooter sh, Neck n, DoubleSupplier translationSup, DoubleSupplier strafeSup, boolean continuous){
         double rootg = Math.sqrt(Constants.Environment.G);
         addCommands(
             sw.new ChangeYaw(translationSup, strafeSup, () -> -getDifference(k).toTranslation2d().getAngle().getRadians()),
@@ -64,8 +74,13 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
             //     latestYaw = desiredYaw;
             //     return desiredYaw;
             // }),
-
-            sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 450d, 350d), true)
+            new SequentialCommandGroup(
+                sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 350d, 250d), continuous),
+                new PrintCommand("lookuptable done"),
+                n.new ChangeNeck(SpinState.FW),
+                new WaitUntilCommand(() -> !k.shooterHasNote()),
+                new ParallelCommandGroup(sh. new ChangeState(Constants.Shooter.idleCommand), n.new ChangeNeck(SpinState.ST), new InstantCommand(() -> sw.stop()))
+            )
         );
     }
 

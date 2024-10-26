@@ -15,6 +15,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -66,6 +67,16 @@ public class Kinesthetics extends SubsystemBase {
         ShuffleboardTab table = Shuffleboard.getTab("Kinesthetics");
 
         table.addBoolean("Shooter Note?", this::shooterHasNote);
+
+        //ChoreoTrajectory traj = Choreo.getTrajectory("Test_Traj");
+
+        // field.getObject("traj").setPoses(
+        //     traj.getInitialPose(), traj.getFinalPose()
+        // );
+        // field.getObject("trajPoses").setPoses(
+        //     traj.getPoses()
+        // );
+
         table.add("Pose Estimation", field);
     }
 
@@ -74,7 +85,7 @@ public class Kinesthetics extends SubsystemBase {
     @Override
     public void periodic() {
         //SmartDashboard.putNumber("dist from speaker", getDifference().toTranslation2d().getNorm());
-        if(Constants.simulation){
+        if(RobotBase.isSimulation()){
             currentTime = Timer.getFPGATimestamp();
             double dts = currentTime - prevTime;
             prevTime = currentTime;
@@ -84,7 +95,7 @@ public class Kinesthetics extends SubsystemBase {
             // the pose estimator figures out the X/Y part but it depends on the gyro.
             // since omega is the same in both coordinate schemes, just use that.
             double oldAngleDeg = gyroSim.getAngle();
-            double dThetaDeg = -1.0 * new Rotation2d(speeds.omegaRadiansPerSecond * dts).getDegrees();
+            double dThetaDeg = 1.0 * new Rotation2d(speeds.omegaRadiansPerSecond * dts).getDegrees();
             double newAngleDeg = oldAngleDeg + dThetaDeg;
             // note that the "angle" in a gyro is NED, but everything else (e.g robot pose)
             // is NWU, so invert here.

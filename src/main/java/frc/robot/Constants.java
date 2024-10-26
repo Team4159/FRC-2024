@@ -24,7 +24,7 @@ import frc.robot.subsystems.Shooter.ShooterCommand;
 public final class Constants {
     public static final double stickDeadband = 0.15;
 
-    public static final boolean simulation = false;
+    public static final boolean simulation = true;
 
     public static final class Swerve {
         public static final String canBus = "Drivetrain";
@@ -183,7 +183,7 @@ public final class Constants {
         public static final int feederMotorID = 3;
 
         public static final double pitchTolerance = Math.PI/32; // radians
-        public static final double spinTolerance = Math.PI; // radians
+        public static final double spinTolerance = 2*Math.PI; // radians
 
         public static final double intakeSpin = 0.7; // -1 to 1
         public static final double feederSpin = 0.45; // -1 to 1
@@ -191,11 +191,17 @@ public final class Constants {
         public static final double intakeRange = 0.2; // meters
         public static final double intakeAngleRange = Units.degreesToRadians(64);
 
+        public static final PIDController intakePID = new PIDController(0.19, 0.0001, 0){{
+            enableContinuousInput(-Math.PI, Math.PI);
+        }};
+        public static final double intakeFF = 0.02;
+        public static final double intakeFFOffset = 0.340;
+
         public static enum IntakeState {
-            STOW(Units.rotationsToRadians(0.007), SpinState.ST), // starting pos & when moving
-            GARGLE(Units.rotationsToRadians(0.007), SpinState.FW), // just move the motors
+            STOW(Units.rotationsToRadians(0.05), SpinState.ST), // starting pos & when moving
+            GARGLE(Units.rotationsToRadians(0.05), SpinState.FW), // just move the motors
             DOWN(Units.rotationsToRadians(0.400), SpinState.FW), // intaking
-            RETCH(Units.rotationsToRadians(0.007), SpinState.BW), // just move the motors
+            RETCH(Units.rotationsToRadians(0.05), SpinState.BW), // just move the motors
             SPIT(Units.rotationsToRadians(0.400), SpinState.BW); // outtaking
 
             public final double pitch;
@@ -221,20 +227,20 @@ public final class Constants {
         public static final int beamBreakID = 0; // PWM
 
         public static final double pitchTolerance = Math.PI/64;
-        public static final double spinTolerance = Math.PI/8;
+        public static final double spinTolerance = 10;
 
         public static double pitchOffset = Units.degreesToRotations(-3);
         public static final double minimumPitch = Units.degreesToRadians(14);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
         public static final double neckSpeed = 0.60; // -1 to 1
-        public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 0d);//spin 150d
+        public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 150d);//spin 150d
         
         /** @param shooterSpinFF kS radians / second, kV radians / second per meter / second */
         public static final SimpleMotorFeedforward shooterSpinFF = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);
         
         // TODO: This must be tuned to specific robot
-        public static final PIDController shooterPID = new PIDController(0.75, 0.0003, 0.02);
-        public static final double kG = 0.016;
+        public static final PIDController shooterPID = new PIDController(0.75, 0.00035, 0.02);//ki 0.0003
+        public static final double kG = 0.017;//0.016
     }
 
     public static final class Deflector {

@@ -15,6 +15,7 @@ import frc.robot.Constants.SpinState;
 
 public class Intake extends SubsystemBase {
     private CANSparkBase angleMotorController, intakeMotorController, feederMotorController;
+    private double goalPitch;
 
     public Intake() {
         angleMotorController = new CANSparkFlex(Constants.Intake.angleMotorID, MotorType.kBrushless);
@@ -22,6 +23,11 @@ public class Intake extends SubsystemBase {
         intakeMotorController.setInverted(true);
         feederMotorController = new CANSparkMax(Constants.Intake.feederMotorID, MotorType.kBrushless);
     }
+    @Override
+    public void periodic(){
+        double ff = Constants.Intake.intakeFF * Math.cos(getPitch()-Units.rotationsToRadians(Constants.Intake.intakeFFOffset));
+        angleMotorController.set(Constants.Intake.intakePID.calculate(MathUtil.angleModulus(getPitch()), goalPitch) - ff);
+;    }
 
     /** @return radians */
     private double getPitch() {
@@ -30,7 +36,8 @@ public class Intake extends SubsystemBase {
     
     /** @param goalPitch radians */
     private void setGoalPitch(double goalPitch) {
-        angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch), CANSparkBase.ControlType.kSmartMotion);
+        //angleMotorController.getPIDController().setReference(Units.radiansToRotations(goalPitch), CANSparkBase.ControlType.kSmartMotion);
+        this.goalPitch = MathUtil.angleModulus(goalPitch);
     }
 
     /** @return radians / second */

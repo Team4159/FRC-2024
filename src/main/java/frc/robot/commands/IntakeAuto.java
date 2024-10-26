@@ -47,6 +47,19 @@ public class IntakeAuto extends SequentialCommandGroup {
             n.new ChangeNeck(SpinState.ST)
         );
     }
+    public IntakeAuto(Kinesthetics k, Shooter sh, Neck n, Intake i) {
+        addCommands(
+            sh.stopShooter(), // return to initial angle
+            new ParallelDeadlineGroup(
+                new WaitUntilCommand(k::shooterHasNote),
+                n.new ChangeNeck(SpinState.FW),
+                i.new ChangeState(IntakeState.DOWN)
+            ),
+            n.new ChangeNeck(SpinState.BW, true),
+            new WaitCommand(0.02),
+            n.new ChangeNeck(SpinState.ST)
+        );
+    }
 
     public static boolean canRun(Kinesthetics k) { // is there a note in view and does it seem close enough to grab
         var notetrans = Vision.getNoteTranslation();
