@@ -7,9 +7,17 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.Constants;
+import frc.robot.Constants.SpinState;
 import frc.robot.subsystems.Kinesthetics;
+import frc.robot.subsystems.Neck;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Shooter.ShooterCommand;
 import frc.robot.subsystems.Swerve;
@@ -37,7 +45,10 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
         put(5.0, 0.46);
     }}; // distance: pitch
 
-    public SpeakerLookupTable(Kinesthetics k, Swerve sw, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup){
+    public SpeakerLookupTable(Kinesthetics k, Swerve sw, Shooter sh, Neck n,DoubleSupplier translationSup, DoubleSupplier strafeSup){
+        this(k, sw, sh, n, translationSup, strafeSup, false);
+    }
+    public SpeakerLookupTable(Kinesthetics k, Swerve sw, Shooter sh, Neck n, DoubleSupplier translationSup, DoubleSupplier strafeSup, boolean continuous){
         double rootg = Math.sqrt(Constants.Environment.G);
         addCommands(
             sw.new ChangeYaw(translationSup, strafeSup, () -> -getDifference(k).toTranslation2d().getAngle().getRadians()),
@@ -64,14 +75,47 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
             //     latestYaw = desiredYaw;
             //     return desiredYaw;
             // }),
-
-            sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 450d, 350d), true)
+            new SequentialCommandGroup(
+                sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 350d, 250d), continuous),
+                n.new ChangeNeck(SpinState.FW),
+                new WaitUntilCommand(() -> !k.shooterHasNote()),
+                new ParallelCommandGroup(sh. new ChangeState(Constants.Shooter.idleCommand), n.new ChangeNeck(SpinState.ST))
+            )
         );
     }
-    public SpeakerLookupTable(Kinesthetics k, Shooter sh, DoubleSupplier translationSup, DoubleSupplier strafeSup){
+
+    //Timeout used for auto
+    public SpeakerLookupTable(Kinesthetics k, Swerve sw, Shooter sh, Neck n, DoubleSupplier translationSup, DoubleSupplier strafeSup, double timeout){
         double rootg = Math.sqrt(Constants.Environment.G);
         addCommands(
-            sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 450d, 350d), true)
+            sw.new ChangeYaw(translationSup, strafeSup, () -> -getDifference(k).toTranslation2d().getAngle().getRadians()).withTimeout(timeout),
+            // sw.new ChangeYaw(translationSup, strafeSup, () -> {
+            //     var transform = getDifference(k);
+            //     var state = k.getRobotState();
+
+            //     double roottwoh = Math.sqrt(2*transform.getZ()); // Z, up +
+            //     boolean speakerIsOnRight = transform.getX() > 0;
+
+            //     double relativex  = Math.abs(transform.getX()); // left+ right+
+            //     double relativey  = (speakerIsOnRight ? -1 : 1) * transform.getY(); // forward backward
+            //     double relativexv = (speakerIsOnRight ? 1 : -1) * state.getvx(); // speaker relative towards+ away-
+            //     double relativeyv = (speakerIsOnRight ? -1 : 1) * state.getvy(); // speaker relative left- right+
+                
+            //     double n = relativex * rootg / roottwoh - relativexv;
+
+            //     double desiredYaw = -Math.atan(- ((rootg * relativey) / roottwoh + relativeyv) / n); // CCW+, facing speaker = 0
+            //     if (!speakerIsOnRight) desiredYaw += Math.PI; // flip it around
+
+            //     SmartDashboard.putNumber("Kinesthetics yaw", k.getPose().getRotation().getDegrees());
+            //     SmartDashboard.putNumber("Speaker absolute theta", Units.radiansToDegrees(desiredYaw)); // CCW+, 0 = North
+
+            //     latestYaw = desiredYaw;
+            //     return desiredYaw;
+            // }),
+            new SequentialCommandGroup(
+                new ParallelDeadlineGroup(new WaitCommand(timeout), sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(k).toTranslation2d().getNorm()), 350d, 250d), false)),
+                new ParallelDeadlineGroup(new WaitCommand(0.1), n.new ChangeNeck(k, SpinState.FW)))
+                //new ParallelCommandGroup(sh. new ChangeState(() -> Constants.Shooter.idleCommand, false, true), n.new ChangeNeck(SpinState.ST)))
         );
     }
 

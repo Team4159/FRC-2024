@@ -2,7 +2,9 @@ package frc.robot;
 
 import choreo.Choreo;
 import choreo.auto.AutoFactory;
-import choreo.auto.AutoFactory.ChoreoAutoBindings;
+import choreo.auto.AutoFactory.AutoBindings;
+import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -24,24 +26,33 @@ public class RobotContainer {
     /* Controllers */
     private static final Joystick driver = new Joystick(0);
     private static final Joystick secondary = new Joystick(1);
+    private static final XboxController backupController = new XboxController(2);
 
     /* Driver Buttons */
-    private static final JoystickButton lookupTableShoot = new JoystickButton(driver, 5);
-    private static final JoystickButton resetGyro = new JoystickButton(driver, 4);
+    private static final JoystickButton lookupTableShoot = new JoystickButton(driver, 2);
+    private static final Trigger manualIntakeDown = new JoystickButton(driver, 3)
+                                                .or(new JoystickButton(secondary, 2))
+                                                .or(new JoystickButton(backupController, 6));
     private static final JoystickButton forceVision = new JoystickButton(driver, 9);
+    private static final JoystickButton resetGyro = new JoystickButton(driver, 4);
 
-    private static final JoystickButton manualAmp = new JoystickButton(secondary, 3);
+    private static final Trigger manualAmp = new JoystickButton(secondary, 3)
+                                                .or(new JoystickButton(backupController, 2));
     private static final JoystickButton manualShootSubwoofer = new JoystickButton(secondary, 4);
-    private static final JoystickButton manualShootPodium = new JoystickButton(secondary, 5);
+    private static final Trigger manualShootPodium = new JoystickButton(secondary, 5)
+                                                 .or(new JoystickButton(backupController, 1));
     private static final JoystickButton manualShootSourceIn = new JoystickButton(secondary, 6);
     private static final JoystickButton manualIntakeUp = new JoystickButton(secondary, 7);
-    private static final JoystickButton manualIntakeDown = new JoystickButton(secondary, 2);
+    //private static final JoystickButton manualIntakeDown = new JoystickButton(secondary, 2);
     private static final JoystickButton manualOuttakeUp = new JoystickButton(secondary, 11);
     private static final JoystickButton manualOuttakeDown = new JoystickButton(secondary, 10);
-    private static final JoystickButton manualClimberUp = new JoystickButton(secondary, 8);
-    private static final JoystickButton manualClimberDown = new JoystickButton(secondary, 9);
+    private static final Trigger manualClimberUp = new JoystickButton(secondary, 8)
+                                               .or(new JoystickButton(backupController, 4));
+    private static final Trigger manualClimberDown = new JoystickButton(secondary, 9)
+                                                 .or(new JoystickButton(backupController, 3));
     private static final Trigger manualFeed = new JoystickButton(driver, 1)
-                                          .or(new JoystickButton(secondary, 1));
+                                          .or(new JoystickButton(secondary, 1))
+                                          .or(new JoystickButton(backupController, 5));
 
     //private static final JoystickButton autoAmp = new JoystickButton(driver, 4);
     //private static final JoystickButton autoSpk = new JoystickButton(driver, 3);
@@ -62,17 +73,19 @@ public class RobotContainer {
 
     private final SendableChooser<String> autoChooser;
 
+    private AutoBindings autoBindings = createAutoBindings();
+
     private AutoFactory factory = Choreo.createAutoFactory(
         s_Swerve,
         kinesthetics::getPose,
-        Constants.Swerve.AutoConfig.choreoController,
-        (ChassisSpeeds speeds) -> { // needs to be robot-relative
-            ChassisSpeeds reversedChassisSpeeds = new ChassisSpeeds(-speeds.vxMetersPerSecond, -speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
+        (Pose2d curPose, SwerveSample samples) -> { // needs to be robot-relative
+            ChassisSpeeds speeds = Constants.Swerve.AutoConfig.getChassisSpeeds(curPose, samples);
+            ChassisSpeeds reversedChassisSpeeds = new ChassisSpeeds(-speeds.vxMetersPerSecond, -speeds.vyMetersPerSecond, -speeds.omegaRadiansPerSecond);
             SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(reversedChassisSpeeds);
             s_Swerve.setModuleStates(swerveModuleStates, false);
         },
         ()->{var ally = DriverStation.getAlliance(); return ally.isPresent() && ally.get().equals(Alliance.Red);},
-        new ChoreoAutoBindings() // not useful until event markers
+        new AutoBindings() // not useful until event markers
     );
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -92,6 +105,12 @@ public class RobotContainer {
 
         autoChooser = getCommandChooser();
         SmartDashboard.putData("Autonomous Routine", autoChooser);
+    }
+
+    private AutoBindings createAutoBindings(){
+        AutoBindings autoBindings = new AutoFactory.AutoBindings();
+        autoBindings.bind("LookupTable", new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, s_Neck, null, null));
+        return autoBindings;
     }
 
     private SendableChooser<String> getCommandChooser(){
@@ -161,7 +180,7 @@ public class RobotContainer {
             ));
         lookupTableShoot 
             .onTrue(s_Neck.new ChangeNeck(SpinState.ST))
-            .whileTrue(new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, () -> 0, () -> 0))
+            .whileTrue(new SpeakerLookupTable(kinesthetics, s_Swerve, s_Shooter, s_Neck, () -> 0, () -> 0))
             .onFalse(new SequentialCommandGroup(
                 s_Neck.new ChangeNeck(SpinState.ST),
                 s_Shooter.stopShooter()
@@ -221,6 +240,10 @@ public class RobotContainer {
         );
     }
     public Command getAutonomousCommand() {
-        return AutoPaths.autoMap.get(autoChooser.getSelected()).getCommand(factory, kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake);
+        System.out.println("getAutonomousCommand");
+        if(autoChooser.getSelected() != null){
+            return AutoPaths.autoMap.get(autoChooser.getSelected()).getCommand(factory, kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake);
+        }
+        return new PrintCommand("No auto selected");
     }
 }

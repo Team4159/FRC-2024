@@ -32,8 +32,6 @@ public class Shooter extends SubsystemBase {
         shooterMLeftController = new CANSparkFlex(Constants.Shooter.shooterMLeftID, MotorType.kBrushless);
         shooterMRightController= new CANSparkFlex(Constants.Shooter.shooterMRightID,MotorType.kBrushless);
         shooterMRightController.setInverted(true);
-        
-        Constants.Shooter.pitchOffset = angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition() - Units.radiansToRotations(Constants.Shooter.minimumPitch) - 0.00041;
 
         var canvas = new Mechanism2d(400, 400);
         mechanism = new MechanismLigament2d("Shooter", 100, Units.radiansToDegrees(getPitch()), 10, new Color8Bit(255, 64, 64));
@@ -52,7 +50,6 @@ public class Shooter extends SubsystemBase {
         SmartDashboard.putNumber("current L spin", getLSpin());
         SmartDashboard.putNumber("desired R spin", desiredRSpin);
         SmartDashboard.putNumber("current R spin", getRSpin());
-        SmartDashboard.putNumber("desired pitch", desiredPitch);
         mechanism.setAngle(Units.radiansToDegrees(getPitch()));
         angleMotorController.set(
             Constants.Shooter.shooterPID.calculate(getPitch(), desiredPitch)
@@ -62,7 +59,7 @@ public class Shooter extends SubsystemBase {
 
     /** @return radians */
     public double getPitch() {
-        return Units.rotationsToRadians(angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition() - Constants.Shooter.pitchOffset);
+        return Units.rotationsToRadians(angleMotorController.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle).getPosition());
     }
 
     private double desiredPitch = Constants.Shooter.minimumPitch;
@@ -91,9 +88,10 @@ public class Shooter extends SubsystemBase {
      * */
     private void setGoalSpin(double goalLSpin, double goalRSpin) {
         shooterMLeftController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalLSpin), CANSparkBase.ControlType.kSmartVelocity);
-        shooterMRightController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalRSpin), CANSparkBase.ControlType.kSmartVelocity);  
+        shooterMRightController.getPIDController().setReference(Conversions.RadiansPSToRPM(goalRSpin), CANSparkBase.ControlType.kSmartVelocity);
+        desiredLSpin = goalLSpin;
+        desiredRSpin = goalRSpin;
     }
-
     public ChangeState stopShooter() {
         return new ChangeState(Constants.Shooter.idleCommand);
     }
