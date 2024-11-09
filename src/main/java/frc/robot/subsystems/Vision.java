@@ -19,13 +19,13 @@ public class Vision extends SubsystemBase {
     private static final NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
     private static final NetworkTable rpiTable = NetworkTableInstance.getDefault().getTable("raspberrypi");
 
-    private Kinesthetics kinesthetics;
+    private CommandSwerveDrivetrain swerve;
     private final GenericEntry isSingleTarget;
 
     private static final Field2d field = new Field2d(); 
 
-    public Vision(Kinesthetics k) {
-        this.kinesthetics = k;
+    public Vision(CommandSwerveDrivetrain s) {
+        this.swerve = s;
 
         var table = Shuffleboard.getTab("Vision");
 
@@ -35,7 +35,7 @@ public class Vision extends SubsystemBase {
         table.addDouble("LL Error", () -> {
             var v = Vision.getLimelightData();
             if (v == null) return -1d;
-            return kinesthetics.getPose().getTranslation().getDistance(v.pose().getTranslation().toTranslation2d());
+            return swerve.getPose().getTranslation().getDistance(v.pose().getTranslation().toTranslation2d());
         });
         table.addBoolean("Note Seen", () -> limelightTable.getEntry("notetrans").exists());
         table.add("Vision Field", field);

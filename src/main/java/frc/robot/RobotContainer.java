@@ -1,9 +1,13 @@
 package frc.robot;
 
+import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+
 import choreo.Choreo;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoFactory.AutoBindings;
 import choreo.trajectory.SwerveSample;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -20,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Intake.IntakeState;
 import frc.robot.Constants.SpinState;
 import frc.robot.commands.*;
+import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.*;
 
 public class RobotContainer {
@@ -59,7 +64,7 @@ public class RobotContainer {
     private static final JoystickButton autoIntake = new JoystickButton(driver, 2);
     
     /* Subsystems */
-    private final Swerve s_Swerve = new Swerve();
+    private final CommandSwerveDrivetrain s_Swerve = TunerConstants.DriveTrain;
     private final Shooter s_Shooter = new Shooter();
     private final Neck s_Neck = new Neck();
     private final Intake s_Intake = new Intake();
@@ -68,8 +73,15 @@ public class RobotContainer {
 
     private final Kinesthetics kinesthetics = new Kinesthetics(s_Swerve);
     @SuppressWarnings("unused")
-    private final Vision s_Vision = new Vision(kinesthetics);
+    private final Vision s_Vision = new Vision(s_Swerve);
 
+    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+      .withDeadband(Constants.Swerve.maxSpeed * 0.1).withRotationalDeadband(Constants.Swerve.maxAngularVelocity * 0.1) // Add a 10% deadband
+      .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // I want field-centric
+                                                               // driving in open loop
+    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+    private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+    private final Telemetry logger = new Telemetry(Constants.Swerve.maxSpeed);
 
     private final SendableChooser<String> autoChooser;
 
@@ -77,12 +89,9 @@ public class RobotContainer {
 
     private AutoFactory factory = Choreo.createAutoFactory(
         s_Swerve,
-        kinesthetics::getPose,
+        s_Swerve::getPose,
         (Pose2d curPose, SwerveSample samples) -> { // needs to be robot-relative
-            ChassisSpeeds speeds = Constants.Swerve.AutoConfig.getChassisSpeeds(curPose, samples);
-            ChassisSpeeds reversedChassisSpeeds = new ChassisSpeeds(-speeds.vxMetersPerSecond, -speeds.vyMetersPerSecond, -speeds.omegaRadiansPerSecond);
-            SwerveModuleState[] swerveModuleStates = Constants.Swerve.swerveKinematics.toSwerveModuleStates(reversedChassisSpeeds);
-            s_Swerve.setModuleStates(swerveModuleStates, false);
+            s_Swerve.followPath(curPose, samples);
         },
         ()->{var ally = DriverStation.getAlliance(); return ally.isPresent() && ally.get().equals(Alliance.Red);},
         new AutoBindings() // not useful until event markers
@@ -91,12 +100,10 @@ public class RobotContainer {
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         s_Swerve.setDefaultCommand(
-            new SwerveManual(
-                s_Swerve, 
-                () -> -driver.getY(), 
-                () -> -driver.getX(), 
-                () -> driver.getZ(), 
-                () -> false
+            s_Swerve.applyRequest(() -> drive.withVelocityX(MathUtil.applyDeadband(-driver.getY() * Constants.Swerve.maxSpeed, Constants.stickDeadband)) // Drive forward with
+                                                                                           // negative Y (forward)
+            .withVelocityY(MathUtil.applyDeadband(-driver.getX() * Constants.Swerve.maxSpeed, Constants.stickDeadband)) // Drive left with negative X (left)
+            .withRotationalRate(MathUtil.applyDeadband(-driver.getZ() * Constants.Swerve.maxSpeed, Constants.stickDeadband)) // Drive counterclockwise with negative X (left)
             )
         );
 
@@ -131,8 +138,8 @@ public class RobotContainer {
         DriverStation.silenceJoystickConnectionWarning(true);
 
         /* Driver Buttons */
-        resetGyro.onTrue(new InstantCommand(s_Swerve::setAngleOffset));
-        forceVision.onTrue(new InstantCommand(kinesthetics::forceVision));
+        resetGyro.onTrue(s_Swerve.runOnce(() -> s_Swerve.seedFieldRelative()));
+        //forceVision.onTrue(new InstantCommand(kinesthetics::forceVision));
 
         // Automatic Command Groups
         // autoSpk.and(kinesthetics::shooterHasNote).and(() -> SpeakerAutoAim.isInRange(kinesthetics))
@@ -148,7 +155,7 @@ public class RobotContainer {
         //         s_Neck.new ChangeNeck(kinesthetics, SpinState.FW)
         //     )).onFalse(s_Neck.new ChangeNeck(SpinState.ST));
         autoIntake.and(() -> !kinesthetics.shooterHasNote()).and(() -> IntakeAuto.canRun(kinesthetics))
-            .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake))
+            .whileTrue(new IntakeAuto(kinesthetics, s_Shooter, s_Neck, s_Intake))
             .onFalse(new ParallelCommandGroup(
                 s_Neck.new ChangeNeck(SpinState.ST),
                 s_Intake.new ChangeState(IntakeState.STOW)
@@ -207,7 +214,7 @@ public class RobotContainer {
                 s_Intake.new ChangeState(IntakeState.STOW) 
             ));
         manualIntakeDown
-            .whileTrue(new IntakeAuto(kinesthetics, s_Swerve, s_Shooter, s_Neck, s_Intake, true))
+            .whileTrue(new IntakeAuto(kinesthetics, s_Shooter, s_Neck, s_Intake, true))
             .onFalse(new ParallelCommandGroup(
                 s_Intake.new ChangeState(IntakeState.STOW),
                 s_Neck.new ChangeNeck(SpinState.ST)
@@ -231,6 +238,7 @@ public class RobotContainer {
             .whileTrue(s_Climber.new ChangeState(SpinState.FW));
         manualClimberDown
             .whileTrue(s_Climber.new ChangeState(SpinState.BW));
+        s_Swerve.registerTelemetry(logger::telemeterize);
     }
 
     public Command getTeleopInit() {

@@ -35,24 +35,14 @@ public class SwerveModule {
 
     private final VelocityVoltage driveVelocity = new VelocityVoltage(0);
 
-    private TalonFXSimState driveSimState;
-
     private final FlywheelSim driveSim = new FlywheelSim(DCMotor.getKrakenX60(1), Constants.Swerve.driveGearRatio, 0.025);
 
     /* angle motor control requests */
     private final PositionVoltage anglePosition = new PositionVoltage(0);
 
-    private TalonFXSimState angleSimState;
-
-    private FlywheelSim angleSim = new FlywheelSim(DCMotor.getKrakenX60(1), Constants.Swerve.angleGearRatio, 0.004);
+    private final FlywheelSim angleSim = new FlywheelSim(DCMotor.getKrakenX60(1), Constants.Swerve.angleGearRatio, 0.004);
 
     private boolean simulation;
-
-    private final DCMotorSim driveMotorSimModel =
-    new DCMotorSim(DCMotor.getKrakenX60Foc(1), Constants.Swerve.driveGearRatio, 0.001);
-
-    private final DCMotorSim angleMotorSimModel =
-    new DCMotorSim(DCMotor.getKrakenX60Foc(1), Constants.Swerve.angleGearRatio, 0.001);
 
     public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants){
         simulation = RobotBase.isSimulation();
@@ -74,13 +64,6 @@ public class SwerveModule {
         mDriveMotor.getConfigurator().apply(Robot.ctreConfigs.swerveDriveFXConfig);
         mDriveMotor.getConfigurator().setPosition(0.0);
         driveVelocity.UpdateFreqHz = 50;
-        if(simulation){
-            driveSimState = mDriveMotor.getSimState();
-            angleSimState = mAngleMotor.getSimState();
-
-            driveSimState.setSupplyVoltage(12.5);
-            angleSimState.setSupplyVoltage(12.5);
-        }
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop){
@@ -118,40 +101,6 @@ public class SwerveModule {
             driveSim.setInputVoltage(mDriveMotor.getMotorVoltage().getValueAsDouble());
             angleSim.setInputVoltage(mAngleMotor.getMotorVoltage().getValueAsDouble());
             angleSimPosition = angleSim.getAngularVelocityRPM()*updateTime/60;
-
-
-            var dMotorVoltage = driveSimState.getMotorVoltage();
-
-            // use the motor voltage to calculate new position and velocity
-            // using WPILib's DCMotorSim class for physics simulation
-            driveMotorSimModel.setInputVoltage(dMotorVoltage);
-            driveMotorSimModel.update(0.020); // assume 20 ms loop time
-
-            // apply the new rotor position and velocity to the TalonFX;
-            // note that this is rotor position/velocity (before gear ratio), but
-            // DCMotorSim returns mechanism position/velocity (after gear ratio)
-            driveSimState.setRawRotorPosition(
-                Constants.Swerve.driveGearRatio * driveMotorSimModel.getAngularPositionRotations()
-            );
-            driveSimState.setRotorVelocity(
-                Constants.Swerve.driveGearRatio * Units.radiansToRotations(driveMotorSimModel.getAngularVelocityRadPerSec())
-            );
-            var aMotorVoltage = angleSimState.getMotorVoltage();
-
-            // use the motor voltage to calculate new position and velocity
-            // using WPILib's DCMotorSim class for physics simulation
-            angleMotorSimModel.setInputVoltage(aMotorVoltage);
-            angleMotorSimModel.update(0.020); // assume 20 ms loop time
-
-            // apply the new rotor position and velocity to the TalonFX;
-            // note that this is rotor position/velocity (before gear ratio), but
-            // DCMotorSim returns mechanism position/velocity (after gear ratio)
-            angleSimState.setRawRotorPosition(
-                Constants.Swerve.angleGearRatio * angleMotorSimModel.getAngularPositionRotations()
-            );
-            angleSimState.setRotorVelocity(
-                Constants.Swerve.angleGearRatio * Units.radiansToRotations(angleMotorSimModel.getAngularVelocityRadPerSec())
-            );
         }
         return new SwerveModuleState(
             Conversions.RPSToMPS(driveSim.getAngularVelocityRPM()/60, Constants.Swerve.wheelCircumference), 

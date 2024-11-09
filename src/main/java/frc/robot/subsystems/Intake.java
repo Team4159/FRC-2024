@@ -52,7 +52,14 @@ public class Intake extends SubsystemBase {
 
     public class ChangeState extends Command {
         private final Constants.Intake.IntakeState desiredState;
-        private boolean continuous;
+        private boolean continuous, instant;
+
+        public ChangeState(Constants.Intake.IntakeState ds, boolean cont, boolean instant) {
+            desiredState = ds;
+            continuous = cont;
+            this.instant = instant;
+            addRequirements(Intake.this);
+        }
 
         public ChangeState(Constants.Intake.IntakeState ds, boolean cont) {
             desiredState = ds;
@@ -73,12 +80,8 @@ public class Intake extends SubsystemBase {
         }
 
         @Override
-        public void execute(){
-            System.out.println(desiredState.spin);
-        }
-
-        @Override
         public boolean isFinished() {
+            if(instant) return true;
             return MathUtil.isNear(desiredState.pitch, getPitch(), Constants.Intake.pitchTolerance) &&
                 MathUtil.isNear(desiredState.spin.multiplier * Constants.Intake.intakeSpin, getSpin(), Constants.Intake.spinTolerance);
         }

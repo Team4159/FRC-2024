@@ -109,9 +109,9 @@ public final class Constants {
                     kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
 
             //Choreo PID controllers
-            public static final PIDController xController = new PIDController(5, 0, 0);
-            public static final PIDController yController = new PIDController(5, 0, 0);
-            public static final PIDController thetaController = new PIDController(5, 0, 0){{
+            public static final PIDController xController = new PIDController(1, 0, 0);
+            public static final PIDController yController = new PIDController(1, 0, 0);
+            public static final PIDController thetaController = new PIDController(1, 0, 0){{
                 enableContinuousInput(-Math.PI, Math.PI);
             }};
 
@@ -136,7 +136,7 @@ public final class Constants {
             public static final int driveMotorID = 1;
             public static final int angleMotorID = 2;
             public static final int canCoderID = 1;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-55.5);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-54.8);
 
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -147,7 +147,7 @@ public final class Constants {
             public static final int driveMotorID = 3;
             public static final int angleMotorID = 4;
             public static final int canCoderID = 2;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-70); 
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-70.6); 
 
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -158,7 +158,7 @@ public final class Constants {
             public static final int driveMotorID = 5;
             public static final int angleMotorID = 6;
             public static final int canCoderID = 3;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-16.5);
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(-16.1);
 
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -169,7 +169,7 @@ public final class Constants {
             public static final int driveMotorID = 7;
             public static final int angleMotorID = 8;
             public static final int canCoderID = 4;
-            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(55.3); 
+            public static final Rotation2d angleOffset = Rotation2d.fromDegrees(61.6); 
 
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
@@ -232,7 +232,7 @@ public final class Constants {
         public static final double minimumPitch = Units.degreesToRadians(14);
         public static final double maximumPitch = Units.rotationsToRadians(0.2);
         public static final double neckSpeed = 0.60; // -1 to 1
-        public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 150d);//spin 150d
+        public static final ShooterCommand idleCommand = new ShooterCommand(minimumPitch, 0d);//spin 150d
         
         /** @param shooterSpinFF kS radians / second, kV radians / second per meter / second */
         public static final SimpleMotorFeedforward shooterSpinFF = new SimpleMotorFeedforward(-41.57843503917089, 28.371771957538527);

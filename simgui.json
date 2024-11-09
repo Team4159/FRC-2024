@@ -20,18 +20,40 @@
         "header": {
           "open": true
         }
+      },
+      "Talon FX (v6)[4]/Fwd Limit": {
+        "header": {
+          "open": true
+        }
       }
     }
   },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/Pose": "Field2d",
+      "/Shuffleboard/Kinesthetics/Field": "Field2d",
       "/Shuffleboard/Kinesthetics/Pose Estimation": "Field2d",
       "/Shuffleboard/Kinesthetics/Shooter": "Mechanism2d",
       "/Shuffleboard/Vision/Vision Field": "Field2d",
-      "/SmartDashboard/Autonomous Routine": "String Chooser"
+      "/SmartDashboard/Autonomous Routine": "String Chooser",
+      "/SmartDashboard/Module 0": "Mechanism2d",
+      "/SmartDashboard/Module 1": "Mechanism2d",
+      "/SmartDashboard/Module 2": "Mechanism2d",
+      "/SmartDashboard/Module 3": "Mechanism2d"
     },
     "windows": {
+      "/Pose": {
+        "bottom": 1476,
+        "height": 8.210550308227539,
+        "left": 150,
+        "right": 2961,
+        "top": 79,
+        "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
+      },
       "/Shuffleboard/Kinesthetics/Pose Estimation": {
         "bottom": 1476,
         "height": 8.210550308227539,
@@ -46,6 +68,18 @@
     }
   },
   "NetworkTables Info": {
+    "Clients": {
+      "open": true
+    },
+    "Server": {
+      "Publishers": {
+        "open": true
+      },
+      "Subscribers": {
+        "open": true
+      },
+      "open": true
+    },
     "visible": true
   }
 }
