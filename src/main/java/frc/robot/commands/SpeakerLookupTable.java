@@ -120,12 +120,12 @@ public class SpeakerLookupTable extends ParallelCommandGroup {
             //     latestYaw = desiredYaw;
             //     return desiredYaw;
             // }),
-            sw.new ChangeYaw(() -> getDifference(sw).toTranslation2d().getAngle().getRadians() + Math.PI, translationSup, strafeSup),
+            sw.new ChangeYaw(() -> getDifference(sw).toTranslation2d().getAngle().getRadians() + Math.PI, translationSup, strafeSup).withTimeout(timeout),
             new SequentialCommandGroup(
                 sh.new ChangeState(() -> new ShooterCommand(bestPitch(getDifference(sw).toTranslation2d().getNorm()), 350d, 250d), false).withTimeout(2.0)),
-                n.new ChangeNeck(SpinState.FW),
-                new WaitUntilCommand(() -> !k.shooterHasNote()),
-                new ParallelCommandGroup(sh. new ChangeState(Constants.Shooter.idleCommand), n.new ChangeNeck(SpinState.ST))
+                n.new ChangeNeck(SpinState.FW).withTimeout(0.1),
+                new WaitUntilCommand(() -> !k.shooterHasNote())
+                //new ParallelCommandGroup(sh. new ChangeState(Constants.Shooter.idleCommand), n.new ChangeNeck(SpinState.ST))
         );
     }
 

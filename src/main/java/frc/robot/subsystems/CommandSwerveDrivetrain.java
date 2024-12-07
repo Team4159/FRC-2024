@@ -1,11 +1,9 @@
 package frc.robot.subsystems;
 
-import java.lang.reflect.Field;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
@@ -18,8 +16,8 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -33,7 +31,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
-import frc.robot.generated.TunerConstants;
 
 /**
  * Class that extends the Phoenix SwerveDrivetrain class and implements
@@ -54,9 +51,9 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     private boolean hasAppliedOperatorPerspective = false;
 
     private final ApplyChassisSpeeds m_pathApplyChassisSpeeds = new ApplyChassisSpeeds();
-    private final PIDController m_pathXController = new PIDController(1, 0, 0);
-    private final PIDController m_pathYController = new PIDController(1, 0, 0);
-    private final PIDController m_pathThetaController = new PIDController(1, 0, 0);
+    private final PIDController m_pathXController = new PIDController(10, 0, 0);
+    private final PIDController m_pathYController = new PIDController(10, 0, 0);
+    private final PIDController m_pathThetaController = new PIDController(7, 0, 0);
 
     public CommandSwerveDrivetrain(SwerveDrivetrainConstants driveTrainConstants, double OdometryUpdateFrequency, SwerveModuleConstants... modules) {
         super(driveTrainConstants, OdometryUpdateFrequency, modules);
@@ -98,7 +95,7 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
 
     public void followPath(Pose2d pose, SwerveSample sample) {
         m_pathThetaController.enableContinuousInput(-Math.PI, Math.PI);
-
+        
         var targetSpeeds = sample.getChassisSpeeds();
         targetSpeeds.vxMetersPerSecond = targetSpeeds.vxMetersPerSecond + m_pathXController.calculate(
             pose.getX(), sample.x
@@ -110,8 +107,10 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             pose.getRotation().getRadians(), sample.heading
         );
 
+        var robotRelativeSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(targetSpeeds, new Rotation2d(pose.getRotation().getRadians()));
+
         setControl(
-            m_pathApplyChassisSpeeds.withSpeeds(targetSpeeds)
+            m_pathApplyChassisSpeeds.withSpeeds(robotRelativeSpeeds)
         );
     }
 
@@ -124,11 +123,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
     }
 
     public void setPose(Pose2d pose) {
-        double angle = 0;
-        if(DriverStation.getAlliance().orElse(null) == Alliance.Red){
-            angle = Math.PI;
+        Transform2d alloffset = new Transform2d();
+        if(DriverStation.getAlliance().equals(Alliance.Red)){
+            alloffset = new Transform2d(0, 0, new Rotation2d(Math.PI));
         }
-        m_odometry.resetPosition(m_pigeon2.getRotation2d(), m_modulePositions, pose);
+        m_odometry.resetPosition(m_pigeon2.getRotation2d(), m_modulePositions, pose.plus(alloffset));
         //s_Swerve.setAngleOffset(angle - pose.getRotation().getRadians());
     }
 
@@ -164,6 +163,19 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
         }
         field.setRobotPose(getPose());
     }
+
+    public void seedFieldRelative() {
+        Rotation2d allOffset = new Rotation2d();
+        if(DriverStation.getAlliance().equals(Alliance.Red)) allOffset = new Rotation2d(Math.PI);
+        try {
+            m_stateLock.writeLock().lock();
+
+            m_fieldRelativeOffset = getState().Pose.getRotation().plus(allOffset);
+        } finally {
+            m_stateLock.writeLock().unlock();
+        }
+    }
+
     public class ChangeYaw extends Command{
         DoubleSupplier desiredYaw;
         DoubleSupplier desiredTranslation;

@@ -40,7 +40,7 @@ public class AutoPaths {
         "AMP-5notecleanupfar", (autoFactory, kinesthetics, swerve, shooter, neck , intake) -> AMP5notecleanupfar(autoFactory, kinesthetics, swerve, shooter, neck, intake),
         "AMP-3.5notefar", (autoFactory, kinesthetics, swerve, shooter, neck , intake) -> AMP3notefar(autoFactory, kinesthetics, swerve, shooter, neck, intake),
         //"setPoseAmp", (autoFactory, kinesthetics, swerve, shooter, neck , intake) -> setposeamp(autoFactory, kinesthetics, swerve, shooter, neck, intake),
-        "spintest", (autoFactory, kinesthetics, swerve, shooter, neck , intake) -> spintest(autoFactory, kinesthetics, swerve, shooter, neck, intake)
+        "spintest", (autoFactory, kinesthetics, swerve, shooter, neck , intake) -> testpath(autoFactory, kinesthetics, swerve, shooter, neck, intake)
     );
     public static Command betterTestAuto(AutoFactory factory, Kinesthetics kinesthetics, CommandSwerveDrivetrain swerve, Shooter shooter, Neck neck, Intake intake){
         final AutoLoop loop = factory.newLoop("betterTestAuto");
@@ -277,7 +277,7 @@ public class AutoPaths {
         ));
         return loop.cmd();
     }
-    public static Command spintest(AutoFactory factory, Kinesthetics kinesthetics, CommandSwerveDrivetrain swerve, Shooter shooter, Neck neck, Intake intake){
+    public static Command testpath(AutoFactory factory, Kinesthetics kinesthetics, CommandSwerveDrivetrain swerve, Shooter shooter, Neck neck, Intake intake){
         final AutoLoop loop = factory.newLoop("betterTestAuto");
         final AutoTrajectory traj = factory.trajectory("spintest.traj", loop);
 
@@ -286,6 +286,9 @@ public class AutoPaths {
         loop.enabled().onTrue(new InstantCommand(() -> swerve.setPose(startingPose))
         .andThen(
             traj.cmd()
+        )
+        .andThen(
+            swerve.runOnce(() -> swerve.setPose(traj.getFinalPose().orElse(new Pose2d())))
         ));
         return loop.cmd();
     }
